@@ -128,7 +128,7 @@ const navItems: NavItem[] = [
   {
     title: 'MachineRegister',
     path: 'machine',
-    icon: 'typcn:vendor-android',
+    icon: 'streamline-cyber:virtual-machine-3',
     active: true,
     collapsible: false,
   },

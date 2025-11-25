@@ -21,6 +21,7 @@ import {
 } from "@mui/material";
 
 import IconifyIcon from "components/base/IconifyIcon";
+
 import './MachineRegister.css'
 
 // Vendor type (for linking)
