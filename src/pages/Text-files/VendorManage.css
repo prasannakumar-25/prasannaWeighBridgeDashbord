@@ -1,0 +1,287 @@
+/* --- Global Variables & Resets --- */
+:root {
+  --primary-color: #1976d2;
+  --bg-color: #f4f6f8;
+  --card-bg: #ffffff;
+  --text-primary: #212b36;
+  --text-secondary: #637381;
+  --border-color: #e0e0e0;
+  --success-color: #229a16;
+  --success-bg: rgba(34, 154, 22, 0.16);
+  --error-color: #b72136;
+  --error-bg: rgba(183, 33, 54, 0.16);
+  --shadow-card: 0 0 2px 0 rgba(145, 158, 171, 0.2), 0 12px 24px -4px rgba(145, 158, 171, 0.12);
+  --radius-md: 12px;
+  --radius-sm: 8px;
+}
+
+.vm-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--bg-color);
+  padding: 20px;
+  font-family: "Public Sans", sans-serif;
+}
+
+/* --- Header Section --- */
+.vm-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.vm-title {
+  font-weight: 700 !important;
+  color: var(--text-primary);
+}
+
+.vm-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.add-vendor-btn {
+  text-transform: none !important;
+  font-weight: 600 !important;
+  border-radius: var(--radius-sm) !important;
+  padding: 8px 20px !important;
+  box-shadow: none !important;
+}
+
+/* --- Mobile View Toggles --- */
+.vm-view-toggles {
+  display: none; /* Hidden by default on Desktop */
+  background-color: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+}
+
+.vm-view-toggles button {
+  color: var(--text-secondary);
+}
+
+.vm-view-toggles button.active-toggle {
+  color: var(--primary-color);
+  background-color: rgba(25, 118, 210, 0.08);
+}
+
+/* --- Table Styles (Desktop) --- */
+.vm-table-container {
+  background-color: var(--card-bg);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  overflow-x: auto;
+}
+
+.vm-table thead th {
+  background-color: #f4f6f8;
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.vm-table tbody td {
+  border-bottom: 1px solid rgba(224, 224, 224, 0.5);
+  padding: 16px;
+  color: var(--text-primary);
+}
+
+.vm-link {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+.vm-link:hover {
+  text-decoration: underline;
+}
+
+/* Action Buttons in Table */
+.action-btn {
+  color: var(--text-secondary) !important;
+}
+.action-btn.edit:hover {
+  color: var(--primary-color) !important;
+  background-color: rgba(25, 118, 210, 0.08) !important;
+}
+.action-btn.delete:hover {
+  color: var(--error-color) !important;
+  background-color: rgba(183, 33, 54, 0.08) !important;
+}
+
+/* --- Status Badges --- */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.status-badge.active {
+  color: var(--success-color);
+  background-color: var(--success-bg);
+}
+
+.status-badge.inactive {
+  color: var(--text-secondary);
+  background-color: rgba(145, 158, 171, 0.16);
+}
+
+/* --- Mobile Card View --- */
+.vm-card-grid {
+  padding-bottom: 20px;
+}
+
+.vm-mobile-card {
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-card) !important;
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.card-title {
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+}
+
+.card-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-secondary);
+}
+
+.card-icon {
+  font-size: 18px;
+  color: var(--primary-color);
+}
+
+.card-actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+/* --- Drawer (Sidebar Form) --- */
+.vm-drawer-paper {
+  width: 500px;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.drawer-header {
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.drawer-content {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.form-section-title {
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.5px;
+}
+
+.form-error {
+  background-color: var(--error-bg);
+  color: var(--error-color);
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+  font-size: 0.875rem;
+}
+
+.drawer-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  background-color: #fff;
+}
+
+/* --- Responsive Queries --- */
+
+/* Small Mobile (XS) */
+@media (max-width: 599px) {
+  .vm-root {
+    padding: 12px;
+  }
+  
+  .vm-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .vm-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .vm-view-toggles {
+    display: flex; /* Show toggles on mobile */
+  }
+
+  .hidden-on-mobile {
+    display: none;
+  }
+
+  .vm-drawer-paper {
+    width: 100% !important;
+  }
+}
+
+/* Tablet (SM) */
+@media (min-width: 600px) and (max-width: 899px) {
+  .vm-view-toggles {
+    display: flex; /* Show toggles on tablet too */
+  }
+  
+  .hidden-on-mobile {
+    display: none;
+  }
+}
+
+/* Desktop (MD+) */
+@media (min-width: 900px) {
+  .vm-card-grid {
+    display: none; /* Hide card grid on large screens, enforce table */
+  }
+  
+  .vm-table-wrapper {
+    display: block !important;
+  }
+}
