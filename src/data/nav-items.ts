@@ -135,7 +135,7 @@ const navItems: NavItem[] = [
   {
     title: 'UserAuthendication',
     path: 'uesr',
-    icon: 'fa-solid:user-tie',
+    icon: 'mdi:user-group-outline',
     active: true,
     collapsible: false,
   },

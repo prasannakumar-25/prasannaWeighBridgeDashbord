@@ -15,11 +15,24 @@ const PageLoader = (props: StackOwnProps) => {
             </linearGradient>
           </defs>
         </svg>
-        <CircularProgress
+        {/* <CircularProgress
           size={100}
           thickness={3}
           sx={{ 'svg circle': { stroke: 'url(#my_gradient)' } }}
-        />
+        /> */}
+      <CircularProgress
+        size={90}
+        thickness={3}
+        sx={{
+          color: "transparent",
+          position: "absolute",
+          top: 20,
+          left: 20,
+          "svg circle": { stroke: "#6a11cb" },
+          animation: "rotateCCW 1.5s linear infinite",
+        }}
+      />
+
       </Box>
     </Stack>
   );

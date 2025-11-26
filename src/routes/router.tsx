@@ -79,11 +79,11 @@ const routes: RouteObject[] = [
           {
             path: paths.vendor,
             element: 
-          // <MainLayout>
+          <MainLayout>
               <Suspense fallback={<PageLoader />}>
                 <VendorRegister />
               </Suspense>
-            // </MainLayout>,
+            </MainLayout>,
           },
           
         ],
