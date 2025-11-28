@@ -2,29 +2,27 @@
 .vm-root {
   display: flex;
   width: 100%;
-  margin-top: 0;
-  margin-left: 0;
-  min-height: 100vh;
-  background: #f5f7fb;
-  /* margin-right: 20px;   */
+  margin-top: 4vh !important;
+  margin-left: 10px !important;
+  min-height: 100vh !important;
+  background: #c3d4f8; 
 }
-
-   /* MAIN CONTENT */
 
 .vm-content {
   flex: 3;
   padding: 36px 52px !important;
 }
-  
-   /* HEADER */
 
-.vm-header {
+
+ .vm-header {
   display: flex;
   position: sticky;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 18px;
-}
+} 
+
+
 
 .vm-header h4 {
   font-weight: 700;
@@ -562,7 +560,7 @@
 
 
 
-/* @media print {
+@media print {
   .drawer-header .MuiIconButton-root {
     display: none;
   }
@@ -610,4 +608,4 @@
   .drawer-content::-webkit-scrollbar-thumb:hover {
     background: #757575;
   }
-} */
+}

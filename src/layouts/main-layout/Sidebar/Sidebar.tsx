@@ -28,7 +28,7 @@ const Sidebar = (): ReactElement => {
       sx={{
         overflow: 'hidden',
         margin: { xs: 0, lg: 3.75 },
-        borderRadius: { xs: 0, lg: 5 },
+        borderRadius: { xs: 0, lg: 2 },
         '&:hover': {
           overflowY: 'auto',
         },

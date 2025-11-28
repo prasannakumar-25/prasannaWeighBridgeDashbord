@@ -14,7 +14,7 @@ import IconifyIcon from 'components/base/IconifyIcon';
 import { drawerWidth } from 'layouts/main-layout';
 
 import { useLocation } from 'react-router-dom';
-// import capitalizePathname from 'helpers/capitalize-pathname';
+import capitalizePathname from 'helpers/capitalize-pathname';
 import AccountDropdown from './AccountDropdown';
 import LanguageDropdown from './LanguageDropdown';
 import Image from 'components/base/Image';
@@ -27,18 +27,18 @@ interface TopbarProps {
 
 const Topbar = ({ handleDrawerToggle }: TopbarProps): ReactElement => {
   const { pathname } = useLocation();
-  // const title = capitalizePathname(pathname);
+  const title = capitalizePathname(pathname);
 
   return (
     <AppBar
       sx={{
-        width: { lg: `calc(100% - ${drawerWidth}px + 24px)` },
+        width: { lg: `calc(100% - ${drawerWidth}px + 18px)` },
         ml: { lg: `${drawerWidth}px` },
       }}
     >
       <Toolbar
         sx={{
-          p: 3.75,
+          p: 2.25,
         }}
       >
         <Stack direction="row" gap={1}>
@@ -46,6 +46,7 @@ const Topbar = ({ handleDrawerToggle }: TopbarProps): ReactElement => {
             <IconButton color="inherit" sx={{ p: 0.75, bgcolor: 'inherit' }}>
               <Image src={Acutuz} width={1} height={1} />
             </IconButton>
+            {/* <h1>Acutuz Management Dashboard</h1> */}
           </Link>
           <IconButton
             color="inherit"
@@ -85,7 +86,7 @@ const Topbar = ({ handleDrawerToggle }: TopbarProps): ReactElement => {
           flex={'1 1 auto'}
         >
           <Typography variant="h5" component="h5" className='text-dark' sx={{ color: "#000000" }}>
-            {/* {pathname === '/' ? 'Dashboard' : title} */}
+            {pathname === '/' ? 'Dashboard' : title}
           </Typography>
           <TextField
             variant="outlined"
@@ -103,11 +104,11 @@ const Topbar = ({ handleDrawerToggle }: TopbarProps): ReactElement => {
         </Stack>
         <Stack direction="row" alignItems="center" gap={{ xs: 1, sm: 1.75 }}>
           <LanguageDropdown />
-          <IconButton color="inherit" centerRipple sx={{ bgcolor: 'inherit', p: 0.75 }}>
-            <Badge badgeContent={1} color="primary">
+          {/* <IconButton color="inherit" centerRipple sx={{ bgcolor: 'inherit', p: 0.75 }}>
+            <Badge badgeContent={4} color="primary">
               <IconifyIcon icon="carbon:notification-filled" width={24} height={24} />
             </Badge>
-          </IconButton>
+          </IconButton> */}
           <AccountDropdown />
         </Stack>
       </Toolbar>

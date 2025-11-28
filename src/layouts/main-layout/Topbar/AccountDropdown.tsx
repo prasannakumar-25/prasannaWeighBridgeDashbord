@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import IconifyIcon from 'components/base/IconifyIcon';
 import { MouseEvent, ReactElement, useState } from 'react';
-import profile from 'assets/profile/profile.jpg';
+// import profile from 'assets/profile/profile.jpg';
 
 const AccountDropdown = (): ReactElement => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -39,7 +39,7 @@ const AccountDropdown = (): ReactElement => {
         }}
       >
         <Tooltip title="Aiden Max" placement="top" arrow enterDelay={0} leaveDelay={0}>
-          <Avatar alt="Aiden Max" src={profile} sx={{ width: 45, height: 45 }} />
+          <Avatar alt="Aiden Max" sx={{ width: 35, height: 35 }} />
         </Tooltip>
         <Typography
           variant="body1"
