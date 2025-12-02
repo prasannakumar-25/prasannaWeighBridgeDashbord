@@ -84,11 +84,14 @@ const Topbar = ({ handleDrawerToggle }: TopbarProps): ReactElement => {
           gap={{ lg: 6.25 }}
           alignItems="center"
           flex={'1 1 auto'}
+          justifyContent={'center'}
+          letterSpacing={1}
+          fontWeight={400}
         >
-          <Typography variant="h5" component="h5" className='text-dark' sx={{ color: "#000000" }}>
+          {/* <Typography variant="h5" component="h5" className='text-dark' sx={{ color: "#000000" }}>
             {pathname === '/' ? 'Dashboard' : title}
-          </Typography>
-          <TextField
+          </Typography> */}
+          {/* <TextField
             variant="outlined"
             placeholder="Search..."
             InputProps={{
@@ -100,15 +103,18 @@ const Topbar = ({ handleDrawerToggle }: TopbarProps): ReactElement => {
             }}
             fullWidth
             sx={{ maxWidth: 330 }}
-          />
+          /> */}
+          <Typography variant="h1" component="h1" className='text-dark' sx={{ color: "#303030ff", fontSize: "34px"}}>
+            {pathname === '/' ? 'Dashboard' : title}
+          </Typography>
         </Stack>
         <Stack direction="row" alignItems="center" gap={{ xs: 1, sm: 1.75 }}>
           <LanguageDropdown />
-          {/* <IconButton color="inherit" centerRipple sx={{ bgcolor: 'inherit', p: 0.75 }}>
+          <IconButton color="inherit" centerRipple sx={{ bgcolor: 'inherit', p: 0.75 }}>
             <Badge badgeContent={4} color="primary">
               <IconifyIcon icon="carbon:notification-filled" width={24} height={24} />
             </Badge>
-          </IconButton> */}
+          </IconButton>
           <AccountDropdown />
         </Stack>
       </Toolbar>

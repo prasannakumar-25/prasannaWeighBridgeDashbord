@@ -6,6 +6,9 @@ import paths, { rootPaths } from './paths';
 import PageLoader from '../components/loading/PageLoader';
 import Splash from 'components/loading/Splash';
 import VendorRegister from 'pages/RegisterManagement/VendorRegister/VendorRegister';
+import MachineRegister from 'pages/RegisterManagement/MachineRegister/MachineRegister';
+import UserRegister from 'pages/RegisterManagement/UserRegistration/UserRegister';
+import VehicleRegister from 'pages/RegisterManagement/VehicleRegister/VehicleRegister';
 
 
 const App = lazy(() => import('App'));
@@ -67,11 +70,11 @@ const routes: RouteObject[] = [
       {
         path: rootPaths.vendorRoot,
         element: (
-          <AuthLayout>
+          // <AuthLayout>
             <Suspense fallback={<PageLoader />}>
               <Outlet />
             </Suspense>
-          </AuthLayout>
+          // </AuthLayout> 
         ),
         children: [
           {
@@ -86,72 +89,72 @@ const routes: RouteObject[] = [
           
         ],
       },
-      // {
-      //   path: rootPaths.machineRoot,
-      //   element: (
-      //     <AuthLayout>
-      //       <Suspense fallback={<PageLoader />}>
-      //         <Outlet />
-      //       </Suspense>
-      //     </AuthLayout>
-      //   ),
-      //   children: [
-      //     {
-      //       path: paths.machine,
-      //       element: 
-      //       <MainLayout>
-      //         <Suspense fallback={<PageLoader />}>
-      //           <MachineRegister />
-      //         </Suspense>
-      //       </MainLayout>,
-      //     },
+      {
+        path: rootPaths.machineRoot,
+        element: (
+          // <AuthLayout>
+            <Suspense fallback={<PageLoader />}>
+              <Outlet />
+            </Suspense>
+          // </AuthLayout>
+        ),
+        children: [
+          {
+            path: paths.machine,
+            element: 
+            <MainLayout>
+              <Suspense fallback={<PageLoader />}>
+                <MachineRegister />
+              </Suspense>
+            </MainLayout>,
+          },
           
-      //   ],
-      // },
-      // {
-      //   path: rootPaths.userRoot,
-      //   element: (
-      //     <AuthLayout>
-      //       <Suspense fallback={<PageLoader />}>
-      //         <Outlet />
-      //       </Suspense>
-      //     </AuthLayout>
-      //   ),
-      //   children: [
-      //     {
-      //       path: paths.user,
-      //       element: 
-      //       <MainLayout>
-      //         <Suspense fallback={<PageLoader />}>
-      //           <UserRegister />
-      //         </Suspense>
-      //       </MainLayout>,
-      //     },
+        ],
+      },
+      {
+        path: rootPaths.userRoot,
+        element: (
+          // <AuthLayout>
+            <Suspense fallback={<PageLoader />}>
+              <Outlet />
+            </Suspense>
+          // </AuthLayout>
+        ),
+        children: [
+          {
+            path: paths.user,
+            element: 
+            <MainLayout>
+              <Suspense fallback={<PageLoader />}>
+                <UserRegister />
+              </Suspense>
+            </MainLayout>,
+          },
           
-      //   ],
-      // },
-      // {
-      //   path: rootPaths.vehicleRoot,
-      //   element: (
-      //     <AuthLayout>
-      //       <Suspense fallback={<PageLoader />}>
-      //         <Outlet />
-      //       </Suspense>
-      //     </AuthLayout>
-      //   ),
-      //   children: [
-      //     {
-      //       path: paths.vehicle,
-      //       element: 
-      //       <MainLayout>
-      //         <Suspense fallback={<PageLoader />}>
-      //           <VehicleRegister />
-      //         </Suspense>
-      //       </MainLayout>,
-      //     },
+        ],
+      },
+      {
+        path: rootPaths.vehicleRoot,
+        element: (
+          // <AuthLayout>
+            <Suspense fallback={<PageLoader />}>
+              <Outlet />
+            </Suspense>
+          // </AuthLayout>
+        ),
+        children: [
+          {
+            path: paths.vehicle,
+            element: 
+            <MainLayout>
+              <Suspense fallback={<PageLoader />}>
+                <VehicleRegister />
+              </Suspense>
+            </MainLayout>,
+          },
           
-      //   ],
-      // },
+        ],
+      },
       {
         path: rootPaths.authRoot,
         element: (

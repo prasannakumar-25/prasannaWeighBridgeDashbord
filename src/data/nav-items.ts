@@ -153,65 +153,33 @@ const navItems: NavItem[] = [
   },
   {
     title: 'VendorRegister',
-    path: '/vendor',
+    path: '/vendorManagement',
     icon: 'typcn:vendor-android',
     active: true,
     collapsible: false,
   },
   {
     title: 'MachineRegister',
-    path: '/machine',
+    path: '/machineManagemant',
     icon: 'streamline-cyber:virtual-machine-3',
     active: true,
     collapsible: false,
   },
   {
     title: 'UserRgister',
-    path: '/user',
+    path: '/userManagement',
     icon: 'mdi:user-group-outline',
     active: true,
     collapsible: false,
   },
   {
     title: 'VehicleRegister',
-    path: '/vehicle',
+    path: '/vehicleManagement',
     icon: 'icon-park-solid:engineering-vehicle',
     active: true,
     collapsible: false,
   },
-  // {
-  //   title: 'Applications',
-  //   path: '/dashboard',
-  //   icon: 'mingcute:grid-fill',
-  //   active: true,
-  //   collapsible: true,
-  //   sublist: [
-  //     {
-  //       title: 'Kanban',
-  //       path: '#!',
-  //       active: false,
-  //       collapsible: false,
-  //     },
-  //     {
-  //       title: 'Wizard',
-  //       path: '#!',
-  //       active: false,
-  //       collapsible: false,
-  //     },
-  //     {
-  //       title: 'Data Tables',
-  //       path: '#!',
-  //       active: false,
-  //       collapsible: false,
-  //     },
-  //     {
-  //       title: 'Schedule',
-  //       path: '#!',
-  //       active: false,
-  //       collapsible: false,
-  //     },
-  //   ],
-  // },
+
   // {
   //   title: 'Ecommerce',
   //   path: 'ecommerce1',
@@ -268,68 +236,68 @@ const navItems: NavItem[] = [
   //   ],
   // },
 
-  // {
-  //   title: 'Notification',
-  //   path: '#!',
-  //   icon: 'zondicons:notifications',
-  //   active: true,
-  //   collapsible: true,
-  //   sublist: [
-  //     {
-  //       title: 'VnedorNf',
-  //       path: '/',
-  //       active: true,
-  //       collapsible: false,
-  //     },
-  //     {
-  //       title: 'MachineNf',
-  //       path: '/',
-  //       active: true,
-  //       collapsible: false,
-  //     },
-  //     {
-  //       title: 'CustomerNf',
-  //       path: '/',
-  //       active: true,
-  //       collapsible: false,
-  //     },
-  //   ]
-  // },
+  {
+    title: 'Notification',
+    path: '#!',
+    icon: 'zondicons:notifications',
+    active: true,
+    collapsible: true,
+    sublist: [
+      {
+        title: 'VnedorNf',
+        path: '/',
+        active: true,
+        collapsible: false,
+      },
+      {
+        title: 'MachineNf',
+        path: '/',
+        active: true,
+        collapsible: false,
+      },
+      {
+        title: 'CustomerNf',
+        path: '/',
+        active: true,
+        collapsible: false,
+      },
+    ]
+  },
   
-  // {
-  //   title: 'Calendar',
-  //   path: '#!',
-  //   icon: 'ph:calendar',
-  //   active: true,
-  //   collapsible: false,
-  //   sublist: [
-  //     {
-  //       title: 'Sign In',
-  //       path: 'login',
-  //       active: true,
-  //       collapsible: false,
-  //     },
-  //     {
-  //       title: 'Sign Up',
-  //       path: 'sign-up',
-  //       active: true,
-  //       collapsible: false,
-  //     },
-  //     {
-  //       title: 'Forgot password',
-  //       path: 'forgot-password',
-  //       active: true,
-  //       collapsible: false,
-  //     },
-  //   ]
-  // },
-  // {
-  //   title: 'Message',
-  //   path: '#!',
-  //   icon: 'ph:chat-circle-dots-fill',
-  //   active: true,
-  //   collapsible: false,
-  // },
+  {
+    title: 'Calendar',
+    path: '#!',
+    icon: 'ph:calendar',
+    active: true,
+    collapsible: true,
+    sublist: [
+      {
+        title: 'Sign In',
+        path: 'login',
+        active: true,
+        collapsible: false,
+      },
+      {
+        title: 'Sign Up',
+        path: 'sign-up',
+        active: true,
+        collapsible: false,
+      },
+      {
+        title: 'Forgot password',
+        path: 'forgot-password',
+        active: true,
+        collapsible: false,
+      },
+    ]
+  },
+  {
+    title: 'Message',
+    path: '#!',
+    icon: 'ph:chat-circle-dots-fill',
+    active: true,
+    collapsible: false,
+  },
 ];
 
 export default navItems;

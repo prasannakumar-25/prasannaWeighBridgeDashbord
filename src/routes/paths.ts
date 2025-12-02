@@ -1,10 +1,10 @@
 
 export const rootPaths = {
   homeRoot: '',
-  vendorRoot:'vendor',
-  // machineRoot: "machine",
-  // vehicleRoot: 'vehicle',
-  // userRoot: 'user',
+  vendorRoot:'vendorManagement',
+  machineRoot: "machineManagemant",
+  vehicleRoot: 'vehicleManagement',
+  userRoot: 'userManagement',
   pagesRoot: 'pages',
   applicationsRoot: 'applications',
   ecommerceRoot: 'ecommerce',
@@ -18,9 +18,9 @@ export const rootPaths = {
 export default {
   home: `/${rootPaths.homeRoot}`,
   vendor: `/${rootPaths.vendorRoot}`,
-  // machine: `/${rootPaths.machineRoot}`,
-  // vehicle: `/${rootPaths.vehicleRoot}`,
-  // user: `/${rootPaths.userRoot}`,
+  machine: `/${rootPaths.machineRoot}`,
+  vehicle: `/${rootPaths.vehicleRoot}`,
+  user: `/${rootPaths.userRoot}`,
   login: `/${rootPaths.authRoot}/login`,
   signup: `/${rootPaths.authRoot}/sign-up`,
   resetPassword: `/${rootPaths.authRoot}/reset-password`,
