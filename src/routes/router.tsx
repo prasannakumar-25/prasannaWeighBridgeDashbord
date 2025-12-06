@@ -9,6 +9,9 @@ import VendorRegister from 'pages/RegisterManagement/VendorRegister/VendorRegist
 import MachineRegister from 'pages/RegisterManagement/MachineRegister/MachineRegister';
 import UserRegister from 'pages/RegisterManagement/UserRegistration/UserRegister';
 import VehicleRegister from 'pages/RegisterManagement/VehicleRegister/VehicleRegister';
+import IPCameraRegister from 'pages/RegisterManagement/IPCameraRegister/IPCameraRegister';
+import WeighbridgeRegister from 'pages/RegisterManagement/WeighbridgeRegister/WeighbridgeRegister';
+
 
 
 const App = lazy(() => import('App'));
@@ -156,6 +159,50 @@ const routes: RouteObject[] = [
         ],
       },
       {
+        path: rootPaths.ipCameraRoot,
+        element: (
+          // <AuthLayout>
+            <Suspense fallback={<PageLoader />}>
+              <Outlet />
+            </Suspense>
+          // </AuthLayout>
+        ),
+        children: [
+          {
+            path: paths.ipCamera,
+            element: 
+            <MainLayout>
+              <Suspense fallback={<PageLoader />}>
+                <IPCameraRegister />
+              </Suspense>
+            </MainLayout>,
+          },
+          
+        ],
+      },
+      {
+        path: rootPaths.weighbridgeRoot,
+        element: (
+          // <AuthLayout>
+            <Suspense fallback={<PageLoader />}>
+              <Outlet />
+            </Suspense>
+          // </AuthLayout>
+        ),
+        children: [
+          {
+            path: paths.weighbridge,
+            element: 
+            <MainLayout>
+              <Suspense fallback={<PageLoader />}>
+                <WeighbridgeRegister />
+              </Suspense>
+            </MainLayout>,
+          },
+          
+        ],
+      },
+      {
         path: rootPaths.authRoot,
         element: (
           <AuthLayout>
@@ -167,7 +214,14 @@ const routes: RouteObject[] = [
         children: [
           {
             path: paths.login,
-            element: <Login />,
+            // element: <Login />,
+            element: (
+              <MainLayout>
+                <Suspense fallback={<PageLoader />}>
+                  <Login />
+                </Suspense>
+              </MainLayout>
+            ),
           },
           {
             path: paths.signup,

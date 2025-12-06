@@ -179,6 +179,20 @@ const navItems: NavItem[] = [
     active: true,
     collapsible: false,
   },
+  {
+    title: 'IPCamera',
+    path: '/ipcameraManage',
+    icon: 'cbi:aqara-camera-g5',
+    active: true,
+    collapsible: false,
+  },
+  {
+    title: 'Weighbridge',
+    path: '/weighbridgeManage',
+    icon: 'game-icons:weight-scale',
+    active: true,
+    collapsible: false,
+  },
 
   // {
   //   title: 'Ecommerce',
@@ -273,7 +287,7 @@ const navItems: NavItem[] = [
     sublist: [
       {
         title: 'Sign In',
-        path: 'login',
+        path: '/login',
         active: true,
         collapsible: false,
       },

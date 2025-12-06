@@ -1654,3 +1654,423 @@ export default VendorRegister;
 // };
 
 // export default VendorRegister;
+
+
+
+
+
+
+
+// import { ChangeEvent, ReactElement, useMemo, useState, useEffect } from 'react';
+// import {
+//   Avatar,
+//   Divider,
+//   InputAdornment,
+//   LinearProgress,
+//   Link,
+//   Stack,
+//   TextField,
+//   Tooltip, 
+//   Typography,
+//   debounce,
+//   Box,
+//   Button,
+//   // Drawer,
+//   // IconButton,
+//   // MenuItem,
+//   useMediaQuery,
+//   useTheme,
+//   // Table,
+//   // TableBody,
+//   // TableCell,
+//   // TableContainer,
+//   // TableHead,
+//   // TableRow,
+// } from '@mui/material';
+// import { DataGrid, GridApi, GridColDef, GridSlots, useGridApiRef } from '@mui/x-data-grid';
+// import IconifyIcon from 'components/base/IconifyIcon';
+// import { DataRow, rows } from 'data/products';
+// // import CustomPagination from './CustomPagination';
+// import CustomPagination from 'components/sections/dashboard/Home/Sales/TopSellingProduct/CustomPagination';
+// import { currencyFormat } from 'helpers/format-functions';
+
+// //  * Vendor type
+
+// type Vendor = {
+//   id: number;
+//   vendorName: string;
+//   category?: string;
+//   phone?: string;
+//   email?: string;
+//   website?: string;
+//   gstNumber?: string;
+//   address?: string;
+//   location?: string;
+//   // description?: string;
+//   status?: "Active" | "Inactive";
+// };
+
+// const initialVendors: Vendor[] = [
+//   {
+//     id: 1,
+//     vendorName: "TechCorp Industries",
+//     category: "Electronics",
+//     phone: "9876543210",
+//     email: "tech@corp.com",
+//     website: "https://techcorp.com",
+//     gstNumber: "GST123456",
+//     address: "12 Marine Drive, Mumbai",
+//     location: "Mumbai, Maharashtra",
+//     // description: "Leading hardware supplier with nationwide distribution.",
+//     status: "Active",
+//   },
+//   {
+//     id: 2,
+//     vendorName: "Global Logistics",
+//     category: "Logistics",
+//     phone: "9876543211",
+//     email: "global@log.com",
+//     website: "https://globallog.com",
+//     gstNumber: "GST123457",
+//     address: "45 Industrial Estate, Delhi",
+//     location: "New Delhi, Delhi",
+//     // description: "Freight forwarding & warehousing specialists.",
+//     status: "Active",
+//   },
+//   {
+//     id: 3,
+//     vendorName: "ExpressCargo Solutions",
+//     category: "Transport",
+//     phone: "9876543212",
+//     email: "express@cargo.com",
+//     website: "https://expresscargo.com",
+//     gstNumber: "GST123458",
+//     address: "99 Tech Park, Bangalore",
+//     location: "Bengaluru, Karnataka",
+//     // description: "Same-day regional shipping & delivery.",
+//     status: "Inactive",
+//   },
+// ];
+
+// // const VendorRegister: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
+// const VendorRegister: React.FC<{ onLogout?: () => void }> = () => {
+//   const [vendors, setVendors] = useState<Vendor[]>([]);
+//   const [drawerOpen, setDrawerOpen] = useState(false);
+//   const [editingVendor, setEditingVendor] = useState<Vendor | null>(null);
+//   const [formError, setFormError] = useState<string | null>(null);
+
+//   const theme = useTheme();
+//   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
+
+//   // form state (single object)
+//   const [form, setForm] = useState<Vendor>({
+//     id: 0,
+//     vendorName: "",
+//     category: "",
+//     phone: "",
+//     email: "",
+//     website: "",
+//     gstNumber: "",
+//     address: "",
+//     location: "",
+//     // description: "",
+//     status: "Active",
+//   });
+
+//   useEffect(() => {
+//     // Load mock vendors on first render
+//     setVendors(initialVendors);
+//   }, []);
+
+//   // open drawer for add
+//   const handleOpenAdd = () => {
+//     setEditingVendor(null);
+//     setForm({
+//       id: 0,
+//       vendorName: "",
+//       category: "",
+//       phone: "",
+//       email: "",
+//       website: "",
+//       gstNumber: "",
+//       address: "",
+//       location: "",
+//       // description: "",
+//       status: "Active",
+//     });
+//     setFormError(null);
+//     setDrawerOpen(true);
+//   };
+
+//   // open drawer for edit
+//   const handleOpenEdit = (v: Vendor) => {
+//     setEditingVendor(v);
+//     setForm({ ...v });
+//     setFormError(null);
+//     setDrawerOpen(true);
+//   };
+
+//   // close drawer
+//   const handleCloseDrawer = () => {
+//     setDrawerOpen(false);
+//     setEditingVendor(null);
+//     setFormError(null);
+//   };
+
+//   // validate basic fields
+//   const validate = (): boolean => {
+//     if (!form.vendorName || !form.vendorName.trim()) {
+//       setFormError("Vendor name is required.");
+//       return false;
+//     }
+//     if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+//       setFormError("Please enter a valid email address.");
+//       return false;
+//     }
+//     if (form.phone && !/^[6-9]\d{9}$/.test(form.phone)) {
+//       setFormError("Please enter a valid 10-digit phone number.");
+//       return false;
+//     }
+//     setFormError(null);
+//     return true;
+//   };
+
+//   // save vendor (add or update)
+//   const handleSave = () => {
+//     if (!validate()) return;
+
+//     if (editingVendor) {
+//       // update
+//       setVendors((prev) => prev.map((p) => (p.id === editingVendor.id ? { ...form, id: editingVendor.id } : p)));
+//     } else {
+//       // add
+//       const newVendor: Vendor = { ...form, id: Date.now() };
+//       setVendors((prev) => [newVendor, ...prev]);
+//     }
+
+//     handleCloseDrawer();
+//   };
+
+//   const handleDelete = (id: number) => {
+//     if (!confirm("Are you sure you want to delete this vendor?")) return;
+//     setVendors((prev) => prev.filter((v) => v.id !== id));
+//   };
+
+//   // update form field helper
+//   const setField = (key: keyof Vendor, value: any) => {
+//     setForm((prev) => ({ ...prev, [key]: value }));
+//   };
+
+//   // drawer width responsive:
+//   const drawerWidth = isMdUp ? Math.min(700, Math.round(window.innerWidth * 0.55)) : window.innerWidth;
+
+
+// const columns: GridColDef<DataRow>[] = [
+  
+  
+//   {
+//     field: 'id',
+//     headerName: 'ID',
+//   },
+//   {
+//     field: 'product',
+//     headerName: 'Product',
+//     flex: 1,
+//     minWidth: 182.9625,
+//     valueGetter: (params: any) => {
+//       return params.title + ' ' + params.subtitle;
+//     },
+//     renderCell: (params: any) => {
+//       return (
+//         <Stack direction="row" spacing={1.5} alignItems="center" component={Link} href="#!">
+//           <Tooltip title={params.row.product.title} placement="top" arrow>
+//             <Avatar src={params.row.product.avatar} sx={{ objectFit: 'cover' }} />
+//           </Tooltip>
+//           <Stack direction="column" spacing={0.5} justifyContent="space-between">
+//             <Typography variant="body1" color="text.primary">
+//               {params.row.product.title}
+//             </Typography>
+//             <Typography variant="body2" color="text.secondary">
+//               {params.row.product.subtitle}
+//             </Typography>
+//           </Stack>
+//         </Stack>
+//       );
+//     },
+//     sortComparator: (v1: string, v2: string) => v1.localeCompare(v2),
+//   },
+//   {
+//     field: 'orders',
+//     headerName: 'Orders',
+//     flex: 0.75,
+//     minWidth: 137.221875,
+//   },
+//   {
+//     field: 'price',
+//     headerName: 'Price',
+//     flex: 0.75,
+//     minWidth: 137.221875,
+//     valueGetter: (params: any) => {
+//       return currencyFormat(params);
+//     },
+//   },
+//   {
+//     field: 'adsSpent',
+//     headerName: 'Ads Spent',
+//     flex: 0.75,
+//     minWidth: 137.221875,
+//     valueGetter: (params: any) => {
+//       return currencyFormat(params, { minimumFractionDigits: 3 });
+//     },
+//   },
+//   {
+//     field: 'refunds',
+//     headerName: 'Refunds',
+//     flex: 0.75,
+//     minWidth: 137.221875,
+//     renderCell: ({ row: { refunds } }: any) => {
+//       if (refunds > 0) return `> ${refunds}`;
+//       else return `< ${-refunds}`;
+//     },
+//     filterable: false,
+//   },
+// ];
+
+// const TopSellingProduct = (): ReactElement => {
+//   const apiRef = useGridApiRef<GridApi>();
+//   const [search, setSearch] = useState('');
+
+//   const visibleColumns = useMemo(
+//     () =>
+//       columns
+//         .filter((column) => column.field !== 'id')
+//         .map((column) => {
+//           if (column.field === 'refunds') {
+//             return {
+//               ...column,
+//               getApplyQuickFilterFn: undefined,
+//               filterable: false,
+//             };
+//           }
+//           return column;
+//         }),
+//     [columns],
+//   );
+
+//   const handleGridSearch = useMemo(() => {
+//     return debounce((searchValue) => {
+//       apiRef.current.setQuickFilterValues(
+//         searchValue.split(' ').filter((word: any) => word !== ''),
+//       );
+//     }, 250);
+//   }, [apiRef]);
+
+//   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+//     const searchValue = event.currentTarget.value;
+//     setSearch(searchValue);
+//     handleGridSearch(searchValue);
+//   };
+
+//   useEffect(() => {
+//     // Load mock vendors on first render
+//     setVendors(initialVendors);
+//   }, []);
+
+//   return (
+//     <Stack
+//       bgcolor="background.paper"
+//       className='main-first-container'
+//       borderRadius={5}
+//       width={1}
+//       boxShadow={(theme) => theme.shadows[4]}
+//       // height={1}
+//       sx={{
+//         padding: "30px"
+//       }}
+//     >
+//       <Stack
+//         className='container-head'
+//         direction={{ sm: 'row' }}
+//         justifyContent="space-between"
+//         alignItems="center"
+//         padding={2.75}
+//         gap={3.75}
+//       >
+//         <Box className="vm-header">
+//           <Typography variant="h4">Vendor Register</Typography>
+
+//           <div className="vm-actions">
+//             <Button
+//               variant="contained"
+//               // startIcon={<IconifyIcon icon="material-symbols:add-rounded" />}
+//               onClick={handleOpenAdd}
+//               className="add-vendor-btn"
+//             >
+//               Add Vendor
+//             </Button>
+//           </div>
+//         </Box>
+//         {/* <Typography className='header-title-content' variant="h5" color="text.primary">
+//           Top Selling Product
+//         </Typography> */}
+//         <TextField
+//           variant="filled"
+//           className='header-search-section'
+//           placeholder="Search..."
+//           id="search-input"
+//           name="table-search-input"
+//           onChange={handleChange}
+//           value={search}
+//           InputProps={{
+//             endAdornment: (
+//               <InputAdornment position="end" sx={{ width: 24, height: 24 }}>
+//                 <IconifyIcon icon="mdi:search" width={1} height={1} />
+//               </InputAdornment>
+//             ),
+//           }}
+//         />
+//       </Stack>
+//       <Divider />
+//       <Stack height={1}>
+//         <DataGrid
+//           apiRef={apiRef}
+//           columns={visibleColumns}
+//           rows={rows}
+//           getRowHeight={() => 70}
+//           hideFooterSelectedRowCount
+//           disableColumnResize
+//           disableColumnSelector
+//           disableRowSelectionOnClick
+//           rowSelection={false}
+//           initialState={{
+//             pagination: { paginationModel: { pageSize: 5, page: 0 } },
+//             columns: {
+//               columnVisibilityModel: {
+//                 id: false,
+//               },
+//             },
+//           }}
+//           pageSizeOptions={[5]}
+//           onResize={() => {
+//             apiRef.current.autosizeColumns({
+//               includeOutliers: true,
+//               expand: true,
+//             });
+//           }}
+//           slots={{
+//             loadingOverlay: LinearProgress as GridSlots['loadingOverlay'],
+//             pagination: CustomPagination,
+//             noRowsOverlay: () => <section>No rows available</section>,
+//           }}
+//           sx={{
+//             height: 1,
+//             width: 1,
+//           }}
+//         />
+//       </Stack>
+//     </Stack>
+//   );
+// };
+
+// export default VendorRegister;
+// // export default TopSellingProduct;

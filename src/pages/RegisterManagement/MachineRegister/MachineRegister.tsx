@@ -62,83 +62,83 @@ type Machine = {
   machineLocation?: string;
 };
 
-const initialVendors: Vendor[] = [
-  {
-    id: 1,
-    vendorName: "TechCorp Industries",
-    category: "Electronics",
-    phone: "9876543210",
-    email: "tech@corp.com",
-    website: "https://techcorp.com",
-    gstNumber: "GST123456",
-    address: "12 Marine Drive, Mumbai",
-    location: "Mumbai, Maharashtra",
-    status: "Active",
-  },
-  {
-    id: 2,
-    vendorName: "Global Logistics",
-    category: "Logistics",
-    phone: "9876543211",
-    email: "global@log.com",
-    website: "https://globallog.com",
-    gstNumber: "GST123457",
-    address: "45 Industrial Estate, Delhi",
-    location: "New Delhi, Delhi",
-    status: "Active",
-  },
-  {
-    id: 3,
-    vendorName: "ExpressCargo Solutions",
-    category: "Transport",
-    phone: "9876543212",
-    email: "express@cargo.com",
-    website: "https://expresscargo.com",
-    gstNumber: "GST123458",
-    address: "99 Tech Park, Bangalore",
-    location: "Bengaluru, Karnataka",
-    status: "Inactive",
-  },
-];
+// const initialVendors: Vendor[] = [
+//   {
+//     id: 1,
+//     vendorName: "TechCorp Industries",
+//     category: "Electronics",
+//     phone: "9876543210",
+//     email: "tech@corp.com",
+//     website: "https://techcorp.com",
+//     gstNumber: "GST123456",
+//     address: "12 Marine Drive, Mumbai",
+//     location: "Mumbai, Maharashtra",
+//     status: "Active",
+//   },
+//   {
+//     id: 2,
+//     vendorName: "Global Logistics",
+//     category: "Logistics",
+//     phone: "9876543211",
+//     email: "global@log.com",
+//     website: "https://globallog.com",
+//     gstNumber: "GST123457",
+//     address: "45 Industrial Estate, Delhi",
+//     location: "New Delhi, Delhi",
+//     status: "Active",
+//   },
+//   {
+//     id: 3,
+//     vendorName: "ExpressCargo Solutions",
+//     category: "Transport",
+//     phone: "9876543212",
+//     email: "express@cargo.com",
+//     website: "https://expresscargo.com",
+//     gstNumber: "GST123458",
+//     address: "99 Tech Park, Bangalore",
+//     location: "Bengaluru, Karnataka",
+//     status: "Inactive",
+//   },
+// ];
 
-const initialMachines: Machine[] = [
-  {
-    id: 1,
-    vendorId: 1,
-    machineName: "Machine A",
-    password: "pass123",
-    machineMac: "AA:BB:CC:DD:EE:FF",
-    machineModel: "Model X",
-    capacityTon: 5.5,
-    lastServiceDate: "2024-01-15",
-    machineType: "Company",
-    machineLocation: "Mumbai, Maharashtra",
-  },
-  {
-    id: 2,
-    vendorId: 2,
-    machineName: "Machine B",
-    password: "secure456",
-    machineMac: "11:22:33:44:55:66",
-    machineModel: "Model Y",
-    capacityTon: 10.0,
-    lastServiceDate: "2024-06-20",
-    machineType: "ThirdParty",
-    machineLocation: "New Delhi, Delhi",
-  },
-  {
-    id: 3,
-    vendorId: 1,
-    machineName: "Machine C",
-    password: "estate789",
-    machineMac: "99:88:77:66:55:44",
-    machineModel: "Model Z",
-    capacityTon: 2.25,
-    lastServiceDate: "2024-03-10",
-    machineType: "Estate",
-    machineLocation: "Bengaluru, Karnataka",
-  },
-];
+// const initialMachines: Machine[] = [
+//   {
+//     id: 1,
+//     vendorId: 1,
+//     machineName: "Machine A",
+//     password: "pass123",
+//     machineMac: "AA:BB:CC:DD:EE:FF",
+//     machineModel: "Model X",
+//     capacityTon: 5.5,
+//     lastServiceDate: "2024-01-15",
+//     machineType: "Company",
+//     machineLocation: "Mumbai, Maharashtra",
+//   },
+//   {
+//     id: 2,
+//     vendorId: 2,
+//     machineName: "Machine B",
+//     password: "secure456",
+//     machineMac: "11:22:33:44:55:66",
+//     machineModel: "Model Y",
+//     capacityTon: 10.0,
+//     lastServiceDate: "2024-06-20",
+//     machineType: "ThirdParty",
+//     machineLocation: "New Delhi, Delhi",
+//   },
+//   {
+//     id: 3,
+//     vendorId: 1,
+//     machineName: "Machine C",
+//     password: "estate789",
+//     machineMac: "99:88:77:66:55:44",
+//     machineModel: "Model Z",
+//     capacityTon: 2.25,
+//     lastServiceDate: "2024-03-10",
+//     machineType: "Estate",
+//     machineLocation: "Bengaluru, Karnataka",
+//   },
+// ];
 
 const MachineRegister: React.FC<{ onLogout?: () => void }> = () => {
   const [machines, setMachines] = useState<Machine[]>([]);
@@ -146,6 +146,7 @@ const MachineRegister: React.FC<{ onLogout?: () => void }> = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingMachine, setEditingMachine] = useState<Machine | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false)
 
   const [search, setSearch] = useState('');
   const apiRef = useGridApiRef<GridApi>();
@@ -160,6 +161,12 @@ const MachineRegister: React.FC<{ onLogout?: () => void }> = () => {
   // -- Snackbar State --
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+
+  // -- Show password --
+  const handleClickShowPassword = () => setShowPassword(!showPassword);
+
+   // Filter State (Filter by Machine)
+  const [filterMachine, setFilterMachine] = useState<number | "">(""); 
   
 
   // form state (single object)
@@ -178,8 +185,8 @@ const MachineRegister: React.FC<{ onLogout?: () => void }> = () => {
 
   useEffect(() => {
     // Load mock machines and vendors on first render
-    setMachines(initialMachines);
-    setVendors(initialVendors);
+    // setMachines(initialMachines);
+    setVendors([]);
   }, []);
 
   // open drawer for add
@@ -241,12 +248,14 @@ const MachineRegister: React.FC<{ onLogout?: () => void }> = () => {
     if (editingMachine) {
       // update
       setMachines((prev) => prev.map((p) => (p.id === editingMachine.id ? { ...form, id: editingMachine.id } : p)));
+      setSnackbarMessage("Machine updated successfully");
     } else {
-      // add
+      // add new
       const newMachine: Machine = { ...form, id: Date.now() };
       setMachines((prev) => [newMachine, ...prev]);
+      setSnackbarMessage("Machine added successfully");
     }
-
+    setSnackbarOpen(true);
     handleCloseDrawer();
   };
 
@@ -262,9 +271,7 @@ const MachineRegister: React.FC<{ onLogout?: () => void }> = () => {
   // 2. Confirm Deletion
   const handleConfirmDelete = () => {
     if (machineToDelete !== null) {
-      setVendors((prev) => prev.filter((v) => v.id !== machineToDelete));
-      
-      // Show success message
+      setMachines((prev) => prev.filter((v) => v.id !== machineToDelete));
       setSnackbarMessage("Machine deleted successfully");
       setSnackbarOpen(true);
     }
@@ -312,6 +319,16 @@ const MachineRegister: React.FC<{ onLogout?: () => void }> = () => {
   };
   
 
+    // Filter Logic: Combine Text Search + Dropdown Filter
+  const filteredMachinefound = machines.filter((m) => {
+    const matchesSearch = {}
+    
+    const matchesMachine = filterMachine === "" || m.vendorId=== filterMachine;
+
+    return matchesSearch && matchesMachine;
+  });
+
+
   return (
     // <Stack
     //   bgcolor="common.white"
@@ -321,295 +338,359 @@ const MachineRegister: React.FC<{ onLogout?: () => void }> = () => {
     //   mx="auto"
     //   boxShadow={theme.shadows[4]}
     // >
-    <Stack
-      bgcolor="background.paper"
-      borderRadius={5}
-      width={1}
-      boxShadow={(theme) => theme.shadows[4]}
-      height={1}
-    >
+    <div className="vm-root">
       <Stack
-        direction={{ sm: 'row' }}
-        justifyContent="space-between"
-        alignItems="center"
-        padding={3.75}
-        gap={3.75}
+        bgcolor="background.paper"
+        borderRadius={5}
+        width={1}
+        boxShadow={(theme) => theme.shadows[4]}
+        // height={1}
       >
+        {/* <Stack
+          direction={{ sm: 'row' }}
+          justifyContent="space-between"
+          alignItems="center"
+          padding={3.75}
+          gap={3.75}
+        > */}
 
-        <main className="vm-content">
-            <Box className="vm-header">
-            <Typography variant="h4">Machine Register</Typography>
-            <TextField
+          <main className="vm-content">
+              <Box className="vm-header">
+              <Typography variant="h4">Machine Register</Typography>
+              <TextField
+                variant="outlined"
+                placeholder="Search..."
+                id="search-input"
+                name="table-search-input"
+                onChange={handleChange}
+                value={search}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end" sx={{ width: 24, height: 24 }}>
+                      <IconifyIcon icon="mdi:search" width={1} height={1} />
+                    </InputAdornment>
+                  ),
+                }}
+                fullWidth
+                sx={{ maxWidth: 300}}
+                
+              />
+              <div className="selection-header-lable">
+              <TextField
               variant="outlined"
-              placeholder="Search..."
-              id="search-input"
+              // label="Vendor"
               name="table-search-input"
-              onChange={handleChange}
-              value={search}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end" sx={{ width: 24, height: 24 }}>
-                    <IconifyIcon icon="mdi:search" width={1} height={1} />
-                  </InputAdornment>
-                ),
-              }}
+              select
               fullWidth
-              sx={{ maxWidth: 330}}
-            />
+              value={form.vendorId}
+              placeholder="Vendor..."
+              onChange={(e) => setField("vendorId", Number(e.target.value))}
+              // fullWidth
+              sx={{ maxWidth: 300}}
+              >
+                <MenuItem value= "">
+                  <em>None</em>
+                </MenuItem>
+              {vendors.map((v) => (
+                <MenuItem key={v.id} value={v.id}>
+                  {v.vendorName}
+                </MenuItem>
+              ))}
+              </TextField>
+              </div>
+              <div className="vm-actions">
+                  <Button
+                  variant="contained"
+                  // startIcon={<IconifyIcon icon="material-symbols:add-rounded" />}
+                  onClick={handleOpenAdd}
+                  className="add-vendor-btn"
+                  >
+                  Add Machine
+                  </Button>
+              </div>
+              </Box>
 
-            <div className="vm-actions">
-                <Button
-                variant="contained"
-                // startIcon={<IconifyIcon icon="material-symbols:add-rounded" />}
-                onClick={handleOpenAdd}
-                className="add-vendor-btn"
-                >
-                Add Machine
-                </Button>
-            </div>
-            </Box>
+              {/* TABLE VERSION */}
+              <TableContainer className="vm-table-container">
+              <Table className="vm-table">
+                  <TableHead className="vm-table-header">
+                  <TableRow className="vm-table-row">
+                      <TableCell className="header-name">Machine Name</TableCell>
+                      <TableCell className="header-name">Vendor</TableCell>
+                      <TableCell className="header-name">Type</TableCell>
+                      <TableCell className="header-name">Capacity (tons)</TableCell>
+                      <TableCell className="header-name">Location</TableCell>
+                      <TableCell className="header-name">Last Service</TableCell>
+                      <TableCell className="header-name" align="right">Actions</TableCell>
+                  </TableRow>
+                  </TableHead>
 
-            {/* TABLE VERSION */}
-            <TableContainer className="vm-table-container">
-            <Table className="vm-table">
-                <TableHead className="vm-table-header">
-                <TableRow className="vm-table-row">
-                    <TableCell className="header-name">Machine Name</TableCell>
-                    <TableCell className="header-name">Vendor</TableCell>
-                    <TableCell className="header-name">Type</TableCell>
-                    <TableCell className="header-name">Capacity (tons)</TableCell>
-                    <TableCell className="header-name">Location</TableCell>
-                    <TableCell className="header-name">Last Service</TableCell>
-                    <TableCell className="header-name" align="right">Actions</TableCell>
-                </TableRow>
-                </TableHead>
+                  <TableBody>
+                  {machines.map((m) => (
+                      <TableRow key={m.id}>
+                      <TableCell>
+                          <Typography variant="subtitle1" className="vm-row-title">
+                          {m.machineName}
+                          </Typography>
+                      </TableCell>
 
-                <TableBody>
-                {machines.map((m) => (
-                    <TableRow key={m.id}>
-                    <TableCell>
-                        <Typography variant="subtitle1" className="vm-row-title">
-                        {m.machineName}
-                        </Typography>
-                    </TableCell>
+                      <TableCell>{vendors.find(v => v.id === m.vendorId)?.vendorName || "—"}</TableCell>
+                      <TableCell>{m.machineType}</TableCell>
+                      <TableCell>{m.capacityTon ? `${m.capacityTon} tons` : "—"}</TableCell>
+                      <TableCell>{m.machineLocation || "—"}</TableCell>
 
-                    <TableCell>{vendors.find(v => v.id === m.vendorId)?.vendorName || "—"}</TableCell>
-                    <TableCell>{m.machineType}</TableCell>
-                    <TableCell>{m.capacityTon ? `${m.capacityTon} tons` : "—"}</TableCell>
-                    <TableCell>{m.machineLocation || "—"}</TableCell>
+                      <TableCell>
+                          {m.lastServiceDate ? new Date(m.lastServiceDate).toLocaleDateString() : "—"}
+                      </TableCell>
 
-                    <TableCell>
-                        {m.lastServiceDate ? new Date(m.lastServiceDate).toLocaleDateString() : "—"}
-                    </TableCell>
+                      <TableCell align="right" className="vm-action-cell">
+                          <Button
+                          onClick={() => handleOpenEdit(m)}
+                          className="vm-btn vm-action-btn-edit"
+                          >
+                          <IconifyIcon icon="fluent:notepad-edit-16-regular" />
+                          </Button>
 
-                    <TableCell align="right" className="vm-action-cell">
-                        <Button
-                        onClick={() => handleOpenEdit(m)}
-                        className="vm-btn vm-action-btn-edit"
-                        >
-                        <IconifyIcon icon="fluent:notepad-edit-16-regular" />
-                        </Button>
+                          <Button
+                          onClick={() => handleClickDelete(m.id)}
+                          className="vm-btn vm-action-btn-delete"
+                          >
+                          <IconifyIcon icon="wpf:delete" />
+                          </Button>
+                      </TableCell>
+                      </TableRow>
+                  ))}
+                  {filteredMachinefound.length === 0 && (
+                      <TableRow>
+                          <TableCell colSpan={7} align="center">
+                              No Machines found.
+                          </TableCell>
+                      </TableRow>
+                  )}
+                  </TableBody>
+              </Table>
+              </TableContainer>
+          </main>
 
-                        <Button
-                        onClick={() => handleClickDelete(m.id)}
-                        className="vm-btn vm-action-btn-delete"
-                        >
-                        <IconifyIcon icon="wpf:delete" />
-                        </Button>
-                    </TableCell>
-                    </TableRow>
-                ))}
-                </TableBody>
-            </Table>
-            </TableContainer>
-        </main>
-
-        {/* Right drawer - slides in from right; full width on small screens */}
-        <Drawer
-            anchor="right"
-            open={drawerOpen}
-            onClose={handleCloseDrawer}
-            PaperProps={{
-            sx: {
-                width: drawerWidth ,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                padding: "30px",
-                maxWidth: "100%",
-                borderTopLeftRadius: { xs: 0, md: 12 },
-                borderBottomLeftRadius: { xs: 0, md: 12 },
-                height: { xs: "100vh", md: "100vh" },
-            },
-            }}
-            ModalProps={{ keepMounted: true }}
-        >
-            <Box className="drawer-header">
-            <Typography variant="h6">{editingMachine ? "Edit Machine" : "Add New Machine"}</Typography>
-            <IconButton onClick={handleCloseDrawer} aria-label="close">
-                <IconifyIcon icon="material-symbols:close-rounded" />
-            </IconButton>
-            </Box>
-
-            <Box className="drawer-content">
-            {formError && <Box className="form-error">{formError}</Box>}
-
-            <Stack spacing={2}>
-                <TextField
-                label="Machine Name"
-                placeholder="Enter machine name"
-                fullWidth
-                value={form.machineName}
-                onChange={(e) => setField("machineName", e.target.value)}
-                />
-
-                <TextField
-                label="Vendor"
-                select
-                fullWidth
-                value={form.vendorId}
-                onChange={(e) => setField("vendorId", Number(e.target.value))}
-                >
-                {vendors.map((v) => (
-                    <MenuItem key={v.id} value={v.id}>
-                    {v.vendorName}
-                    </MenuItem>
-                ))}
-                </TextField>
-
-                <TextField
-                label="Password"
-                type="password"
-                placeholder="Enter password"
-                fullWidth
-                value={form.password}
-                onChange={(e) => setField("password", e.target.value)}
-                />
-
-                <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-                <TextField
-                    label="MAC Address"
-                    placeholder="e.g., AA:BB:CC:DD:EE:FF"
-                    fullWidth
-                    value={form.machineMac || ""}
-                    onChange={(e) => setField("machineMac", e.target.value)}
-                />
-                <TextField
-                    label="Machine Model"
-                    placeholder="e.g., Model X"
-                    fullWidth
-                    value={form.machineModel || ""}
-                    onChange={(e) => setField("machineModel", e.target.value)}
-                />
-                </Stack>
-
-                <TextField
-                label="Capacity (tons)"
-                type="number"
-                // step="0.01"
-                placeholder="e.g., 5.5"
-                fullWidth
-                value={form.capacityTon ?? ""}
-                onChange={(e) => setField("capacityTon", e.target.value ? parseFloat(e.target.value) : undefined)}
-                />
-
-                <TextField
-                label="Last Service Date"
-                type="date"
-                fullWidth
-                value={form.lastServiceDate || ""}
-                onChange={(e) => setField("lastServiceDate", e.target.value)}
-                InputLabelProps={{ shrink: true }}
-                />
-
-                <TextField
-                label="Machine Type"
-                select
-                fullWidth
-                value={form.machineType}
-                onChange={(e) => setField("machineType", e.target.value as "Company" | "ThirdParty" | "Estate")}
-                >
-                <MenuItem value="Company">Company</MenuItem>
-                <MenuItem value="ThirdParty">ThirdParty</MenuItem>
-                <MenuItem value="Estate">Estate</MenuItem>
-                </TextField>
-
-                <TextField
-                label="Machine Location"
-                placeholder="e.g., City, State"
-                fullWidth
-                value={form.machineLocation || ""}
-                onChange={(e) => setField("machineLocation", e.target.value)}
-                />
-
-                <Stack direction="row" spacing={2} justifyContent="flex-end" mt={1}>
-                <Button variant="text" className="cancel-button" onClick={handleCloseDrawer} 
-                // startIcon={<IconifyIcon icon="material-symbols:close-rounded" /> }
-                >
-                    Cancel
-                </Button>
-
-                <Button variant="contained" className="edit-button" onClick={handleSave} 
-                // startIcon={<IconifyIcon icon="material-symbols:add-rounded" />}
-                >
-                    {editingMachine ? "Update Machine" : "Save Machine"}
-                </Button>
-                </Stack>
-            </Stack>
-            </Box>
-        </Drawer>
-        {/* --- DELETE CONFIRMATION DIALOG --- */}
-        <Dialog
-          open={deleteDialogOpen}
-          onClose={handleCancelDelete}
-          maxWidth="xs"
-          fullWidth
-        >
-          <DialogTitle sx={{ textAlign: 'center', pb: 1 }}>
-            Confirm Delete
-          </DialogTitle>
-          <DialogContent>
-            <Typography textAlign="center" color="text.secondary">
-              Are you sure you want to delete this Machine?
-            </Typography>
-          </DialogContent>
-          <DialogActions sx={{ justifyContent: 'center', pb: 3, gap: 1 }}>
-            <Button 
-              variant="outlined" 
-              onClick={handleCancelDelete}
-              color="inherit"
-            >
-              Cancel
-            </Button>
-            <Button 
-              variant="contained" 
-              onClick={handleConfirmDelete}
-              color="error"
-              startIcon={<IconifyIcon icon="wpf:delete" />}
-            >
-              Delete
-            </Button>
-          </DialogActions> 
-        </Dialog>
-    
-        {/* --- SUCCESS SNACKBAR --- */}
-        <Snackbar
-          open={snackbarOpen}
-          autoHideDuration={3000}
-          onClose={handleCloseSnackbar}
-          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-        >
-          <Alert 
-            onClose={handleCloseSnackbar} 
-            severity="success" 
-            variant="filled"
-            sx={{ width: "100%" }}
+          {/* Right drawer - slides in from right; full width on small screens */}
+          <Drawer
+              anchor="right"
+              open={drawerOpen}
+              onClose={handleCloseDrawer}
+              PaperProps={{
+              sx: {
+                  width: drawerWidth ,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  padding: "30px",
+                  maxWidth: "100%",
+                  borderTopLeftRadius: { xs: 0, md: 12 },
+                  borderBottomLeftRadius: { xs: 0, md: 12 },
+                  height: { xs: "100vh", md: "100vh" },
+              },
+              }}
+              ModalProps={{ keepMounted: true }}
           >
-            {snackbarMessage}
-          </Alert>
-        </Snackbar>
-      </Stack>
-    </Stack>
+              <Box className="drawer-header">
+              <Typography variant="h6">{editingMachine ? "Edit Machine" : "Add New Machine"}</Typography>
+              <IconButton onClick={handleCloseDrawer} aria-label="close">
+                  <IconifyIcon icon="material-symbols:close-rounded" />
+              </IconButton>
+              </Box>
+
+              <Box className="drawer-content">
+              {formError && <Box className="form-error">{formError}</Box>}
+
+              <Stack spacing={2}>
+                  <TextField
+                  label="Machine Name"
+                  className="input-bg-color"
+                  placeholder="Enter machine name"
+                  fullWidth
+                  value={form.machineName}
+                  onChange={(e) => setField("machineName", e.target.value)}
+                  />
+
+                  <TextField
+                  label="Asscoiated Vendor"
+                  className="input-bg-color"
+                  select
+                  fullWidth
+                  value={form.vendorId}
+                  onChange={(e) => setField("vendorId", Number(e.target.value))}
+                  >
+                  <MenuItem>
+                    <em>None</em>
+                  </MenuItem>
+                  {vendors.map((v) => (
+                      <MenuItem key={v.id} value={v.id}>
+                      {v.vendorName}
+                      </MenuItem>
+                  ))}
+                  </TextField>
+
+                  <TextField
+                  label="Password"
+                  className="input-bg-color"
+                  type={showPassword ? 'text' : "password"}
+                  placeholder="*********"
+                  fullWidth
+                  value={form.password}
+                  onChange={(e) => setField("password", e.target.value)}
+                    InputProps = {{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={handleClickShowPassword}
+                            edge="end"
+                            sx={{
+                              color: 'text.secondary',
+                            }}
+                          >
+                            {showPassword ? (
+                              <IconifyIcon icon="ic:baseline-key-off" />
+                            ) : (
+                              <IconifyIcon icon="ic:baseline-key" />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+
+                  <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+                  <TextField
+                      label="MAC Address"
+                      className="input-bg-color"
+                      placeholder="e.g., AA:BB:CC:DD:EE:FF"
+                      fullWidth
+                      value={form.machineMac || ""}
+                      onChange={(e) => setField("machineMac", e.target.value)}
+                  />
+                  <TextField
+                      label="Machine Model"
+                      className="input-bg-color"
+                      placeholder="e.g., Model X"
+                      fullWidth
+                      value={form.machineModel || ""}
+                      onChange={(e) => setField("machineModel", e.target.value)}
+                  />
+                  </Stack>
+
+                  <TextField
+                  label="Capacity (tons)"
+                  className="input-bg-color"
+                  type="number"
+                  // step="0.01"
+                  placeholder="e.g., 5.5"
+                  fullWidth
+                  value={form.capacityTon ?? ""}
+                  onChange={(e) => setField("capacityTon", e.target.value ? parseFloat(e.target.value) : undefined)}
+                  />
+
+                  <TextField
+                  label="Last Service Date"
+                  className="input-bg-color"
+                  type="date"
+                  fullWidth
+                  value={form.lastServiceDate || ""}
+                  onChange={(e) => setField("lastServiceDate", e.target.value)}
+                  InputLabelProps={{ shrink: true }}
+                  />
+
+                  <TextField
+                  label="Machine Type"
+                  className="input-bg-color"
+                  select
+                  fullWidth
+                  value={form.machineType}
+                  onChange={(e) => setField("machineType", e.target.value as "Company" | "ThirdParty" | "Estate")}
+                  >
+                  <MenuItem value="Company">Company</MenuItem>
+                  <MenuItem value="ThirdParty">ThirdParty</MenuItem>
+                  <MenuItem value="Estate">Estate</MenuItem>
+                  </TextField>
+
+                  <TextField
+                  label="Machine Location"
+                  className="input-bg-color"
+                  placeholder="e.g., City, State"
+                  fullWidth
+                  value={form.machineLocation || ""}
+                  onChange={(e) => setField("machineLocation", e.target.value)}
+                  />
+
+                  <Stack direction="row" spacing={2} justifyContent="flex-end" mt={1}>
+                  <Button variant="text" className="cancel-button" onClick={handleCloseDrawer} 
+                  // startIcon={<IconifyIcon icon="material-symbols:close-rounded" /> }
+                  >
+                      Cancel
+                  </Button>
+
+                  <Button variant="contained" className="edit-button" onClick={handleSave} 
+                  // startIcon={<IconifyIcon icon="material-symbols:add-rounded" />}
+                  >
+                      {editingMachine ? "Update Machine" : "Save Machine"}
+                  </Button>
+                  </Stack>
+              </Stack>
+              </Box>
+          </Drawer>
+          {/* --- DELETE CONFIRMATION DIALOG --- */}
+          <Dialog
+            open={deleteDialogOpen}
+            onClose={handleCancelDelete}
+            maxWidth="xs"
+            fullWidth
+          >
+            <DialogTitle sx={{ textAlign: 'center', pb: 1 }}>
+              Confirm Delete
+            </DialogTitle>
+            <DialogContent>
+              <Typography textAlign="center" color="text.secondary">
+                Are you sure you want to delete this Machine?
+              </Typography>
+            </DialogContent>
+            <DialogActions sx={{ justifyContent: 'center', pb: 3, gap: 1 }}>
+              <Button 
+                variant="outlined" 
+                onClick={handleCancelDelete}
+                color="inherit"
+              >
+                Cancel
+              </Button>
+              <Button 
+                variant="contained" 
+                onClick={handleConfirmDelete}
+                color="error"
+                startIcon={<IconifyIcon icon="wpf:delete" />}
+              >
+                Delete
+              </Button>
+            </DialogActions> 
+          </Dialog>
+      
+          {/* --- SUCCESS SNACKBAR --- */}
+          <Snackbar
+            open={snackbarOpen}
+            autoHideDuration={3000}
+            onClose={handleCloseSnackbar}
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+          >
+            <Alert 
+              onClose={handleCloseSnackbar} 
+              severity="success" 
+              variant="filled"
+              sx={{ width: "100%" }}
+            >
+              {snackbarMessage}
+            </Alert>
+          </Snackbar>
+        </Stack>
+      {/* </Stack> */}
+    </div>
   );
 };
 

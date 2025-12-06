@@ -3,10 +3,10 @@ import {
   AppBar,
   Badge,
   IconButton,
-  InputAdornment,
+  // InputAdornment,
   Link,
   Stack,
-  TextField,
+  // TextField,
   Toolbar,
   Typography,
 } from '@mui/material';
@@ -104,7 +104,9 @@ const Topbar = ({ handleDrawerToggle }: TopbarProps): ReactElement => {
             fullWidth
             sx={{ maxWidth: 330 }}
           /> */}
-          <Typography variant="h1" component="h1" className='text-dark' sx={{ color: "#303030ff", fontSize: "34px"}}>
+          {/* <Typography variant="h1" component="h1" className='text-dark' sx={{ color: "#303030ff", fontSize: "34px" , fontFamily: "inherit"}}> */}
+          <Typography variant="h1" component="h1" className='text-dark' 
+          sx={{ background: "linear-gradient(90deg, #1a1a1aff, #3692faff)",WebkitTextFillColor: "transparent",WebkitBackgroundClip: "text", fontSize: "34px" , fontFamily: "inherit"}}>
             {pathname === '/' ? 'Dashboard' : title}
           </Typography>
         </Stack>

@@ -32,7 +32,7 @@ const Sidebar = (): ReactElement => {
         '&:hover': {
           overflowY: 'auto',
         },
-        width: 223,
+        width: 218,
       }}
     >
       <Link
