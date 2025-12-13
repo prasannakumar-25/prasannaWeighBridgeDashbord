@@ -355,6 +355,8 @@ interface VehicleMainProps {
   onAdd: () => void;
   onEdit: (vehicle: Vehicle) => void;
   onDelete: (id: number) => void;
+  loading: boolean;
+  onRefresh: () => void;
 }
 
 const VehicleMain: React.FC<VehicleMainProps> = ({
@@ -363,6 +365,9 @@ const VehicleMain: React.FC<VehicleMainProps> = ({
   onAdd,
   onEdit,
   onDelete,
+  loading,
+  onRefresh,
+
 }) => {
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
@@ -551,7 +556,7 @@ const VehicleMain: React.FC<VehicleMainProps> = ({
             <Typography variant="h4" fontWeight="bold" color="text.primary">
               Vehicle Register
             </Typography>
-            <Tooltip title="Add Vehicle" arrow>
+            <Tooltip title="Add Vehicle" placement="top" arrow>
             <Button
               variant="contained"
               onClick={onAdd}
@@ -650,7 +655,8 @@ const VehicleMain: React.FC<VehicleMainProps> = ({
 
               <Tooltip title="Refresh" arrow>
                 <IconButton
-                  onClick={() => console.log("Refresh")}
+                  onClick={onRefresh}
+                  disabled={loading}
                   sx={{ color: 'primary.main' }}
                 >
                   <IconifyIcon icon="mdi:refresh" />
@@ -661,7 +667,7 @@ const VehicleMain: React.FC<VehicleMainProps> = ({
         </Box>
 
         {/* --- DATA GRID SECTION --- */}
-        <Box sx={{ height: 550, width: '100%' }}>
+        <Box sx={{ height: 650, width: '100%' }}>
             <DataGrid
                 rows={filteredVehicles}
                 columns={columns}
@@ -683,6 +689,7 @@ const VehicleMain: React.FC<VehicleMainProps> = ({
                 }}
 
                 // Styling
+                loading={loading}
                 getRowHeight={() => 70}
                 disableRowSelectionOnClick
                 disableColumnSelector

@@ -344,7 +344,7 @@ import IconifyIcon from "components/base/IconifyIcon";
 import { useSnackbar } from 'notistack';
 
 // Import Types and Pagination
-import { Machine, Weighbridge } from "pages/RegisterManagement/VehicleRegister/VehicleRegister";
+import { Weighbridge, Machine } from "pages/RegisterManagement/WeighbridgeRegister/WeighbridgeRegister";
 import CustomPagination from "../VehicleManage/CustomPagination";
 
 import "../../RegisterManagement/MachineRegister/MachineRegister.css";
@@ -355,6 +355,8 @@ interface WeighbridgeMainProps {
   onAdd: () => void;
   onEdit: (wb: Weighbridge) => void;
   onDelete: (id: number) => void;
+  loading: boolean;
+  onRefresh: () => void;
 }
 
 const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
@@ -363,6 +365,8 @@ const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
   onAdd,
   onEdit,
   onDelete,
+  loading,
+  onRefresh,
 }) => {
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
@@ -538,7 +542,7 @@ const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
             <Typography variant="h4" fontWeight="bold" color="text.primary">
               Weighbridge Register
             </Typography>
-            <Tooltip title="Add Weighbridge" arrow>
+            <Tooltip title="Add Weighbridge" placement="top" arrow>
             <Button
               variant="contained"
               onClick={onAdd}
@@ -640,7 +644,8 @@ const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
 
               <Tooltip title="Refresh" arrow>
                 <IconButton
-                  onClick={() => console.log("Refresh")}
+                  onClick={onRefresh}
+                  // disabled={loading}
                   sx={{ color: 'primary.main' }}
                 >
                   <IconifyIcon icon="mdi:refresh" />
@@ -673,6 +678,7 @@ const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
                 }}
 
                 // Styling
+                loading={loading}
                 getRowHeight={() => 70}
                 disableRowSelectionOnClick
                 disableColumnSelector

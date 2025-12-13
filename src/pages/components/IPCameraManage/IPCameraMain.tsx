@@ -393,6 +393,8 @@ interface IPCameraMainProps {
   onAdd: () => void;
   onEdit: (cam: IPCamera) => void;
   onDelete: (id: number) => void;
+  loading: boolean;
+  onRefresh: () => void;
 }
 
 const IPCameraMain: React.FC<IPCameraMainProps> = ({
@@ -401,6 +403,8 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
   onAdd,
   onEdit,
   onDelete,
+  loading,
+  onRefresh,
 }) => {
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
@@ -461,6 +465,7 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
         c.ipAddress,
         c.macAddress,
         c.rtspUrl || "",
+        c.httpUrl || "",
         c.location || "",
         c.installedDate ? dayjs(c.installedDate).format('YYYY-MM-DD') : "",
         c.status
@@ -532,6 +537,26 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
             return dayjs(params.value).format('DD MMM YYYY');
         }
     },
+    {
+        field: 'rtspUrl',
+        headerName: 'RTSP Url',
+        width: 130,
+        renderCell: (params: GridRenderCellParams) => (
+          params.value ? (
+            <a
+              href={params.value.startsWith('http') ? params.value : `https://${params.value}`}
+              target="_blank"
+              rel="noreferrer"
+              style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: theme.palette.primary.main }}
+            >
+              <IconifyIcon icon="material-symbols:open-in-new-rounded" />
+              &nbsp;Visit
+            </a>
+          ) : (
+            "—"
+          )
+        )
+      },
      {
         field: 'username',
         headerName: 'User Name',
@@ -552,6 +577,7 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
             <Typography variant="subtitle2" fontWeight={200} color="text.primary">
                 {params.value}
             </Typography>
+            
         )
     },
     {
@@ -613,7 +639,7 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
             <Typography variant="h4" fontWeight="bold" color="text.primary">
               IP Camera Register
             </Typography>
-            <Tooltip title="Add Camera" arrow>
+            <Tooltip title="Add Camera" placement="top" arrow>
             <Button
               variant="contained"
               onClick={onAdd}
@@ -715,7 +741,8 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
 
               <Tooltip title="Refresh" arrow>
                 <IconButton
-                  onClick={() => console.log("Refresh")}
+                  onClick={onRefresh}
+                  disabled={loading}
                   sx={{ color: 'primary.main' }}
                 >
                   <IconifyIcon icon="mdi:refresh" />
@@ -748,6 +775,7 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
                 }}
 
                 // Styling
+                loading={loading}
                 getRowHeight={() => 70}
                 disableRowSelectionOnClick
                 disableColumnSelector

@@ -48,8 +48,8 @@ const Sidebar = (): ReactElement => {
         }}
       >
         <div className="sidebar">
-          <div className="sidebar-logo">
-            <Image src={Acutuz} alt="Logo" className="logo-img" />
+          <div className="sidebar-logo" style={{ marginLeft: '50%' }}>
+            <Image src={Acutuz} width={85.8}  alt="Logo" className="logo-img" />
           </div>
         </div>
       </Link>
@@ -101,10 +101,10 @@ const Sidebar = (): ReactElement => {
                 },
               }}
             >
-              <ListItemIcon>
+              {/* <ListItemIcon>
                 <IconifyIcon icon="ri:logout-circle-line" />
               </ListItemIcon>
-              <ListItemText>Log out</ListItemText>
+              <ListItemText>Log out</ListItemText> */}
             </ListItemButton>
           </ListItem>
         </List>

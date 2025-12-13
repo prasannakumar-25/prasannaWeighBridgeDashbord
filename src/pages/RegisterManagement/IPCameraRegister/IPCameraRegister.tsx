@@ -1637,7 +1637,7 @@ import {
 } from "@mui/material";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { useSnackbar } from 'notistack';
+// import { useSnackbar } from 'notistack';
 
 // Sub Components
 import IPCameraMain from "pages/components/IPCameraManage/IPCameraMain";
@@ -1645,6 +1645,8 @@ import IPCameraDrawer from "pages/components/IPCameraManage/IPCameraDrawer";
 
 // Custom CSS (Your existing CSS)
 import "../../RegisterManagement/MachineRegister/MachineRegister.css";
+import IconifyIcon from "components/base/IconifyIcon";
+import ipCameraApi from "services/ipCameraApi";
 
 // --- Global Types ---
 export type Machine = {
@@ -1657,7 +1659,7 @@ export type IPCamera = {
   machineId: number;
   cameraName: string;
   ipAddress: string;
-  rtspUrl?: string;
+  rtspUrl: string;
   httpUrl?: string;
   username: string;
   password: string;
@@ -1675,6 +1677,7 @@ const IPCameraRegister: React.FC = () => {
   // UI Control State
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingCamera, setEditingCamera] = useState<IPCamera | null>(null);
+  const [loading, setLoading] = useState(false);
 
   // Feedback State
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -1682,10 +1685,34 @@ const IPCameraRegister: React.FC = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
-  const { enqueueSnackbar } = useSnackbar();
+
+  // const { enqueueSnackbar } = useSnackbar();
+
+  // API / effect------------
+  const fetchCamera = async () => {
+    setLoading(true);
+    try{
+      const response = await ipCameraApi.getIPcameraDetails();
+      if (response.success) {
+        setCameras(response.data)
+      } else {
+        setSnackbarMessage(response.message || "Failed to register IPcamera");
+      }
+    } catch (error: any) {
+      const errorMessage = error.response?.data.message || "Somthing error occured try again later";
+      setSnackbarMessage(errorMessage)
+    } finally {
+      setSnackbarOpen(true);
+      setLoading(false);
+    }
+  };
+
+
 
   // Load Mock Data
   useEffect(() => {
+    setLoading(true);
+    fetchCamera();
     setMachines([
         { id: 1, machineName: "Machine A" },
         { id: 2, machineName: "Machine B" },
@@ -1695,11 +1722,11 @@ const IPCameraRegister: React.FC = () => {
         { id: 1, machineId: 1, 
           cameraName: "Cam Front", ipAddress: "192.168.1.10", macAddress: "FBW FWU FDU",
           status: "Online", location: "Gate 1", 
-          installedDate: "2023-11-01", username: "Ram", password: "ram@24" },
+          installedDate: "2023-11-01", rtspUrl: "https://cursor.com/", username: "Ram", password: "ram@24" },
         { id: 2, machineId: 2, 
           cameraName: "Cam Back", ipAddress: "192.168.1.11", macAddress: "NDG DVA RSG",
           status: "Offline", location: "Conveyor", 
-          installedDate: "2023-12-15",username: "kumar", password: "kumar@24"  },
+          installedDate: "2023-12-15", rtspUrl:"https://alpha.com/", username: "kumar", password: "kumar@24"  },
         // { id: 3, machineId: 1, 
         //   cameraName: "Cam Side", ipAddress: "192.168.1.12", 
         //   status: "Error", location: "Warehouse", 
@@ -1713,6 +1740,7 @@ const IPCameraRegister: React.FC = () => {
         //   status: "Online", location: "Entrance", 
         //   installedDate: "2024-03-20" },
     ]);
+    setLoading(false);
   }, []);
 
   // --- Handlers ---
@@ -1732,16 +1760,21 @@ const IPCameraRegister: React.FC = () => {
   };
 
   const handleSave = (formData: IPCamera) => {
+    setLoading(true);
     // Simulate API call
-    if (editingCamera) {
-      setCameras((prev) => prev.map((c) => (c.id === editingCamera.id ? { ...formData, id: editingCamera.id } : c)));
-      enqueueSnackbar("Camera updated successfully", { variant: "success" });
-    } else {
-      const newCamera: IPCamera = { ...formData, id: Date.now() };
-      setCameras((prev) => [newCamera, ...prev]);
-      enqueueSnackbar("Camera added successfully", { variant: "success" });
-    }
-    handleCloseDrawer();
+    setTimeout(() => {
+      if (editingCamera) {
+        setCameras((prev) => prev.map((c) => (c.id === editingCamera.id ? { ...formData, id: editingCamera.id } : c)));
+        setSnackbarMessage("Camera updated successfully");
+      } else {
+        const newCamera: IPCamera = { ...formData, id: Date.now() };
+        setCameras((prev) => [newCamera, ...prev]);
+        setSnackbarMessage("Camera added successfully");
+      }
+      setLoading(false);
+      setSnackbarOpen(true);
+      handleCloseDrawer();
+      }, 400);
   };
 
   // --- Delete Logic ---
@@ -1771,7 +1804,10 @@ const IPCameraRegister: React.FC = () => {
           onAdd={handleOpenAdd}
           onEdit={handleOpenEdit}
           onDelete={initiateDelete}
+          loading={loading}
+          onRefresh={fetchCamera}
         />
+
 
         {/* 2. Drawer View (Form) */}
         <IPCameraDrawer
@@ -1780,6 +1816,7 @@ const IPCameraRegister: React.FC = () => {
           onSave={handleSave}
           initialData={editingCamera}
           machines={machines}
+          loading={loading}
         />
 
         {/* 3. Global Dialogs */}
@@ -1788,9 +1825,11 @@ const IPCameraRegister: React.FC = () => {
           <DialogContent>
             <Typography>Are you sure you want to delete this Camera?</Typography>
           </DialogContent>
-          <DialogActions>
+          <DialogActions sx={{ justifyContent: "flex-end", pb: 2, gap: 1 }}>
             <Button onClick={() => setDeleteDialogOpen(false)} variant="outlined" color="inherit">Cancel</Button>
-            <Button onClick={confirmDelete} color="error" variant="contained">Delete</Button>
+            <Button onClick={confirmDelete} color="error" variant="contained"
+            startIcon={<IconifyIcon icon="wpf:delete"/>}
+            >Delete</Button>
           </DialogActions>
         </Dialog>
 

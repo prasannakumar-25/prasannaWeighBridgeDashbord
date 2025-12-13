@@ -267,7 +267,7 @@ interface VehicleDrawerProps {
   initialData: Vehicle | null;
   vendors: Vendor[];
   machines: Machine[]; 
-  loading: boolean;
+  loading?: boolean;
 }
 
 const VehicleDrawer: React.FC<VehicleDrawerProps> = ({
@@ -277,7 +277,7 @@ const VehicleDrawer: React.FC<VehicleDrawerProps> = ({
   initialData,
   vendors,
   machines,
-  loading,
+  loading = false
 }) => {
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));

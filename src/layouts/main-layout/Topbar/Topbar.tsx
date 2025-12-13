@@ -62,7 +62,7 @@ const Topbar = ({ handleDrawerToggle }: TopbarProps): ReactElement => {
               bgcolor: 'inherit',
             }}
           >
-            <IconifyIcon icon="mdi:menu" />
+            <IconifyIcon icon="mdi:menu" sx={{ color: "black" }} />
           </IconButton>
           {/* <IconButton
             color="inherit"

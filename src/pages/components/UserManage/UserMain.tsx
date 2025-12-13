@@ -408,6 +408,8 @@ interface UserMainProps {
   onAdd: () => void;
   onEdit: (user: User) => void;
   onDelete: (id: number) => void;
+  loading: boolean;
+  onRefresh: () => void;
 }
 
 const UserMain: React.FC<UserMainProps> = ({
@@ -415,6 +417,8 @@ const UserMain: React.FC<UserMainProps> = ({
   onAdd,
   onEdit,
   onDelete,
+  loading,
+  onRefresh,
 }) => {
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
@@ -542,7 +546,7 @@ const UserMain: React.FC<UserMainProps> = ({
         minWidth: 140,
         renderCell: (params: any) => {
             if (!params.value) return "—";
-            return dayjs(params.value).format('DD MMM YYYY');
+            return dayjs(params.value).format('DD/ MMM/ YYYY');
         }
     },
     {
@@ -603,7 +607,7 @@ const UserMain: React.FC<UserMainProps> = ({
             <Typography variant="h4" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
                 User Register
             </Typography>
-            <Tooltip title="Add User" arrow>
+            <Tooltip title="Add User" placement="top" arrow>
             <Button
               variant="contained"
               onClick={onAdd}
@@ -619,7 +623,7 @@ const UserMain: React.FC<UserMainProps> = ({
           <Grid container spacing={2} alignItems="center">
             {/* Search */}
             <Grid item xs={12} sm={6} md={3}>
-              <Tooltip title="Search Name or Email" arrow>
+              {/* <Tooltip title="Search Name or Email" arrow> */}
               <TextField
                 variant="outlined"
                 label="Search "
@@ -635,11 +639,10 @@ const UserMain: React.FC<UserMainProps> = ({
                     </InputAdornment>
                   ),
                 }}
-              /></Tooltip>
+              />
             </Grid>
 
             {/* From Date */}
-            <Tooltip title="From Date" arrow>
             <Grid item xs={6} sm={3} md={2}>
               <DatePicker
                 label="From Date"
@@ -649,10 +652,8 @@ const UserMain: React.FC<UserMainProps> = ({
                 slotProps={{ textField: { size: 'small', fullWidth: true } }}
               />
             </Grid>
-            </Tooltip>
 
             {/* To Date */}
-            <Tooltip title="To Date" arrow>
             <Grid item xs={6} sm={3} md={2}>
               <DatePicker
                 label="To Date"
@@ -662,10 +663,8 @@ const UserMain: React.FC<UserMainProps> = ({
                 slotProps={{ textField: { size: 'small', fullWidth: true } }}
               />
             </Grid>
-            </Tooltip>
 
             {/* Role Filter */}
-            <Tooltip title="Filter Role" arrow>
             <Grid item xs={12} sm={6} md={2}>
               <TextField
                 select
@@ -682,7 +681,6 @@ const UserMain: React.FC<UserMainProps> = ({
                 <MenuItem value="Viewer">Viewer</MenuItem>
               </TextField>
             </Grid>
-            </Tooltip>
 
             {/* Actions */}
             <Grid item xs={12} md={3} sx={{ display: 'flex', justifyContent: { xs: 'flex-start', md: 'flex-end' }, gap: 1 }}>
@@ -712,7 +710,8 @@ const UserMain: React.FC<UserMainProps> = ({
 
               <Tooltip title="Refresh" arrow>
                 <IconButton
-                  onClick={() => console.log("Refresh")}
+                  onClick={onRefresh}
+                  disabled={loading}
                   sx={{ color: 'primary.main' }}
                 >
                   <IconifyIcon icon="mdi:refresh" />
@@ -745,6 +744,7 @@ const UserMain: React.FC<UserMainProps> = ({
                 }}
 
                 // Styling
+                loading={loading}
                 getRowHeight={() => 70}
                 disableRowSelectionOnClick
                 disableColumnSelector

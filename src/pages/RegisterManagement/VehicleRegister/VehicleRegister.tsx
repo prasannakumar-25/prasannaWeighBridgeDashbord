@@ -867,11 +867,14 @@ import {
 } from "@mui/material";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { useSnackbar } from 'notistack';
+// import { useSnackbar } from 'notistack';
 
 // Sub Components
 import VehicleMain from "pages/components/VehicleManage/VehicleMain";
 import VehicleDrawer from "pages/components/VehicleManage/VehicleDawer";
+
+import IconifyIcon from "components/base/IconifyIcon";
+import vehicletypeApi from "services/vehicletypeApi";
 
 // --- Types ---
 export type Vendor = {
@@ -913,10 +916,31 @@ const VehicleRegister: React.FC = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   
-  const { enqueueSnackbar } = useSnackbar();
+  // const { enqueueSnackbar } = useSnackbar();
+
+  // API Fetch-----------
+  const fetchVehicle = async ()=> {
+    setLoading(true);
+    try{
+      const response = await vehicletypeApi.getVehicleDetails();
+      if (response.success) {
+        setVehicles(response.data);
+      } else {
+       setSnackbarMessage(response.message || " Failed to register machine");
+      }
+    } catch (error: any) {
+      const errorMessage = error.response?.data.message || "Somthing error occured please try again later";
+      setSnackbarMessage(errorMessage);
+    } finally {
+      setSnackbarOpen(true)
+      setLoading(false);
+    }
+  }
 
   // Load Data Mock
   useEffect(() => {
+    setLoading(true)
+    fetchVehicle();
     setVendors([
         { id: 1, vendorName: "TechCorp Industries" },
         { id: 2, vendorName: "Global Logistics" }
@@ -928,15 +952,36 @@ const VehicleRegister: React.FC = () => {
         { id: 1, vehicleType: "Truck", vendorId: 1, tareWeight: 2500, status: "Active", createdDate: "2023-11-01" },
         { id: 2, vehicleType: "Van", vendorId: 2, tareWeight: 1800, status: "Active", createdDate: "2023-12-15" },
         { id: 3, vehicleType: "Lorry", vendorId: 1, tareWeight: 3200, status: "Inactive", createdDate: "2024-01-10" },
-        // { id: 4, vehicleType: "Pickup", vendorId: 2, tareWeight: 1500, status: "Active", createdDate: "2024-02-20" },
-        // { id: 5, vehicleType: "Semi", vendorId: 1, tareWeight: 8000, status: "Active", createdDate: "2024-03-05" },
-        // { id: 6, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
-        // { id: 7, vehicleType: "Pickup", vendorId: 2, tareWeight: 1500, status: "Active", createdDate: "2024-02-20" },
-        // { id: 8, vehicleType: "Semi", vendorId: 1, tareWeight: 8000, status: "Active", createdDate: "2024-03-05" },
-        // { id: 9, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
-        // { id: 10, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
-        // { id: 11, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
+        { id: 4, vehicleType: "Pickup", vendorId: 2, tareWeight: 1500, status: "Active", createdDate: "2024-02-20" },
+        { id: 5, vehicleType: "Semi", vendorId: 1, tareWeight: 8000, status: "Active", createdDate: "2024-03-05" },
+        { id: 6, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
+        { id: 7, vehicleType: "Pickup", vendorId: 2, tareWeight: 1500, status: "Active", createdDate: "2024-02-20" },
+        { id: 8, vehicleType: "Semi", vendorId: 1, tareWeight: 8000, status: "Active", createdDate: "2024-03-05" },
+        { id: 9, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
+        { id: 10, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
+        { id: 11, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
+        { id: 12, vehicleType: "Van", vendorId: 2, tareWeight: 1800, status: "Active", createdDate: "2023-12-15" },
+        { id: 13, vehicleType: "Lorry", vendorId: 1, tareWeight: 3200, status: "Inactive", createdDate: "2024-01-10" },
+        { id: 14, vehicleType: "Pickup", vendorId: 2, tareWeight: 1500, status: "Active", createdDate: "2024-02-20" },
+        { id: 15, vehicleType: "Semi", vendorId: 1, tareWeight: 8000, status: "Active", createdDate: "2024-03-05" },
+        { id: 16, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
+        { id: 17, vehicleType: "Pickup", vendorId: 2, tareWeight: 1500, status: "Active", createdDate: "2024-02-20" },
+        { id: 18, vehicleType: "Semi", vendorId: 1, tareWeight: 8000, status: "Active", createdDate: "2024-03-05" },
+        { id: 19, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
+        { id: 20, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
+        { id: 21, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
+        { id: 22, vehicleType: "Van", vendorId: 2, tareWeight: 1800, status: "Active", createdDate: "2023-12-15" },
+        { id: 23, vehicleType: "Lorry", vendorId: 1, tareWeight: 3200, status: "Inactive", createdDate: "2024-01-10" },
+        { id: 24, vehicleType: "Pickup", vendorId: 2, tareWeight: 1500, status: "Active", createdDate: "2024-02-20" },
+        { id: 25, vehicleType: "Semi", vendorId: 1, tareWeight: 8000, status: "Active", createdDate: "2024-03-05" },
+         { id: 26, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
+        { id: 27, vehicleType: "Pickup", vendorId: 2, tareWeight: 1500, status: "Active", createdDate: "2024-02-20" },
+        { id: 28, vehicleType: "Semi", vendorId: 1, tareWeight: 8000, status: "Active", createdDate: "2024-03-05" },
+        { id: 29, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
+        { id: 30, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
+        { id: 31, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
     ]);
+    setLoading(false)
   }, []);
 
   // --- Handlers ---
@@ -962,17 +1007,18 @@ const VehicleRegister: React.FC = () => {
       setTimeout(() => {
         if (editingVehicle) {
              setVehicles(prev => prev.map(v => v.id === formData.id ? formData : v));
-             enqueueSnackbar("Vehicle updated successfully!", { variant: "success" });
+             setSnackbarMessage("Vehicle updated successfully!");
         } else {
              const newVehicle = { ...formData, id: Date.now() };
              setVehicles(prev => [newVehicle, ...prev]);
-             enqueueSnackbar("Vehicle added successfully!", { variant: "success" });
+             setSnackbarMessage("Vehicle added successfully!");
         }
         setLoading(false);
+        setSnackbarOpen(true)
         handleCloseDrawer();
       }, 500); 
     } catch (error) {
-       enqueueSnackbar("Error saving data", { variant: "error" });
+       setSnackbarMessage("Error saving data");
        setLoading(false);
     }
   };
@@ -1004,6 +1050,8 @@ const VehicleRegister: React.FC = () => {
             onAdd={handleOpenAdd}
             onEdit={handleOpenEdit}
             onDelete={initiateDelete}
+            onRefresh={fetchVehicle}
+            loading={loading}
         />
         
 
@@ -1024,9 +1072,11 @@ const VehicleRegister: React.FC = () => {
             <DialogContent>
                 <Typography>Are you sure you want to delete this Vehicle?</Typography>
             </DialogContent>
-            <DialogActions>
-                <Button onClick={() => setDeleteDialogOpen(false)} color="inherit">Cancel</Button>
-                <Button onClick={confirmDelete} color="error" variant="contained">Delete</Button>
+            <DialogActions sx={{justifyContent: "flex-end", pb: 2, gap: 1}}>
+                <Button onClick={() => setDeleteDialogOpen(false)} variant="outlined" color="inherit">Cancel</Button>
+                <Button onClick={confirmDelete} color="error" variant="contained"
+                startIcon={<IconifyIcon icon = "wpf:delete"/>}
+                >Delete</Button>
             </DialogActions> 
         </Dialog>
 

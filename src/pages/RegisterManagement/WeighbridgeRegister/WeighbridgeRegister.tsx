@@ -768,7 +768,7 @@ import {
 } from "@mui/material";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { useSnackbar } from 'notistack';
+// import { useSnackbar } from 'notistack';
 
 // Sub Components
 import WeighbridgeMain from "pages/components/WeighbridgeManage/WeighbridgeMain";
@@ -776,6 +776,8 @@ import WeighbridgeDrawer from "pages/components/WeighbridgeManage/WeighbridgeDra
 
 // Custom CSS (Your existing CSS)
 import "../../RegisterManagement/MachineRegister/MachineRegister.css";
+import IconifyIcon from "components/base/IconifyIcon";
+import weighBridgeApi from "services/weighBridgeApi";
 
 // --- Global Types ---
 export type Machine = {
@@ -812,10 +814,32 @@ const WeighbridgeRegister: React.FC = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
-  const { enqueueSnackbar } = useSnackbar();
+  // const { enqueueSnackbar } = useSnackbar();
+
+  // API Effect----------
+  const fetchWeighbridge = async () => {
+    setLoading(true);
+    try{
+      const response = await weighBridgeApi.getWeighbridgeDetails();
+      if (response.success) {
+        setWeighbridges(response.data)
+      } else {
+        setSnackbarMessage(response.message || "failed to register Weighbridge")
+      }
+     } catch (error: any) {
+        const errorMessage = error.response?.data.message || "Somthing error occured please try again later";
+        setSnackbarMessage(errorMessage);
+      } finally {
+        setSnackbarOpen(true);
+        setLoading(false);
+      }
+    };
+
 
   // Load Mock Data
   useEffect(() => {
+    setLoading(true);
+    fetchWeighbridge();
     setMachines([
       { id: 1, machineName: "Machine A" },
       { id: 2, machineName: "Machine B" },
@@ -829,6 +853,7 @@ const WeighbridgeRegister: React.FC = () => {
       { id: 5, machineId: 2, serialNo: "SN-500", port: "COM3", baudRate: "9600", dataBit: 8, stopBit: 1, party: "Even", createdAt: "2024-03-05" },
       { id: 6, machineId: 3, serialNo: "SN-600", port: "COM4", baudRate: "9600", dataBit: 8, stopBit: 1, party: "None", createdAt: "2024-03-12" },
     ]);
+    setLoading(true);
   }, []);
 
   // --- Handlers ---
@@ -855,13 +880,14 @@ const WeighbridgeRegister: React.FC = () => {
         setWeighbridges((prev) =>
             prev.map((item) => (item.id === editingItem.id ? { ...formData, id: editingItem.id } : item))
         );
-        enqueueSnackbar("Weighbridge updated successfully", { variant: "success" });
+        setSnackbarMessage("Weighbridge updated successfully");
         } else {
         const newItem: Weighbridge = { ...formData, id: Date.now() };
         setWeighbridges((prev) => [newItem, ...prev]);
-        enqueueSnackbar("Weighbridge added successfully", { variant: "success" });
+        setSnackbarMessage("Weighbridge added successfully");
         }
         setLoading(false);
+        setSnackbarOpen(true)
         handleCloseDrawer();
     }, 400);
   };
@@ -893,6 +919,8 @@ const WeighbridgeRegister: React.FC = () => {
           onAdd={handleOpenAdd}
           onEdit={handleOpenEdit}
           onDelete={initiateDelete}
+          loading={loading}
+          onRefresh={fetchWeighbridge}
         />
 
         {/* 2. Drawer View (Form) */}
@@ -911,16 +939,19 @@ const WeighbridgeRegister: React.FC = () => {
           <DialogContent>
             <Typography>Are you sure you want to delete this Weighbridge?</Typography>
           </DialogContent>
-          <DialogActions>
+          <DialogActions sx={{ justifyContent: "flex_end", pb: 2, gap: 1 }}>
             <Button onClick={() => setDeleteDialogOpen(false)} variant="outlined" color="inherit">Cancel</Button>
-            <Button onClick={confirmDelete} color="error" variant="contained">Delete</Button>
+            <Button onClick={confirmDelete} color="error" variant="contained"
+            startIcon={<IconifyIcon icon="wpf:delete"/>}
+            >
+              Delete</Button>
           </DialogActions>
         </Dialog>
 
         {/* Legacy Snackbar */}
         <Snackbar
           open={snackbarOpen}
-          autoHideDuration={3000}
+          autoHideDuration={2500}
           onClose={() => setSnackbarOpen(false)}
           anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         >

@@ -344,6 +344,7 @@ interface IPCameraDrawerProps {
   onSave: (data: IPCamera) => void;
   initialData: IPCamera | null;
   machines: Machine[];
+  loading: boolean;
 }
 
 const IPCameraDrawer: React.FC<IPCameraDrawerProps> = ({
@@ -352,6 +353,7 @@ const IPCameraDrawer: React.FC<IPCameraDrawerProps> = ({
   onSave,
   initialData,
   machines,
+  loading,
 }) => {
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
@@ -571,6 +573,7 @@ const IPCameraDrawer: React.FC<IPCameraDrawerProps> = ({
             className="input-bg-color label-black" 
             placeholder="e.g., Main Entrance"
             fullWidth
+            
             value={form.location || ""}
             onChange={(e) => setField("location", e.target.value)}
           />

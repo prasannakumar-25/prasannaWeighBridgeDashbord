@@ -262,8 +262,7 @@ import {
   useTheme,
 } from "@mui/material";
 import IconifyIcon from "components/base/IconifyIcon";
-import { Machine, Weighbridge } from "pages/RegisterManagement/VehicleRegister/VehicleRegister";
-
+import { Weighbridge, Machine } from "pages/RegisterManagement/WeighbridgeRegister/WeighbridgeRegister";
 import "../../RegisterManagement/MachineRegister/MachineRegister.css";
 
 interface WeighbridgeDrawerProps {

@@ -873,7 +873,7 @@ import {
 } from "@mui/material";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { useSnackbar } from 'notistack';
+// import { useSnackbar } from 'notistack';
 
 // Sub Components
 import UserMain from "pages/components/UserManage/UserMain";
@@ -881,6 +881,8 @@ import UserDrawer from "pages/components/UserManage/UserDrawer";
 
 // Custom CSS (Your existing CSS)
 import "../../RegisterManagement/MachineRegister/MachineRegister.css";
+import IconifyIcon from "components/base/IconifyIcon";
+import userApi from "services/userApi";
 
 // --- Global Types ---
 export type User = {
@@ -911,10 +913,30 @@ const UserRegister: React.FC = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
-  const { enqueueSnackbar } = useSnackbar();
+  // const { enqueueSnackbar } = useSnackbar();
+
+  // --- API / Effect ---
+    const fetchUser = async () => {
+    setLoading(true);
+    try {
+      const response = await userApi.getUserDetails();
+      if (response.success) {
+        setUsers(response.data); 
+      } else {
+        setSnackbarMessage(response.message || "Failed to register machine");
+      }
+    } catch (error: any) {
+      const errorMessage = error.response?.data.message || "Something error occured please try again later";
+      setSnackbarMessage(errorMessage);
+    } finally {
+      setSnackbarOpen(true)
+      setLoading(false);
+    }
+  };
 
   // Load Mock Data
   useEffect(() => {
+    fetchUser();
     setUsers([
       { id: 1, username: "John", fullName: "Alice Johnson", email: "alice@company.com", phoneNumber: "9876543210", role: "Admin", status: "Active", createdDate: "2023-11-01" },
       { id: 2, username: "Smith", fullName: "Bob Smith", email: "bob@company.com", phoneNumber: "8765432109", role: "Operator", status: "Active", createdDate: "2023-12-15" },
@@ -946,13 +968,14 @@ const UserRegister: React.FC = () => {
     setTimeout(() => {
       if (editingUser) {
         setUsers((prev) => prev.map((u) => (u.id === editingUser.id ? { ...formData, id: editingUser.id } : u)));
-        enqueueSnackbar("User updated successfully", { variant: "success" });
+        setSnackbarMessage("User updated successfully");
       } else {
         const newUser: User = { ...formData, id: Date.now() };
         setUsers((prev) => [newUser, ...prev]);
-        enqueueSnackbar("User added successfully", { variant: "success" });
+        setSnackbarMessage("User added successfully");
       }
       setLoading(false);
+      setSnackbarOpen(true);
       handleCloseDrawer();
     }, 400);
   };
@@ -983,6 +1006,8 @@ const UserRegister: React.FC = () => {
           onAdd={handleOpenAdd}
           onEdit={handleOpenEdit}
           onDelete={initiateDelete}
+          onRefresh={fetchUser}
+          loading={loading}
         />
 
         {/* 2. Drawer View (Form) */}
@@ -1000,9 +1025,14 @@ const UserRegister: React.FC = () => {
           <DialogContent>
             <Typography>Are you sure you want to delete this User?</Typography>
           </DialogContent>
-          <DialogActions>
+          <DialogActions sx={{ justifyContent: 'flex-end', pb: 2, gap: 1 }}>
             <Button onClick={() => setDeleteDialogOpen(false)} variant="outlined" color="inherit">Cancel</Button>
-            <Button onClick={confirmDelete} color="error" variant="contained">Delete</Button>
+            <Button onClick={confirmDelete} color="error" 
+            variant="contained"
+            startIcon={<IconifyIcon icon="wpf:delete"/>}
+            >
+              Delete
+              </Button>
           </DialogActions>
         </Dialog>
 
