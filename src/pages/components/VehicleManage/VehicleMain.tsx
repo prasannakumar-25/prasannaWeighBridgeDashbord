@@ -667,7 +667,7 @@ const VehicleMain: React.FC<VehicleMainProps> = ({
         </Box>
 
         {/* --- DATA GRID SECTION --- */}
-        <Box sx={{ height: 650, width: '100%' }}>
+        <Box sx={{ height: 550, width: '100%' }}>
             <DataGrid
                 rows={filteredVehicles}
                 columns={columns}
@@ -694,6 +694,7 @@ const VehicleMain: React.FC<VehicleMainProps> = ({
                 disableRowSelectionOnClick
                 disableColumnSelector
                 disableColumnMenu
+                disableColumnSorting
                 sx={{
                     border: 'none',
                     '& .MuiDataGrid-cell': {

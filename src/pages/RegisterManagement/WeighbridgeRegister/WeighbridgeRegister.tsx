@@ -966,3 +966,10 @@ const WeighbridgeRegister: React.FC = () => {
 };
 
 export default WeighbridgeRegister;
+
+
+
+
+
+
+

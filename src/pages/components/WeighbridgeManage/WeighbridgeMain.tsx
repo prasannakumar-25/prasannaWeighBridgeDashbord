@@ -342,6 +342,10 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import IconifyIcon from "components/base/IconifyIcon";
 import { useSnackbar } from 'notistack';
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Divider from "@mui/material/Divider";
+
 
 // Import Types and Pagination
 import { Weighbridge, Machine } from "pages/RegisterManagement/WeighbridgeRegister/WeighbridgeRegister";
@@ -380,6 +384,30 @@ const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
   const handleChangeSearch = (event: ChangeEvent<HTMLInputElement>) => {
     setSearch(event.currentTarget.value);
   };
+  const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null);
+  const openExportMenu = Boolean(exportAnchorEl);
+  
+  const handleOpenExportMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setExportAnchorEl(event.currentTarget);
+  };
+  
+  const handleCloseExportMenu = () => {
+    setExportAnchorEl(null);
+  };
+
+  const handleExportExcel = () => {
+  handleCloseExportMenu();
+  enqueueSnackbar("Excel export coming soon", { variant: "info" });
+  // TODO: Excel logic
+  };
+  
+  const handleExportWord = () => {
+    handleCloseExportMenu();
+    enqueueSnackbar("Word export coming soon", { variant: "info" });
+    // TODO: Word logic
+  };
+
+
 
   const handleClearFilters = () => {
     setSearch("");
@@ -387,6 +415,8 @@ const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
     setFromDate(null);
     setToDate(null);
   };
+
+
 
   // -- Filter Logic --
   const filteredWeighbridges = useMemo(() => {
@@ -683,6 +713,7 @@ const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
                 disableRowSelectionOnClick
                 disableColumnSelector
                 disableColumnMenu
+                
                 sx={{
                     border: 'none',
                     '& .MuiDataGrid-cell': {
@@ -702,3 +733,12 @@ const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
 };
 
 export default WeighbridgeMain;
+
+
+
+
+
+
+
+
+

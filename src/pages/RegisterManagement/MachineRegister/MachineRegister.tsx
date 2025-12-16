@@ -792,6 +792,7 @@ const MachineRegister: React.FC<{ onLogout?: () => void }> = () => {
         { id: 6, vendorId: 2, machineName: "Machine B", 
         password: "456", machineType: "ThirdParty", capacityTon: 10, machineLocation: "local", machineModel: "Model 242",
         lastServiceDate: "2024-06-20", machineMac: "11:22:33" },
+      
     ]);
   }, []);
 

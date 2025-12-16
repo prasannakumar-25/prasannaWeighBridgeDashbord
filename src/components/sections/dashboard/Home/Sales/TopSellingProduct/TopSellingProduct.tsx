@@ -164,6 +164,7 @@ const TopSellingProduct = (): ReactElement => {
           getRowHeight={() => 70}
           hideFooterSelectedRowCount
           disableColumnResize
+          disableColumnSorting
           disableColumnSelector
           disableRowSelectionOnClick
           rowSelection={false}

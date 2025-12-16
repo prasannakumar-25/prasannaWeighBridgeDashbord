@@ -374,7 +374,8 @@ import {
   DataGrid, 
   GridColDef, 
   GridRenderCellParams, 
-  GridSlots 
+  GridSlots,
+  
 } from '@mui/x-data-grid';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs, { Dayjs } from 'dayjs';
@@ -676,23 +677,51 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
 
             {/* From Date */}
             <Grid item xs={6} sm={3} md={2}>
-              <DatePicker
+              {/* <DatePicker
                 className="header-search-section"
                 label="From Date"
                 value={fromDate}
                 onChange={(newValue) => setFromDate(newValue)}
                 slotProps={{ textField: { size: 'small', fullWidth: true } }}
+              /> */}
+              <Typography variant="caption" fontWeight={600} color="text.secondary" display="block" mb={0.5}>
+                  From Date
+              </Typography>
+              <DatePicker
+                  value={fromDate}
+                  onChange={(newValue) => setFromDate(newValue)}
+                  slotProps={{ 
+                      textField: { 
+                          size: "small", 
+                          fullWidth: true,
+                          InputProps: { sx: { borderRadius: 2, bgcolor: 'background.default' } }
+                      } 
+                  }}
               />
             </Grid>
 
             {/* To Date */}
             <Grid item xs={6} sm={3} md={2}>
-              <DatePicker
+              {/* <DatePicker
                 className="header-search-section"
                 label="To Date"
                 value={toDate}
                 onChange={(newValue) => setToDate(newValue)}
                 slotProps={{ textField: { size: 'small', fullWidth: true } }}
+              /> */}
+              <Typography variant="caption" fontWeight={600} color="text.secondary" display="block" mb={0.5}>
+                  To Date
+              </Typography>
+              <DatePicker
+                  value={toDate}
+                  onChange={(newValue) => setToDate(newValue)}
+                  slotProps={{ 
+                      textField: { 
+                          size: "small", 
+                          fullWidth: true,
+                          InputProps: { sx: { borderRadius: 2, bgcolor: 'background.default' } }
+                      } 
+                  }}
               />
             </Grid>
 
@@ -780,6 +809,7 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
                 disableRowSelectionOnClick
                 disableColumnSelector
                 disableColumnMenu
+                disableColumnSorting
                 sx={{
                     border: 'none',
                     '& .MuiDataGrid-cell': {

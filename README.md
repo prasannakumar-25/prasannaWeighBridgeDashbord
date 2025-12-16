@@ -95,6 +95,7 @@ Follow these steps to get your project up and running:
 
 ## License
 
+<!--
 Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -103,7 +104,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 <div align="">
 <a align="center" href="https://github.com/themewagon/elegent/graphs/contributors">
 <img src="https://contrib.rocks/image?repo=themewagon/elegent" /><br />
-</a></a></div>
+</a></a></div> -->
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->

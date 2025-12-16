@@ -371,6 +371,7 @@ const VendorMain: React.FC<VendorMainProps> = ({
                 disableRowSelectionOnClick
                 disableColumnSelector
                 disableColumnMenu
+                disableColumnSorting
                 sx={{
                     border: 'none',
                     '& .MuiDataGrid-cell': { borderBottom: `1px solid ${theme.palette.divider}` },

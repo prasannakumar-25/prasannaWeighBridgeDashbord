@@ -95,16 +95,16 @@ const Sidebar = (): ReactElement => {
                 backgroundColor: 'background.paper',
                 color: 'primary.main',
                 '&:hover': {
-                  backgroundColor: 'primary.main',
-                  color: 'common.white',
+                  // backgroundColor: 'primary.main',
+                  // color: 'common.white',
                   opacity: 1.5,
                 },
               }}
             >
-              {/* <ListItemIcon>
-                <IconifyIcon icon="ri:logout-circle-line" />
+              <ListItemIcon>
+                <IconifyIcon icon="streamline-logos:android-logo-block"/>
               </ListItemIcon>
-              <ListItemText>Log out</ListItemText> */}
+              <ListItemText>Download app</ListItemText>
             </ListItemButton>
           </ListItem>
         </List>

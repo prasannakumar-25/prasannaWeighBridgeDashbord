@@ -749,6 +749,7 @@ const UserMain: React.FC<UserMainProps> = ({
                 disableRowSelectionOnClick
                 disableColumnSelector
                 disableColumnMenu
+                disableColumnSorting
                 sx={{
                     border: 'none',
                     '& .MuiDataGrid-cell': {
