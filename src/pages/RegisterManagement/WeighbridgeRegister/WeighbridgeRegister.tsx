@@ -853,7 +853,7 @@ const WeighbridgeRegister: React.FC = () => {
       { id: 5, machineId: 2, serialNo: "SN-500", port: "COM3", baudRate: "9600", dataBit: 8, stopBit: 1, party: "Even", createdAt: "2024-03-05" },
       { id: 6, machineId: 3, serialNo: "SN-600", port: "COM4", baudRate: "9600", dataBit: 8, stopBit: 1, party: "None", createdAt: "2024-03-12" },
     ]);
-    setLoading(true);
+    setLoading(false);
   }, []);
 
   // --- Handlers ---

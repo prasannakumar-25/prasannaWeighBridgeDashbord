@@ -219,6 +219,206 @@
 
 
 
+// import React, { useEffect, useState } from "react";
+// import {
+//   Box,
+//   Button,
+//   Drawer,
+//   IconButton,
+//   MenuItem,
+//   Stack,
+//   TextField,
+//   Typography,
+//   Alert,
+//   useMediaQuery,
+//   useTheme,
+// } from "@mui/material";
+// import IconifyIcon from "components/base/IconifyIcon";
+// import { User } from "pages/RegisterManagement/UserRegistration/UserRegister";
+
+// import "../../RegisterManagement/MachineRegister/MachineRegister.css";
+
+// interface UserDrawerProps {
+//   open: boolean;
+//   onClose: () => void;
+//   onSave: (data: User) => void;
+//   initialData: User | null;
+//   loading?: boolean;
+// }
+
+// const UserDrawer: React.FC<UserDrawerProps> = ({
+//   open,
+//   onClose,
+//   onSave,
+//   initialData,
+//   loading = false,
+// }) => {
+//   const theme = useTheme();
+//   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
+//   const drawerWidth = isMdUp ? Math.min(700, Math.round(window.innerWidth * 0.55)) : window.innerWidth;
+
+//   const [formError, setFormError] = useState<string | null>(null);
+
+//   // Default Form State
+//   const defaultForm: User = {
+//     id: 0,
+//     username: "",
+//     fullName: "",
+//     email: "",
+//     phoneNumber: "",
+//     role: "Operator",
+//     status: "Active",
+//     createdDate: new Date().toISOString(),
+//   };
+
+//   const [form, setForm] = useState<User>(defaultForm);
+
+//   // Reset or Populate form when Drawer opens
+//   useEffect(() => {
+//     if (open) {
+//       setFormError(null);
+//       if (initialData) {
+//         setForm({ ...initialData });
+//       } else {
+//         setForm({ ...defaultForm, createdDate: new Date().toISOString() });
+//       }
+//     }
+//   }, [open, initialData]);
+
+//   const setField = (key: keyof User, value: any) => {
+//     setForm((prev) => ({ ...prev, [key]: value }));
+//   };
+
+//   const validate = (): boolean => {
+//     if (!form.fullName?.trim()) {
+//       setFormError("Full Name is required.");
+//       return false;
+//     }
+//     if (!form.email?.trim() || !/\S+@\S+\.\S+/.test(form.email)) {
+//       setFormError("Valid Email is required.");
+//       return false;
+//     }
+//     if (!form.phoneNumber?.trim()) {
+//       setFormError("Phone Number is required.");
+//       return false;
+//     }
+//     setFormError(null);
+//     return true;
+//   };
+
+//   const handleSubmit = () => {
+//     if (validate()) {
+//       onSave(form);
+//     }
+//   };
+
+//   return (
+//     <Drawer
+//       anchor="right"
+//       open={open}
+//       onClose={onClose}
+//       PaperProps={{
+//         sx: {
+//           width: drawerWidth,
+//           p: 3,
+//           borderTopLeftRadius: { xs: 0, md: 12 },
+//           borderBottomLeftRadius: { xs: 0, md: 12 },
+//         },
+//       }}
+//     >
+//       <Box className="drawer-header" display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+//         <Typography variant="h6" fontWeight="bold">
+//             {initialData ? "Edit User" : "Add New User"}
+//         </Typography>
+//         <IconButton onClick={onClose} aria-label="close">
+//             <IconifyIcon icon="material-symbols:close-rounded" />
+//         </IconButton>
+//       </Box>
+
+//       <Stack spacing={2.5}>
+//         {formError && <Alert severity="error">{formError}</Alert>}
+
+//         <TextField
+//           label="Full Name"
+//           className="input-bg-color label-black" 
+//           placeholder="e.g., John Doe"
+//           fullWidth
+//           value={form.fullName}
+//           onChange={(e) => setField("fullName", e.target.value)}
+//           disabled={loading}
+//         />
+
+//         <TextField
+//           label="Email Address"
+//           className="input-bg-color label-black" 
+//           placeholder="e.g., john@example.com"
+//           fullWidth
+//           value={form.email}
+//           onChange={(e) => setField("email", e.target.value)}
+//           disabled={loading}
+//         />
+
+//         <TextField
+//           label="Phone Number"
+//           className="input-bg-color label-black" 
+//           placeholder="e.g., +91 98765 43210"
+//           fullWidth
+//           value={form.phoneNumber}
+//           onChange={(e) => setField("phoneNumber", e.target.value)}
+//           disabled={loading}
+//         />
+
+//         {/* <Stack direction={{ xs: "column", sm: "row" }} spacing={2}> */}
+//           <TextField
+//             label="Role"
+//             className="input-bg-color label-black" 
+//             select
+//             fullWidth
+//             value={form.role}
+//             onChange={(e) => setField("role", e.target.value)}
+//             disabled={loading}
+//           >
+//             <MenuItem value="Admin">Admin</MenuItem>
+//             <MenuItem value="Operator">Operator</MenuItem>
+//             <MenuItem value="Viewer">Viewer</MenuItem>
+//           </TextField>
+
+//           <TextField
+//             label="Status"
+//             className="input-bg-color label-black" 
+//             select
+//             fullWidth
+//             value={form.status}
+//             onChange={(e) => setField("status", e.target.value)}
+//             disabled={loading}
+//           >
+//             <MenuItem value="Active">Active</MenuItem>
+//             <MenuItem value="Inactive">Inactive</MenuItem>
+//           </TextField>
+//         {/* </Stack> */}
+
+//         <Stack direction="row" spacing={2} justifyContent="flex-end" pt={2}>
+//           <Button variant="text" className="cancel-button" onClick={onClose}>
+//               Cancel
+//           </Button>
+
+//           <Button variant="contained" className="edit-button" onClick={handleSubmit} disabled={loading}>
+//               {initialData ? "Update User" : "Save User"}
+//           </Button>
+//         </Stack>
+//       </Stack>
+//     </Drawer>
+//   );
+// };
+
+// export default UserDrawer;
+
+
+
+
+
+
+
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -232,10 +432,15 @@ import {
   Alert,
   useMediaQuery,
   useTheme,
+  Grid,
+  Paper,
+  Avatar,
+  Collapse,
+  alpha,
+  InputAdornment,
 } from "@mui/material";
 import IconifyIcon from "components/base/IconifyIcon";
 import { User } from "pages/RegisterManagement/UserRegistration/UserRegister";
-
 import "../../RegisterManagement/MachineRegister/MachineRegister.css";
 
 interface UserDrawerProps {
@@ -255,55 +460,91 @@ const UserDrawer: React.FC<UserDrawerProps> = ({
 }) => {
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
-  const drawerWidth = isMdUp ? Math.min(700, Math.round(window.innerWidth * 0.55)) : window.innerWidth;
+  const drawerWidth = isMdUp ? 650 : "100%";
 
-  const [formError, setFormError] = useState<string | null>(null);
-
-  // Default Form State
-  const defaultForm: User = {
+  // Form State
+  const [form, setForm] = useState<User>({
     id: 0,
-    username: "",
+    username: "", // Usually auto-generated or same as email, keeping empty for now
     fullName: "",
     email: "",
     phoneNumber: "",
     role: "Operator",
     status: "Active",
     createdDate: new Date().toISOString(),
-  };
+  });
 
-  const [form, setForm] = useState<User>(defaultForm);
+  // Validation State
+  const [errors, setErrors] = useState<Partial<Record<keyof User, string>>>({});
+  const [globalError, setGlobalError] = useState<string | null>(null);
 
-  // Reset or Populate form when Drawer opens
+  // Reset or Populate form
   useEffect(() => {
     if (open) {
-      setFormError(null);
+      setErrors({});
+      setGlobalError(null);
       if (initialData) {
         setForm({ ...initialData });
       } else {
-        setForm({ ...defaultForm, createdDate: new Date().toISOString() });
+        setForm({
+          id: 0,
+          username: "",
+          fullName: "",
+          email: "",
+          phoneNumber: "",
+          role: "Operator",
+          status: "Active",
+          createdDate: new Date().toISOString(),
+        });
       }
     }
   }, [open, initialData]);
 
   const setField = (key: keyof User, value: any) => {
     setForm((prev) => ({ ...prev, [key]: value }));
+    // Clear specific error when user types
+    if (errors[key]) {
+      setErrors((prev) => ({ ...prev, [key]: undefined }));
+    }
   };
 
   const validate = (): boolean => {
+    const newErrors: Partial<Record<keyof User, string>> = {};
+    let isValid = true;
+
+    // Full Name Validation
     if (!form.fullName?.trim()) {
-      setFormError("Full Name is required.");
-      return false;
+      newErrors.fullName = "Full Name is required";
+      isValid = false;
     }
-    if (!form.email?.trim() || !/\S+@\S+\.\S+/.test(form.email)) {
-      setFormError("Valid Email is required.");
-      return false;
+
+    // Email Validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!form.email?.trim()) {
+      newErrors.email = "Email is required";
+      isValid = false;
+    } else if (!emailRegex.test(form.email)) {
+      newErrors.email = "Please enter a valid email address";
+      isValid = false;
     }
+
+    // Phone Validation
     if (!form.phoneNumber?.trim()) {
-      setFormError("Phone Number is required.");
-      return false;
+      newErrors.phoneNumber = "Phone Number is required";
+      isValid = false;
+    } else if (form.phoneNumber.length < 10) {
+        newErrors.phoneNumber = "Phone number seems too short";
+        isValid = false;
     }
-    setFormError(null);
-    return true;
+
+    setErrors(newErrors);
+
+    if (!isValid) {
+      setGlobalError("Please correct the highlighted errors below.");
+    } else {
+      setGlobalError(null);
+    }
+    return isValid;
   };
 
   const handleSubmit = () => {
@@ -320,93 +561,217 @@ const UserDrawer: React.FC<UserDrawerProps> = ({
       PaperProps={{
         sx: {
           width: drawerWidth,
-          p: 3,
-          borderTopLeftRadius: { xs: 0, md: 12 },
-          borderBottomLeftRadius: { xs: 0, md: 12 },
+          boxShadow: theme.shadows[20],
         },
       }}
     >
-      <Box className="drawer-header" display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h6" fontWeight="bold">
-            {initialData ? "Edit User" : "Add New User"}
-        </Typography>
-        <IconButton onClick={onClose} aria-label="close">
-            <IconifyIcon icon="material-symbols:close-rounded" />
+      {/* --- Header --- */}
+      <Box
+        sx={{
+          px: 2.5,
+          py: 2.3,
+          background: `linear-gradient(135deg, ${theme.palette.background.default} 0%, ${theme.palette.background.default} 100%)`,
+          // background: "linear-gradient(135deg, #d4ecfdff 0%, #bbdefb 100%)",
+          // color: "white",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <Stack direction="row" spacing={2} alignItems="center">
+          <Avatar
+            sx={{
+              bgcolor: "#7bbefdff",
+              width: 46,
+              height: 46,
+              boxShadow: theme.shadows[3],
+            }}
+          >
+            <IconifyIcon icon="mdi:account-circle-outline" width={32} color="white" />
+          </Avatar>
+          <Box>
+            <Typography variant="h5" fontWeight="bold">
+              {initialData ? "Edit User" : "New User"}
+            </Typography>
+            <Typography variant="body2" sx={{ opacity: 0.8 }}>
+              {initialData ? "Update user details & access" : "Create a new system user"}
+            </Typography>
+          </Box>
+        </Stack>
+        <IconButton
+          onClick={onClose}
+          sx={{
+            color: "black",
+            // bgcolor: "rgba(227, 248, 255, 0.9)",
+            // "&:hover": { bgcolor: "rgba(24, 23, 23, 0.2)" },=
+          }}
+        >
+          <IconifyIcon icon="material-symbols:close-rounded" />
         </IconButton>
       </Box>
 
-      <Stack spacing={2.5}>
-        {formError && <Alert severity="error">{formError}</Alert>}
+      {/* --- Content --- */}
+      <Box sx={{ p: 3, overflowY: "auto", flex: 1, bgcolor: theme.palette.background.default }}>
+        <Stack spacing={3}>
+          {globalError && (
+            <Collapse in={!!globalError}>
+              <Alert severity="error" onClose={() => setGlobalError(null)} sx={{ mb: 2 }}>
+                {globalError}
+              </Alert>
+            </Collapse>
+          )}
 
-        <TextField
-          label="Full Name"
-          className="input-bg-color label-black" 
-          placeholder="e.g., John Doe"
-          fullWidth
-          value={form.fullName}
-          onChange={(e) => setField("fullName", e.target.value)}
-          disabled={loading}
-        />
+          {/* Section 1: Personal Details */}
+          <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2, borderColor: alpha(theme.palette.divider, 0.6) }}>
+            <Typography variant="overline" color="text.secondary" fontWeight={700} sx={{ mb: 2, display: "block" }}>
+              Personal Details
+            </Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField
+                  label="Full Name"
+                  className="input-bg-color label-black"
+                  placeholder="e.g. John Doe"
+                  fullWidth
+                  value={form.fullName}
+                  onChange={(e) => setField("fullName", e.target.value)}
+                  disabled={loading}
+                  error={!!errors.fullName}
+                  helperText={errors.fullName}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="end">
+                        <IconifyIcon icon="mdi:account-outline" />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
 
-        <TextField
-          label="Email Address"
-          className="input-bg-color label-black" 
-          placeholder="e.g., john@example.com"
-          fullWidth
-          value={form.email}
-          onChange={(e) => setField("email", e.target.value)}
-          disabled={loading}
-        />
+              <Grid item xs={12}>
+                <TextField
+                  label="Email Address"
+                  placeholder="e.g. john@example.com"
+                  className="input-bg-color label-black"
+                  fullWidth
+                  value={form.email}
+                  onChange={(e) => setField("email", e.target.value)}
+                  disabled={loading}
+                  error={!!errors.email}
+                  helperText={errors.email}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="end">
+                        <IconifyIcon icon="mdi:email-outline" />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
 
-        <TextField
-          label="Phone Number"
-          className="input-bg-color label-black" 
-          placeholder="e.g., +91 98765 43210"
-          fullWidth
-          value={form.phoneNumber}
-          onChange={(e) => setField("phoneNumber", e.target.value)}
-          disabled={loading}
-        />
+              <Grid item xs={12}>
+                <TextField
+                  label="Phone Number"
+                  placeholder="e.g. +91 98765 43210"
+                  className="input-bg-color label-black"
+                  fullWidth
+                  value={form.phoneNumber}
+                  onChange={(e) => setField("phoneNumber", e.target.value)}
+                  disabled={loading}
+                  error={!!errors.phoneNumber}
+                  helperText={errors.phoneNumber}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="end">
+                        <IconifyIcon icon="mdi:phone-outline" />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+            </Grid>
+          </Paper>
 
-        {/* <Stack direction={{ xs: "column", sm: "row" }} spacing={2}> */}
-          <TextField
-            label="Role"
-            className="input-bg-color label-black" 
-            select
-            fullWidth
-            value={form.role}
-            onChange={(e) => setField("role", e.target.value)}
-            disabled={loading}
-          >
-            <MenuItem value="Admin">Admin</MenuItem>
-            <MenuItem value="Operator">Operator</MenuItem>
-            <MenuItem value="Viewer">Viewer</MenuItem>
-          </TextField>
+          {/* Section 2: Account Settings */}
+          <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2, borderColor: alpha(theme.palette.divider, 0.6) }}>
+            <Typography variant="overline" color="text.secondary" fontWeight={700} sx={{ mb: 2, display: "block" }}>
+              Account Settings
+            </Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Role"
+                  className="input-bg-color label-black"
+                  select
+                  fullWidth
+                  value={form.role}
+                  onChange={(e) => setField("role", e.target.value)}
+                  disabled={loading}
+                >
+                  <MenuItem value="Admin">Admin</MenuItem>
+                  <MenuItem value="Operator">Operator</MenuItem>
+                  <MenuItem value="Viewer">Viewer</MenuItem>
+                </TextField>
+              </Grid>
 
-          <TextField
-            label="Status"
-            className="input-bg-color label-black" 
-            select
-            fullWidth
-            value={form.status}
-            onChange={(e) => setField("status", e.target.value)}
-            disabled={loading}
-          >
-            <MenuItem value="Active">Active</MenuItem>
-            <MenuItem value="Inactive">Inactive</MenuItem>
-          </TextField>
-        {/* </Stack> */}
-
-        <Stack direction="row" spacing={2} justifyContent="flex-end" pt={2}>
-          <Button variant="text" className="cancel-button" onClick={onClose}>
-              Cancel
-          </Button>
-
-          <Button variant="contained" className="edit-button" onClick={handleSubmit} disabled={loading}>
-              {initialData ? "Update User" : "Save User"}
-          </Button>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Status"
+                  className="input-bg-color label-black"
+                  select
+                  fullWidth
+                  value={form.status}
+                  onChange={(e) => setField("status", e.target.value)}
+                  disabled={loading}
+                >
+                  <MenuItem value="Active">
+                    <Box display="flex" alignItems="center" gap={1}>
+                        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'success.main' }} />
+                        Active
+                    </Box>
+                  </MenuItem>
+                  <MenuItem value="Inactive">
+                    <Box display="flex" alignItems="center" gap={1}>
+                        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'error.main' }} />
+                        Inactive
+                    </Box>
+                  </MenuItem>
+                </TextField>
+              </Grid>
+            </Grid>
+          </Paper>
         </Stack>
-      </Stack>
+      </Box>
+
+      {/* --- Footer --- */}
+      <Box
+        sx={{
+          p: 2,
+          bgcolor: theme.palette.background.paper,
+          borderTop: `1px solid ${theme.palette.divider}`,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <Button onClick={onClose} color="inherit" sx={{ color: "text.secondary" }}>
+          Cancel
+        </Button>
+        <Button
+          variant="contained"
+          onClick={handleSubmit}
+          disabled={loading}
+          size="large"
+          startIcon={<IconifyIcon icon="material-symbols:save-rounded" />}
+          sx={{
+            px: 4,
+            borderRadius: 2,
+            boxShadow: theme.shadows[4],
+          }}
+        >
+          {initialData ? "Save Changes" : "Create User"}
+        </Button>
+      </Box>
     </Drawer>
   );
 };

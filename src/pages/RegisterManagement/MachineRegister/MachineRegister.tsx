@@ -1,5 +1,4 @@
 
-
 // import React, { useEffect, useState } from "react";
 
 // import {
@@ -716,7 +715,7 @@ export type Vendor = {
   gstNumber?: string;
   address?: string;
   location?: string;
-  estate?: string;
+  // estate?: string;
   status?: "Active" | "Inactive";
 };
 
@@ -731,6 +730,7 @@ export type Machine = {
   lastServiceDate?: string;
   machineType: "Company" | "ThirdParty" | "Estate";
   machineLocation: string;
+  status: "Active" | "Inactive";
 };
 
 const MachineRegister: React.FC<{ onLogout?: () => void }> = () => {
@@ -771,29 +771,31 @@ const MachineRegister: React.FC<{ onLogout?: () => void }> = () => {
   };
 
   useEffect(() => {
+    setLoading(true);
     fetchMachine();
     // Mock Data
     setMachines([
        { id: 1, vendorId: 1, machineName: "Machine A", 
         password: "123", machineType: "Company", capacityTon: 5.5, machineLocation: "chennai", machineModel: "Model 242",
-        lastServiceDate: "2024-01-15", machineMac: "AA:BB:CC" },
+        lastServiceDate: "2024-01-15", machineMac: "AA:BB:CC", status: "Active" },
        { id: 2, vendorId: 2, machineName: "Machine B", 
         password: "456", machineType: "ThirdParty", capacityTon: 10, machineLocation: "Kerala", machineModel: "Model 242", 
-        lastServiceDate: "2024-06-20", machineMac: "11:22:33" },
+        lastServiceDate: "2024-06-20", machineMac: "11:22:33", status: "Inactive" },
        { id: 3, vendorId: 1, machineName: "Machine A", 
         password: "123", machineType: "Company", capacityTon: 5.5, machineLocation: "Coimatore", machineModel: "Model 242",
-        lastServiceDate: "2024-01-15", machineMac: "AA:BB:CC" },
+        lastServiceDate: "2024-01-15", machineMac: "AA:BB:CC", status: "Active" },
        { id: 4, vendorId: 2, machineName: "Machine B", 
         password: "456", machineType: "ThirdParty", capacityTon: 10, machineLocation: "local", machineModel: "Model 242",
-        lastServiceDate: "2024-06-20", machineMac: "11:22:33" },
+        lastServiceDate: "2024-06-20", machineMac: "11:22:33", status: "Inactive" },
         { id: 5, vendorId: 2, machineName: "Machine B", 
         password: "456", machineType: "ThirdParty", capacityTon: 10, machineLocation: "local", machineModel: "Model 242",
-        lastServiceDate: "2024-06-20", machineMac: "11:22:33" },
+        lastServiceDate: "2024-06-20", machineMac: "11:22:33", status: "Active" },
         { id: 6, vendorId: 2, machineName: "Machine B", 
         password: "456", machineType: "ThirdParty", capacityTon: 10, machineLocation: "local", machineModel: "Model 242",
-        lastServiceDate: "2024-06-20", machineMac: "11:22:33" },
+        lastServiceDate: "2024-06-20", machineMac: "11:22:33", status: "Inactive" },
       
     ]);
+    setLoading(false);
   }, []);
 
   // --- Handlers ---
@@ -826,7 +828,8 @@ const MachineRegister: React.FC<{ onLogout?: () => void }> = () => {
         }
         setSnackbarOpen(true);
         handleCloseDrawer();
-    }, 400);
+    }, 400);  
+    setLoading(false);
   };
 
   // --- Delete Logic ---

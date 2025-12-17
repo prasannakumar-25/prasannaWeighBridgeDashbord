@@ -1,5 +1,6 @@
 
 export const rootPaths = {
+  authRoot: 'authentication',
   homeRoot: '',
   vendorRoot:'vendorManagement',
   machineRoot: "machineManagemant",
@@ -10,7 +11,7 @@ export const rootPaths = {
   pagesRoot: 'pages',
   applicationsRoot: 'applications',
   // ecommerceRoot: 'ecommerce',
-  authRoot: 'authentication',
+  // authRoot: 'authentication',
   notificationsRoot: 'notifications',
   calendarRoot: 'calendar',
   messageRoot: 'messages',

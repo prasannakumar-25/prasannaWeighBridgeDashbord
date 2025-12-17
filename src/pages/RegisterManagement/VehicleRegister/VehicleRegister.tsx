@@ -939,7 +939,7 @@ const VehicleRegister: React.FC = () => {
 
   // Load Data Mock
   useEffect(() => {
-    setLoading(true)
+    setLoading(true);
     fetchVehicle();
     setVendors([
         { id: 1, vendorName: "TechCorp Industries" },
@@ -953,35 +953,9 @@ const VehicleRegister: React.FC = () => {
         { id: 2, vehicleType: "Van", vendorId: 2, tareWeight: 1800, status: "Active", createdDate: "2023-12-15" },
         { id: 3, vehicleType: "Lorry", vendorId: 1, tareWeight: 3200, status: "Inactive", createdDate: "2024-01-10" },
         { id: 4, vehicleType: "Pickup", vendorId: 2, tareWeight: 1500, status: "Active", createdDate: "2024-02-20" },
-        { id: 5, vehicleType: "Semi", vendorId: 1, tareWeight: 8000, status: "Active", createdDate: "2024-03-05" },
-        { id: 6, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
-        { id: 7, vehicleType: "Pickup", vendorId: 2, tareWeight: 1500, status: "Active", createdDate: "2024-02-20" },
-        { id: 8, vehicleType: "Semi", vendorId: 1, tareWeight: 8000, status: "Active", createdDate: "2024-03-05" },
-        { id: 9, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
-        { id: 10, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
-        { id: 11, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
-        { id: 12, vehicleType: "Van", vendorId: 2, tareWeight: 1800, status: "Active", createdDate: "2023-12-15" },
-        { id: 13, vehicleType: "Lorry", vendorId: 1, tareWeight: 3200, status: "Inactive", createdDate: "2024-01-10" },
-        { id: 14, vehicleType: "Pickup", vendorId: 2, tareWeight: 1500, status: "Active", createdDate: "2024-02-20" },
-        { id: 15, vehicleType: "Semi", vendorId: 1, tareWeight: 8000, status: "Active", createdDate: "2024-03-05" },
-        { id: 16, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
-        { id: 17, vehicleType: "Pickup", vendorId: 2, tareWeight: 1500, status: "Active", createdDate: "2024-02-20" },
-        { id: 18, vehicleType: "Semi", vendorId: 1, tareWeight: 8000, status: "Active", createdDate: "2024-03-05" },
-        { id: 19, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
-        { id: 20, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
-        { id: 21, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
-        { id: 22, vehicleType: "Van", vendorId: 2, tareWeight: 1800, status: "Active", createdDate: "2023-12-15" },
-        { id: 23, vehicleType: "Lorry", vendorId: 1, tareWeight: 3200, status: "Inactive", createdDate: "2024-01-10" },
-        { id: 24, vehicleType: "Pickup", vendorId: 2, tareWeight: 1500, status: "Active", createdDate: "2024-02-20" },
-        { id: 25, vehicleType: "Semi", vendorId: 1, tareWeight: 8000, status: "Active", createdDate: "2024-03-05" },
-         { id: 26, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
-        { id: 27, vehicleType: "Pickup", vendorId: 2, tareWeight: 1500, status: "Active", createdDate: "2024-02-20" },
-        { id: 28, vehicleType: "Semi", vendorId: 1, tareWeight: 8000, status: "Active", createdDate: "2024-03-05" },
-        { id: 29, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
-        { id: 30, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
-        { id: 31, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
+
     ]);
-    setLoading(false)
+    setLoading(false);
   }, []);
 
   // --- Handlers ---
@@ -1098,3 +1072,43 @@ const VehicleRegister: React.FC = () => {
 };
 
 export default VehicleRegister;
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // { id: 5, vehicleType: "Semi", vendorId: 1, tareWeight: 8000, status: "Active", createdDate: "2024-03-05" },
+        // { id: 6, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
+        // { id: 7, vehicleType: "Pickup", vendorId: 2, tareWeight: 1500, status: "Active", createdDate: "2024-02-20" },
+        // { id: 8, vehicleType: "Semi", vendorId: 1, tareWeight: 8000, status: "Active", createdDate: "2024-03-05" },
+        // { id: 9, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
+        // { id: 10, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
+        // { id: 11, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
+        // { id: 12, vehicleType: "Van", vendorId: 2, tareWeight: 1800, status: "Active", createdDate: "2023-12-15" },
+        // { id: 13, vehicleType: "Lorry", vendorId: 1, tareWeight: 3200, status: "Inactive", createdDate: "2024-01-10" },
+        // { id: 14, vehicleType: "Pickup", vendorId: 2, tareWeight: 1500, status: "Active", createdDate: "2024-02-20" },
+        // { id: 15, vehicleType: "Semi", vendorId: 1, tareWeight: 8000, status: "Active", createdDate: "2024-03-05" },
+        // { id: 16, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
+        // { id: 17, vehicleType: "Pickup", vendorId: 2, tareWeight: 1500, status: "Active", createdDate: "2024-02-20" },
+        // { id: 18, vehicleType: "Semi", vendorId: 1, tareWeight: 8000, status: "Active", createdDate: "2024-03-05" },
+        // { id: 19, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
+        // { id: 20, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
+        // { id: 21, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
+        // { id: 22, vehicleType: "Van", vendorId: 2, tareWeight: 1800, status: "Active", createdDate: "2023-12-15" },
+        // { id: 23, vehicleType: "Lorry", vendorId: 1, tareWeight: 3200, status: "Inactive", createdDate: "2024-01-10" },
+        // { id: 24, vehicleType: "Pickup", vendorId: 2, tareWeight: 1500, status: "Active", createdDate: "2024-02-20" },
+        // { id: 25, vehicleType: "Semi", vendorId: 1, tareWeight: 8000, status: "Active", createdDate: "2024-03-05" },
+        //  { id: 26, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
+        // { id: 27, vehicleType: "Pickup", vendorId: 2, tareWeight: 1500, status: "Active", createdDate: "2024-02-20" },
+        // { id: 28, vehicleType: "Semi", vendorId: 1, tareWeight: 8000, status: "Active", createdDate: "2024-03-05" },
+        // { id: 29, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
+        // { id: 30, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },
+        // { id: 31, vehicleType: "Forklift", vendorId: 1, tareWeight: 1200, status: "Inactive", createdDate: "2024-03-12" },

@@ -9,6 +9,7 @@ import {
   Typography,
   InputAdornment,
   Grid,
+  Chip,
   Tooltip,
   useTheme,
   LinearProgress,
@@ -188,6 +189,20 @@ const MachineMain: React.FC<MachineMainProps> = ({
         }
     },
     {
+      field: 'status',
+      headerName: 'Status',
+      width: 120,
+      renderCell: (params: GridRenderCellParams) => (
+        <Chip
+          label={params.value}
+          color={params.value === "Active" ? "success" : "default"}
+          // size="small"
+          variant="outlined"
+          sx={{ fontWeight: 'bold' }}
+        />
+      )
+    },
+    {
         field: 'actions',
         headerName: 'Actions',
         sortable: false,
@@ -347,17 +362,17 @@ const MachineMain: React.FC<MachineMainProps> = ({
         </Box>
 
         {/* --- DATA GRID SECTION --- */}
-        <Box sx={{ height: 552, width: '100%' }}>
+        <Box sx={{ height: 550, width: '100%' }}>
             <DataGrid
                 rows={filteredMachines}
                 columns={columns}
-                // Pagination Setup
+                // Pagination
                 initialState={{
                     pagination: { paginationModel: { pageSize: 5, page: 0 } },
                 }}
                 pageSizeOptions={[5, 10, 20]}
                 
-                // Slots for Custom Components
+                // Slots
                 slots={{
                     loadingOverlay: LinearProgress as GridSlots['loadingOverlay'],
                     pagination: CustomPagination,
@@ -367,9 +382,8 @@ const MachineMain: React.FC<MachineMainProps> = ({
                         </Stack>
                     ),
                 }}
-
-                // Styling
                 loading={loading}
+                // Styling
                 getRowHeight={() => 70}
                 disableRowSelectionOnClick
                 disableColumnSelector
@@ -377,9 +391,7 @@ const MachineMain: React.FC<MachineMainProps> = ({
                 disableColumnSorting
                 sx={{
                     border: 'none',
-                    '& .MuiDataGrid-cell': {
-                        borderBottom: `1px solid ${theme.palette.divider}`,
-                    },
+                    '& .MuiDataGrid-cell': { borderBottom: `1px solid ${theme.palette.divider}` },
                     '& .MuiDataGrid-columnHeaders': {
                         bgcolor: theme.palette.background.default,
                         borderBottom: `2px solid ${theme.palette.divider}`,

@@ -626,14 +626,14 @@ const UserMain: React.FC<UserMainProps> = ({
               {/* <Tooltip title="Search Name or Email" arrow> */}
               <TextField
                 variant="outlined"
-                label="Search "
-                placeholder="Search Name or Email..."
+                label="Search"
+                placeholder="Search name or Email..."
                 size="small"
                 fullWidth
                 value={search}
                 onChange={handleChangeSearch}
                 InputProps={{
-                  endAdornment: (
+                  startAdornment: (
                     <InputAdornment position="end" sx={{ width: 24, height: 24 }}>
                       <IconifyIcon icon="mdi:search" width={1} height={1} />
                     </InputAdornment>

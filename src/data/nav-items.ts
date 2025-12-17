@@ -9,6 +9,39 @@ export interface NavItem {
 
 const navItems: NavItem[] = [
   {
+    title: 'Authentication',
+    path: 'authentication',
+    icon: 'f7:exclamationmark-shield-fill',
+    active: true,
+    collapsible: true,
+    sublist: [ 
+      {
+        title: 'Sign In',
+        path: 'login',
+        active: true,
+        collapsible: false,
+      },
+      {
+        title: 'Sign Up',
+        path: 'sign-up',
+        active: true,
+        collapsible: false,
+      },
+      {
+        title: 'Forgot password',
+        path: 'forgot-password',
+        active: true,
+        collapsible: false,
+      },
+      {
+        title: 'Reset password',
+        path: 'reset-password',
+        active: true,
+        collapsible: false,
+      },
+    ],
+  },
+  {
     title: 'Home',
     path: '/',
     icon: 'ion:home-sharp',
@@ -118,39 +151,39 @@ const navItems: NavItem[] = [
       },
     ],
   },
-    {
-    title: 'Authentication',
-    path: 'authentication',
-    icon: 'f7:exclamationmark-shield-fill',
-    active: true,
-    collapsible: true,
-    sublist: [ 
-      {
-        title: 'Sign In',
-        path: 'login',
-        active: true,
-        collapsible: false,
-      },
-      {
-        title: 'Sign Up',
-        path: 'sign-up',
-        active: true,
-        collapsible: false,
-      },
-      {
-        title: 'Forgot password',
-        path: 'forgot-password',
-        active: true,
-        collapsible: false,
-      },
-      {
-        title: 'Reset password',
-        path: 'reset-password',
-        active: true,
-        collapsible: false,
-      },
-    ],
-  },
+  //   {
+  //   title: 'Authentication',
+  //   path: 'authentication',
+  //   icon: 'f7:exclamationmark-shield-fill',
+  //   active: true,
+  //   collapsible: true,
+  //   sublist: [ 
+  //     {
+  //       title: 'Sign In',
+  //       path: 'login',
+  //       active: true,
+  //       collapsible: false,
+  //     },
+  //     {
+  //       title: 'Sign Up',
+  //       path: 'sign-up',
+  //       active: true,
+  //       collapsible: false,
+  //     },
+  //     {
+  //       title: 'Forgot password',
+  //       path: 'forgot-password',
+  //       active: true,
+  //       collapsible: false,
+  //     },
+  //     {
+  //       title: 'Reset password',
+  //       path: 'reset-password',
+  //       active: true,
+  //       collapsible: false,
+  //     },
+  //   ],
+  // },
   {
     title: 'VendorRegister',
     path: '/vendorManagement',

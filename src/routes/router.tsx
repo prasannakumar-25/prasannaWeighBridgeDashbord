@@ -54,6 +54,42 @@ const routes: RouteObject[] = [
       </Suspense>
     ),
     children: [
+           {
+        path: rootPaths.authRoot,
+        element: (
+          <AuthLayout>
+            <Suspense fallback={<PageLoader />}>
+              <Outlet />
+            </Suspense>
+          </AuthLayout>
+        ),
+        children: [
+          {
+            path: paths.login,
+            // element: <Login />,
+            element: (
+              // <MainLayout>
+                <Suspense fallback={<PageLoader />}>
+                  <Login />
+                </Suspense>
+              // </MainLayout>
+            ),
+          },
+          {
+            path: paths.signup,
+            element: <SignUp />,
+          },
+          {
+            path: paths.resetPassword,
+            element: <ResetPassword />,
+          },
+          {
+            path: paths.forgotPassword,
+            element: <ForgotPassword />,
+          },
+          
+        ],
+      },
       {
         path: rootPaths.homeRoot,
         element: (
@@ -202,42 +238,42 @@ const routes: RouteObject[] = [
           
         ],
       },
-      {
-        path: rootPaths.authRoot,
-        element: (
-          <AuthLayout>
-            <Suspense fallback={<PageLoader />}>
-              <Outlet />
-            </Suspense>
-          </AuthLayout>
-        ),
-        children: [
-          {
-            path: paths.login,
-            // element: <Login />,
-            element: (
-              // <MainLayout>
-                <Suspense fallback={<PageLoader />}>
-                  <Login />
-                </Suspense>
-              // </MainLayout>
-            ),
-          },
-          {
-            path: paths.signup,
-            element: <SignUp />,
-          },
-          {
-            path: paths.resetPassword,
-            element: <ResetPassword />,
-          },
-          {
-            path: paths.forgotPassword,
-            element: <ForgotPassword />,
-          },
+      // {
+      //   path: rootPaths.authRoot,
+      //   element: (
+      //     <AuthLayout>
+      //       <Suspense fallback={<PageLoader />}>
+      //         <Outlet />
+      //       </Suspense>
+      //     </AuthLayout>
+      //   ),
+      //   children: [
+      //     {
+      //       path: paths.login,
+      //       // element: <Login />,
+      //       element: (
+      //         // <MainLayout>
+      //           <Suspense fallback={<PageLoader />}>
+      //             <Login />
+      //           </Suspense>
+      //         // </MainLayout>
+      //       ),
+      //     },
+      //     {
+      //       path: paths.signup,
+      //       element: <SignUp />,
+      //     },
+      //     {
+      //       path: paths.resetPassword,
+      //       element: <ResetPassword />,
+      //     },
+      //     {
+      //       path: paths.forgotPassword,
+      //       element: <ForgotPassword />,
+      //     },
           
-        ],
-      },
+      //   ],
+      // },
       {
         path: '*',
         element: <Error404 />,

@@ -666,7 +666,7 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
                 value={search}
                 onChange={handleChangeSearch}
                 InputProps={{
-                  endAdornment: (
+                  startAdornment: (
                     <InputAdornment position="end" sx={{ width: 24, height: 24 }}>
                       <IconifyIcon icon="mdi:search" width={1} height={1} />
                     </InputAdornment>

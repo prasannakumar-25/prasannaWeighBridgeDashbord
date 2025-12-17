@@ -574,14 +574,14 @@ const VehicleMain: React.FC<VehicleMainProps> = ({
             <Grid item xs={12} sm={6} md={3}>
               <TextField
                 variant="outlined"
-                label="Search Vehicle Type"
-                placeholder="Search ..."
+                label="Search"
+                placeholder="Search Vehicle Type..."
                 size="small"
                 fullWidth
                 value={search}
                 onChange={handleChangeSearch}
                 InputProps={{
-                  endAdornment: (
+                  startAdornment: (
                     <InputAdornment position="end" sx={{ width: 24, height: 24 }}>
                       <IconifyIcon icon="mdi:search" width={1} height={1} />
                     </InputAdornment>
@@ -632,7 +632,7 @@ const VehicleMain: React.FC<VehicleMainProps> = ({
 
             {/* Actions */}
             <Grid item xs={12} md={3} sx={{ display: 'flex', justifyContent: { xs: 'flex-start', md: 'flex-end' }, gap: 1 }}>
-              <Tooltip title="Clear" arrow>
+              <Tooltip title="Clear Filters" arrow>
               <Button
                 variant="outlined"
                 color="secondary"

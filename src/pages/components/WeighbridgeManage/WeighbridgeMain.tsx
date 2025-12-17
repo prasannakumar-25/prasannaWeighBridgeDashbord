@@ -342,9 +342,9 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import IconifyIcon from "components/base/IconifyIcon";
 import { useSnackbar } from 'notistack';
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import Divider from "@mui/material/Divider";
+// import Menu from "@mui/material/Menu";
+// import MenuItem from "@mui/material/MenuItem";
+// import Divider from "@mui/material/Divider";
 
 
 // Import Types and Pagination
@@ -441,7 +441,7 @@ const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
   // -- CSV Download Logic --
   const handleDownloadCSV = () => {
     if (filteredWeighbridges.length === 0) {
-      enqueueSnackbar("No data to download", { variant: "warning" });
+      ("No data to download", { variant: "warning" });
       return;
     }
 
@@ -597,7 +597,7 @@ const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
                 value={search}
                 onChange={handleChangeSearch}
                 InputProps={{
-                  endAdornment: (
+                  startAdornment: (
                     <InputAdornment position="end" sx={{ width: 24, height: 24 }}>
                       <IconifyIcon icon="mdi:search" width={1} height={1} />
                     </InputAdornment>

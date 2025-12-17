@@ -256,13 +256,13 @@ const VendorMain: React.FC<VendorMainProps> = ({
               <TextField
                 variant="outlined"
                 label="Search"
-                placeholder="Search Name, Email..."
+                placeholder="Search Name and Email..."
                 size="small"
                 fullWidth
                 value={search}
                 onChange={handleChangeSearch}
                 InputProps={{
-                  endAdornment: (
+                  startAdornment: (
                     <InputAdornment position="end" sx={{ width: 24, height: 24 }}>
                       <IconifyIcon icon="mdi:search" width={1} height={1} />
                     </InputAdornment>
@@ -307,7 +307,7 @@ const VendorMain: React.FC<VendorMainProps> = ({
 
             {/* Actions */}
             <Grid item xs={12} md={3} sx={{ display: 'flex', justifyContent: { xs: 'flex-start', md: 'flex-end' }, gap: 1 }}>
-             <Tooltip title="Claer" arrow>
+             <Tooltip title="Claer Filters" arrow>
               <Button
                 variant="outlined"
                 color="secondary"

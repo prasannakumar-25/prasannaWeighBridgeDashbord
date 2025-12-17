@@ -872,18 +872,19 @@ const VendorRegister: React.FC<{ onLogout?: () => void }> = () => {
   const handleSave = async (form: Vendor) => {
     setLoading(true);
     try {
-      const payload = {
-        Vendor_name: form.vendorName.trim(),
-        Contact_number: form.phone?.trim(),
-        Email: form.email?.trim().toLowerCase(),
-        Address: form.address?.trim(),
-        Gst_number: form.gstNumber?.trim(),
-        Website: form.website?.trim()
-      };
+      // const payload = {
+      //   Vendor_name: form.vendorName.trim(),
+      //   Contact_number: form.phone?.trim(),
+      //   Email: form.email?.trim().toLowerCase(),
+      //   Address: form.address?.trim(),
+      //   Gst_number: form.gstNumber?.trim(),
+      //   Website: form.website?.trim()
+      // };
 
       if (editingVendor) {
         setVendors((prev) => prev.map((v) => (v.id === editingVendor.id ? { ...form, id: editingVendor.id, createdAt: v.createdAt } : v)));
         setSnackbarMessage("Vendor updated successfully");
+        setLoading(false);
       } else {
         // const response = await vendorApi.addVendor(payload);
         // if (response.success) { ... }
