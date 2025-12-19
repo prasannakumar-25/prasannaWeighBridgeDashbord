@@ -37,7 +37,7 @@ interface MachineMainProps {
   vendors: Vendor[];
   onAdd: () => void;
   onEdit: (m: Machine) => void;
-  onDelete: (id: number) => void;
+  onDelete: (Machine_Id: number) => void;
   loading: boolean;
   onRefresh: () => void;
 }
@@ -76,14 +76,14 @@ const MachineMain: React.FC<MachineMainProps> = ({
     return machines.filter((m) => {
       // 1. Text Search (Name or Mac Address)
       const matchesSearch =
-        m.machineName.toLowerCase().includes(search.toLowerCase()) ||
-        (m.machineMac || "").toLowerCase().includes(search.toLowerCase());
+        m.Machine_name.toLowerCase().includes(search.toLowerCase()) ||
+        (m.Machine_mac || "").toLowerCase().includes(search.toLowerCase());
 
       // 2. Vendor Filter
       const matchesVendor = filterVendorId === "" || m.vendorId === filterVendorId;
 
       // 3. Date Filter (Last Service Date)
-      const itemDate = dayjs(m.lastServiceDate);
+      const itemDate = dayjs(m.Last_service_date);
       const matchesFromDate = fromDate ? itemDate.isValid() && (itemDate.isAfter(fromDate, 'day') || itemDate.isSame(fromDate, 'day')) : true;
       const matchesToDate = toDate ? itemDate.isValid() && (itemDate.isBefore(toDate, 'day') || itemDate.isSame(toDate, 'day')) : true;
 
@@ -103,16 +103,17 @@ const MachineMain: React.FC<MachineMainProps> = ({
     ];
 
     const rows = filteredMachines.map(m => {
-      const vendorName = vendors.find(v => v.id === m.vendorId)?.vendorName || "Unknown";
+      const vendorName = vendors.find(v => v.Vendor_Id === m.vendorId)?.vendorName || "Unknown";
       return [
-        m.machineName,
+        m.Machine_name,
         vendorName,
-        m.machineMac || "",
-        m.capacityTon || "",
-        m.machineType,
-        m.machineLocation || "",
-        m.machineModel || "",
-        m.lastServiceDate ? dayjs(m.lastServiceDate).format('YYYY-MM-DD') : ""
+        m.Machine_mac || "",
+        m.Capacity_ton || "",
+        m.Machine_type,
+        m.Machine_location || "",
+        m.Machine_model || "",
+        m.Last_service_date ? dayjs(m.Last_service_date).format('YYYY-MM-DD') : "",
+        m.Status || "",
       ].join(",");
     });
 
@@ -129,7 +130,7 @@ const MachineMain: React.FC<MachineMainProps> = ({
   // -- DataGrid Columns Definition --
   const columns: GridColDef<Machine>[] = useMemo(() => [
     {
-        field: 'machineName',
+        field: 'Machine_name',
         headerName: 'Machine Name',
         flex: 1,
         minWidth: 150,
@@ -146,41 +147,41 @@ const MachineMain: React.FC<MachineMainProps> = ({
         minWidth: 150,
         renderCell: (params: GridRenderCellParams) => {
             const row = params.row || params;
-            return vendors.find(v => v.id === row.vendorId)?.vendorName || "—";
+            return vendors.find(v => v.Vendor_Id === row.vendorId)?.vendorName || "—";
         }
     },
     {
-        field: 'machineMac',
+        field: 'Machine_mac',
         headerName: 'MAC Address',
         flex: 0.8,
         minWidth: 140,
         renderCell: (params: GridRenderCellParams) => params.value || "—"
     },
     {
-        field: 'capacityTon',
+        field: 'Capacity_ton',
         headerName: 'Capacity',
         width: 120,
         renderCell: (params: any) => params.value ? `${params.value} tons` : "—"
     },
     {
-        field: 'machineType',
+        field: 'Machine_type',
         headerName: 'Type',
         width: 130,
     },
     {
-        field: 'machineModel',
+        field: 'Machine_model',
         headerName: 'Model',
         width: 150,
         renderCell: (params: GridRenderCellParams) => params.value || "—"
     },
     {
-        field: 'machineLocation',
+        field: 'Machine_location',
         headerName: 'Location',
         width: 150,
         renderCell: (params: GridRenderCellParams) => params.value || "—"
     },
     {
-        field: 'lastServiceDate',
+        field: 'Last_service_date',
         headerName: 'Last Service',
         width: 140,
         renderCell: (params: any) => {
@@ -189,7 +190,7 @@ const MachineMain: React.FC<MachineMainProps> = ({
         }
     },
     {
-      field: 'status',
+      field: 'Status',
       headerName: 'Status',
       width: 120,
       renderCell: (params: GridRenderCellParams) => (
@@ -220,7 +221,7 @@ const MachineMain: React.FC<MachineMainProps> = ({
                     <IconifyIcon icon="fluent:notepad-edit-16-regular" />
                 </IconButton>
                 <IconButton 
-                    onClick={() => onDelete(params.row.id)} 
+                    onClick={() => onDelete(params.row.Machine_Id)} 
                     className="vm-btn vm-action-btn-delete"
                     // size="small"
                 >
@@ -314,14 +315,14 @@ const MachineMain: React.FC<MachineMainProps> = ({
               >
                 <MenuItem value=""><em>All Vendors</em></MenuItem>
                 {vendors.map((v) => (
-                  <MenuItem key={v.id} value={v.id}>{v.vendorName}</MenuItem>
+                  <MenuItem key={v.Vendor_Id} value={v.Vendor_Id}>{v.vendorName}</MenuItem>
                 ))}
               </TextField>
             </Grid>
 
             {/* Actions */}
             <Grid item xs={12} md={3} sx={{ display: 'flex', justifyContent: { xs: 'flex-start', md: 'flex-end' }, gap: 1 }}>
-             <Tooltip title="Clear" arrow>
+             <Tooltip title="Clear Filters" arrow>
               <Button
                 variant="outlined"
                 color="secondary"
@@ -362,10 +363,11 @@ const MachineMain: React.FC<MachineMainProps> = ({
         </Box>
 
         {/* --- DATA GRID SECTION --- */}
-        <Box sx={{ height: 550, width: '100%' }}>
+        <Box sx={{ height: 550, width: '100%' }} >
             <DataGrid
                 rows={filteredMachines}
                 columns={columns}
+                getRowId={(row) => row.Machine_Id}
                 // Pagination
                 initialState={{
                     pagination: { paginationModel: { pageSize: 5, page: 0 } },

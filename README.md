@@ -10,7 +10,7 @@
       </a>    
 </center>
 <center>
-       <h1 style="display: inline-block; margin-left: 10px;">Elegent Admin Dashboard</h1>
+       <h1 style="display: inline-block; margin-left: 10px;">Admin Dashboard</h1>
 </center>
 </div>
 <br />
@@ -44,7 +44,7 @@
 
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](public/homepage.png)
+[![Product Name Screen Shot][product-screenshot]](public/homepage1.png)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

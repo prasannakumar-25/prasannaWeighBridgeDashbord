@@ -407,7 +407,7 @@ interface UserMainProps {
   users: User[];
   onAdd: () => void;
   onEdit: (user: User) => void;
-  onDelete: (id: number) => void;
+  onDelete: (User_Id: number) => void;
   loading: boolean;
   onRefresh: () => void;
 }
@@ -445,14 +445,14 @@ const UserMain: React.FC<UserMainProps> = ({
     return users.filter((u) => {
       // 1. Text Search (Name or Email)
       const matchesSearch =
-        u.fullName.toLowerCase().includes(search.toLowerCase()) ||
-        u.email.toLowerCase().includes(search.toLowerCase());
+        u.Full_name.toLowerCase().includes(search.toLowerCase()) ||
+        u.Email.toLowerCase().includes(search.toLowerCase());
 
       // 2. Role Filter
-      const matchesRole = filterRole === "" || u.role === filterRole;
+      const matchesRole = filterRole === "" || u.Role === filterRole;
 
       // 3. Date Filter
-      const itemDate = dayjs(u.createdDate);
+      const itemDate = dayjs(u.Created_at);
       const matchesFromDate = fromDate ? itemDate.isValid() && (itemDate.isAfter(fromDate, 'day') || itemDate.isSame(fromDate, 'day')) : true;
       const matchesToDate = toDate ? itemDate.isValid() && (itemDate.isBefore(toDate, 'day') || itemDate.isSame(toDate, 'day')) : true;
 
@@ -467,16 +467,16 @@ const UserMain: React.FC<UserMainProps> = ({
       return;
     }
 
-    const headers = ["ID", "Full Name", "Email", "Phone", "Role", "Status", "Joined Date"];
+    const headers = ["User_Id", "Full Name", "Email", "Phone", "Role", "Joined Date"];
     const rows = filteredUsers.map(u => {
       return [
-        u.id,
-        u.fullName,
-        u.email,
-        u.phoneNumber,
-        u.role,
-        u.status,
-        u.createdDate ? dayjs(u.createdDate).format('YYYY-MM-DD') : ""
+        u.User_Id,
+        u.Full_name,
+        u.Email,
+        u.Mobile_number,
+        u.Role,
+        // u.status,
+        u.Created_at ? dayjs(u.Created_at).format('YYYY-MM-DD') : ""
       ].join(",");
     });
 
@@ -503,7 +503,7 @@ const UserMain: React.FC<UserMainProps> = ({
   // -- DataGrid Columns Definition --
   const columns: GridColDef<User>[] = useMemo(() => [
     {
-        field: 'fullName',
+        field: 'Full_name',
         headerName: 'Full Name',
         // flex: 1,
         minWidth: 160,
@@ -514,19 +514,19 @@ const UserMain: React.FC<UserMainProps> = ({
         )
     },
     {
-        field: 'email',
+        field: 'Email',
         headerName: 'Email Address',
         flex: 1,
         minWidth: 200,
     },
     {
-        field: 'phoneNumber',
+        field: 'Mobile_number',
         headerName: 'Phone Number',
         flex: 0.8,
         minWidth: 140,
     },
     {
-        field: 'role',
+        field: 'Role',
         headerName: 'Role',
         width: 130,
         renderCell: (params: GridRenderCellParams) => (
@@ -540,7 +540,7 @@ const UserMain: React.FC<UserMainProps> = ({
         )
     },
     {
-        field: 'createdDate',
+        field: 'Created_at',
         headerName: 'Joined Date',
         flex: 0.8,
         minWidth: 140,
@@ -549,19 +549,19 @@ const UserMain: React.FC<UserMainProps> = ({
             return dayjs(params.value).format('DD/ MMM/ YYYY');
         }
     },
-    {
-        field: 'status',
-        headerName: 'Status',
-        width: 120,
-        renderCell: (params: GridRenderCellParams) => (
-            <Chip 
-                label={params.value} 
-                color={params.value === "Active" ? "success" : "default"}
-                // size="small"
-                sx={{ fontWeight: 'bold' }}
-            />
-        )
-    },
+    // {
+    //     field: 'status',
+    //     headerName: 'Status',
+    //     width: 120,
+    //     renderCell: (params: GridRenderCellParams) => (
+    //         <Chip 
+    //             label={params.value} 
+    //             color={params.value === "Active" ? "success" : "default"}
+    //             // size="small"
+    //             sx={{ fontWeight: 'bold' }}
+    //         />
+    //     )
+    // },
     {
         field: 'actions',
         headerName: 'Actions',
@@ -580,7 +580,7 @@ const UserMain: React.FC<UserMainProps> = ({
                     <IconifyIcon icon="fluent:notepad-edit-16-regular" />
                 </IconButton>
                 <IconButton 
-                    onClick={() => onDelete(params.row.id)} 
+                    onClick={() => onDelete(params.row.User_Id)} 
                     className="vm-btn vm-action-btn-delete"
                     // size="small"
                 >
@@ -684,7 +684,7 @@ const UserMain: React.FC<UserMainProps> = ({
 
             {/* Actions */}
             <Grid item xs={12} md={3} sx={{ display: 'flex', justifyContent: { xs: 'flex-start', md: 'flex-end' }, gap: 1 }}>
-              <Tooltip title="Clear" arrow>
+              <Tooltip title="Clear Filters" arrow>
               <Button
                 variant="outlined"
                 color="secondary"
@@ -726,6 +726,7 @@ const UserMain: React.FC<UserMainProps> = ({
             <DataGrid
                 rows={filteredUsers}
                 columns={columns}
+                getRowId={(row) => row.User_Id}
                 // Pagination Setup
                 initialState={{
                     pagination: { paginationModel: { pageSize: 5, page: 0 } },
