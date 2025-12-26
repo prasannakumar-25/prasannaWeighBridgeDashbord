@@ -35,7 +35,7 @@ const ipCameraApi = {
     },
     updateIPcameraDetails : async (camera_id:number, payload:object) => {
         try{
-            const response = await Authaxios.get(`update/ipcamera/${camera_id}`, payload)
+            const response = await Authaxios.put(`update/ipcamera/${camera_id}`, payload)
             return response.data
         }
         catch (error){

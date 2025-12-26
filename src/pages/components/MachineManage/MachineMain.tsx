@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, ChangeEvent } from "react";
 import {
   Box,
@@ -13,6 +14,9 @@ import {
   Tooltip,
   useTheme,
   LinearProgress,
+  Menu,           // <--- ADDED
+  ListItemIcon,   // <--- ADDED
+  ListItemText,   // <--- ADDED
 } from "@mui/material";
 import { 
   DataGrid, 
@@ -24,10 +28,10 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import IconifyIcon from "components/base/IconifyIcon";
 import { useSnackbar } from 'notistack';
+import * as XLSX from 'xlsx'; // <--- ADDED: Import XLSX for Excel export
 
 // Import Types and Pagination
 import { Machine, Vendor } from "pages/RegisterManagement/MachineRegister/MachineRegister";
-// Ensure CustomPagination is in the same directory or update the path
 import CustomPagination from "../VehicleManage/CustomPagination";
 
 import "../../RegisterManagement/MachineRegister/MachineRegister.css";
@@ -54,11 +58,23 @@ const MachineMain: React.FC<MachineMainProps> = ({
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
 
-  // -- Filter State --
+  // -- Local Filter State --
   const [search, setSearch] = useState('');
   const [filterVendorId, setFilterVendorId] = useState<number | "">("");
   const [fromDate, setFromDate] = useState<Dayjs | null>(null);
   const [toDate, setToDate] = useState<Dayjs | null>(null);
+
+  // -- DOWNLOAD MENU STATE (ADDED) --
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const openDownloadMenu = Boolean(anchorEl);
+
+  const handleOpenDownloadMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseDownloadMenu = () => {
+    setAnchorEl(null);
+  };
 
   const handleChangeSearch = (event: ChangeEvent<HTMLInputElement>) => {
     setSearch(event.currentTarget.value);
@@ -80,7 +96,7 @@ const MachineMain: React.FC<MachineMainProps> = ({
         (m.Machine_mac || "").toLowerCase().includes(search.toLowerCase());
 
       // 2. Vendor Filter
-      const matchesVendor = filterVendorId === "" || m.vendorId === filterVendorId;
+      const matchesVendor = filterVendorId === "" || m.Vendor_Id === filterVendorId;
 
       // 3. Date Filter (Last Service Date)
       const itemDate = dayjs(m.Last_service_date);
@@ -91,40 +107,115 @@ const MachineMain: React.FC<MachineMainProps> = ({
     });
   }, [machines, search, filterVendorId, fromDate, toDate]);
 
-  // -- CSV Download Logic --
-  const handleDownloadCSV = () => {
+  // -- PREPARE DATA FOR EXPORT --
+  const getExportData = () => {
     if (filteredMachines.length === 0) {
       enqueueSnackbar("No data to download", { variant: "warning" });
-      return;
+      return null;
     }
+    return filteredMachines.map(m => {
+      const vendorName = vendors.find(v => v.Vendor_Id === m.Vendor_Id)?.vendorName || "Unknown";
+      return {
+        "ID": m.Machine_Id,
+        "Machine Name": m.Machine_name,
+        "Vendor": vendorName,
+        "MAC Address": m.Machine_mac || "",
+        "Capacity (Ton)": m.Capacity_ton || "",
+        "Type": m.Machine_type,
+        "Model": m.Machine_model || "",
+        "Location": m.Machine_location || "",
+        "Last Service": m.Last_service_date ? dayjs(m.Last_service_date).format('YYYY-MM-DD') : "",
+        "Status": m.Status || ""
+      };
+    });
+  };
 
-    const headers = [
-      "Machine Name", "Vendor", "MAC Address", "Capacity (Tons)", "Type", "Location", "Model", "Last Servi"
-    ];
+  // -- EXPORT TO EXCEL FUNCTION --
+  const handleExportExcel = () => {
+    const data = getExportData();
+    if (!data) return;
 
-    const rows = filteredMachines.map(m => {
-      const vendorName = vendors.find(v => v.Vendor_Id === m.vendorId)?.vendorName || "Unknown";
-      return [
-        m.Machine_name,
-        vendorName,
-        m.Machine_mac || "",
-        m.Capacity_ton || "",
-        m.Machine_type,
-        m.Machine_location || "",
-        m.Machine_model || "",
-        m.Last_service_date ? dayjs(m.Last_service_date).format('YYYY-MM-DD') : "",
-        m.Status || "",
-      ].join(",");
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Machines");
+    
+    // Generate buffer and trigger download
+    XLSX.writeFile(workbook, "Machine_Register.xlsx");
+    
+    handleCloseDownloadMenu();
+    enqueueSnackbar("Exported to Excel successfully", { variant: "success" });
+  };
+
+  // -- EXPORT TO WORD FUNCTION --
+  const handleExportWord = () => {
+    const data = getExportData();
+    if (!data) return;
+
+    // Create an HTML Table string
+    let tableHTML = `
+      <table border="1" style="border-collapse: collapse; width: 100%;">
+        <thead>
+          <tr style="background-color: #f2f2f2;">
+            <th>ID</th>
+            <th>Machine Name</th>
+            <th>Vendor</th>
+            <th>MAC Address</th>
+            <th>Capacity</th>
+            <th>Type</th>
+            <th>Location</th>
+            <th>Last Service</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    data.forEach((row) => {
+      tableHTML += `
+        <tr>
+          <td>${row["ID"]}</td>
+          <td>${row["Machine Name"]}</td>
+          <td>${row["Vendor"]}</td>
+          <td>${row["MAC Address"]}</td>
+          <td>${row["Capacity (Ton)"]}</td>
+          <td>${row["Type"]}</td>
+          <td>${row["Location"]}</td>
+          <td>${row["Last Service"]}</td>
+          <td>${row["Status"]}</td>
+        </tr>
+      `;
     });
 
-    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows].join("\n");
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "machine_register.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    tableHTML += `</tbody></table>`;
+
+    // Wrap in standard HTML structure for Word
+    const preHtml = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Machine Register</title></head><body>`;
+    const postHtml = "</body></html>";
+    const html = preHtml + tableHTML + postHtml;
+
+    // Create Blob and Download
+    const blob = new Blob(['\ufeff', html], {
+        type: 'application/msword'
+    });
+    
+    const url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(html);
+    
+    // Create download link
+    const downloadLink = document.createElement("a");
+    document.body.appendChild(downloadLink);
+    
+    if (navigator.userAgent.indexOf("MSIE") !== -1 || navigator.appVersion.indexOf("Trident/") > 0) {
+        // IE Support
+        (window.navigator as any).msSaveOrOpenBlob(blob, "Machine_Register.doc");
+    } else {
+        downloadLink.href = url;
+        downloadLink.download = "Machine_Register.doc";
+        downloadLink.click();
+    }
+    
+    document.body.removeChild(downloadLink);
+    handleCloseDownloadMenu();
+    enqueueSnackbar("Exported to Word successfully", { variant: "success" });
   };
 
   // -- DataGrid Columns Definition --
@@ -141,13 +232,13 @@ const MachineMain: React.FC<MachineMainProps> = ({
         )
     },
     {
-        field: 'vendorId',
+        field: 'Vendor_Id',
         headerName: 'Vendor',
         flex: 1,
         minWidth: 150,
         renderCell: (params: GridRenderCellParams) => {
             const row = params.row || params;
-            return vendors.find(v => v.Vendor_Id === row.vendorId)?.vendorName || "—";
+            return vendors.find(v => v.Vendor_Id === row.Vendor_Id)?.vendorName || "—";
         }
     },
     {
@@ -186,7 +277,7 @@ const MachineMain: React.FC<MachineMainProps> = ({
         width: 140,
         renderCell: (params: any) => {
             if (!params.value) return "—";
-            return dayjs(params.value).format('DD MMM YYYY');
+            return dayjs(params.value).format('DD/ MMM/ YYYY');
         }
     },
     {
@@ -197,7 +288,7 @@ const MachineMain: React.FC<MachineMainProps> = ({
         <Chip
           label={params.value}
           color={params.value === "Active" ? "success" : "default"}
-          // size="small"
+          size="small"
           variant="outlined"
           sx={{ fontWeight: 'bold' }}
         />
@@ -216,14 +307,14 @@ const MachineMain: React.FC<MachineMainProps> = ({
                 <IconButton 
                     onClick={() => onEdit(params.row)}  
                     className="vm-btn vm-action-btn-edit"
-                    // size="small"
+                    color="primary"
                 >
                     <IconifyIcon icon="fluent:notepad-edit-16-regular" />
                 </IconButton>
                 <IconButton 
                     onClick={() => onDelete(params.row.Machine_Id)} 
                     className="vm-btn vm-action-btn-delete"
-                    // size="small"
+                    color="error"
                 >
                     <IconifyIcon icon="wpf:delete" />
                 </IconButton>
@@ -243,6 +334,7 @@ const MachineMain: React.FC<MachineMainProps> = ({
         
         {/* --- Header & Filters --- */}
         <Box sx={{ p: 2.5, borderBottom: `1px solid ${theme.palette.divider}` }}>
+          
           {/* Top Row */}
           <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
             <Typography variant="h4" fontWeight="bold" color="text.primary">
@@ -284,29 +376,46 @@ const MachineMain: React.FC<MachineMainProps> = ({
 
             {/* From Date */}
             <Grid item xs={6} sm={3} md={2}>
+              <Typography variant="caption" fontWeight={300} fontSize={14} color="text.secondary" display="block" mb={0.5}>
+                  From Date
+              </Typography>
               <DatePicker
-                label="From Date" // Service Date
-                value={fromDate}
-                onChange={(newValue) => setFromDate(newValue)}
-                slotProps={{ textField: { size: 'small', fullWidth: true } }}
+                  value={fromDate}
+                  onChange={(newValue) => setFromDate(newValue)}
+                  slotProps={{ 
+                      textField: { 
+                          size: "small", 
+                          fullWidth: true,
+                          InputProps: { sx: { borderRadius: 2, bgcolor: 'background.default' } }
+                      } 
+                  }}
               />
             </Grid>
 
             {/* To Date */}
             <Grid item xs={6} sm={3} md={2}>
+              <Typography variant="caption" fontWeight={300} fontSize={14} color="text.secondary" display="block" mb={0.8}>
+                  To Date
+              </Typography>
               <DatePicker
-                label="To Date" // Service Date
-                value={toDate}
-                onChange={(newValue) => setToDate(newValue)}
-                slotProps={{ textField: { size: 'small', fullWidth: true } }}
+                  value={toDate}
+                  onChange={(newValue) => setToDate(newValue)}
+                  slotProps={{ 
+                      textField: { 
+                          size: "small", 
+                          fullWidth: true,
+                          InputProps: { sx: { borderRadius: 2, bgcolor: 'background.default' } }
+                      } 
+                  }}
               />
             </Grid>
 
-            {/* Vendor Filter */}
+            {/* Vendor Filter Dropdown */}
             <Grid item xs={12} sm={6} md={2}>
               <TextField
                 select
                 label="Filter Vendor"
+                placeholder="Filter Vendor"
                 variant="outlined"
                 size="small"
                 fullWidth
@@ -326,26 +435,55 @@ const MachineMain: React.FC<MachineMainProps> = ({
               <Button
                 variant="outlined"
                 color="secondary"
-                size="medium"
+                size="small"
                 onClick={handleClearFilters}
                 startIcon={<IconifyIcon icon="mdi:filter-off" />}
               >
-                Clear
               </Button>
              </Tooltip>
 
-              {/* ⭐ Download Button */}
-              <Tooltip title="Download CSV" arrow>
+              {/* --- DOWNLOAD DROPDOWN --- */}
+              <Tooltip title="Export Options" arrow>
                 <IconButton
-                  onClick={handleDownloadCSV}
+                  onClick={handleOpenDownloadMenu}
                   sx={{
                     color: 'primary.main',
-                    '&:hover': { bgcolor: theme.palette.primary.light + '40' }
+                    backgroundColor: 'rgba(228, 244, 253, 1)',
+                    backdropFilter: 'blur(6px)',
+                    WebkitBackdropFilter: 'blur(6px)',
+                
+                    '&:hover': {
+                      backgroundColor: '#9bcdfcff',
+                      backdropFilter: 'blur(10px)',
+                      WebkitBackdropFilter: 'blur(10px)',
+                    },
                   }}
                 >
-                  <IconifyIcon icon="mdi:download" />
+                  <IconifyIcon icon="lucide:download" />
                 </IconButton>
               </Tooltip>
+
+              <Menu
+                anchorEl={anchorEl}
+                open={openDownloadMenu}
+                onClose={handleCloseDownloadMenu}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+              >
+                <MenuItem onClick={handleExportExcel}>
+                  <ListItemIcon>
+                    <IconifyIcon icon="vscode-icons:file-type-excel2" color="success.main" />
+                  </ListItemIcon>
+                  <ListItemText>Export to Excel</ListItemText>
+                </MenuItem>
+                
+                <MenuItem onClick={handleExportWord}>
+                  <ListItemIcon>
+                    <IconifyIcon icon="vscode-icons:file-type-word" color="info.main" />
+                  </ListItemIcon>
+                  <ListItemText>Export to Word</ListItemText>
+                </MenuItem>
+              </Menu>
 
               <Tooltip title="Refresh" arrow>
                 <IconButton
@@ -353,9 +491,18 @@ const MachineMain: React.FC<MachineMainProps> = ({
                   disabled={loading}
                   sx={{
                     color: 'primary.main',
+                    backgroundColor: 'rgba(228, 244, 253, 1)',
+                    backdropFilter: 'blur(6px)',
+                    WebkitBackdropFilter: 'blur(6px)',
+                
+                    '&:hover': {
+                      backgroundColor: '#9bcdfcff',
+                      backdropFilter: 'blur(10px)',
+                      WebkitBackdropFilter: 'blur(10px)',
+                    },
                   }}
                 >
-                  <IconifyIcon icon="mdi:refresh" />
+                  <IconifyIcon icon="charm:refresh" />
                 </IconButton>
               </Tooltip>
             </Grid>

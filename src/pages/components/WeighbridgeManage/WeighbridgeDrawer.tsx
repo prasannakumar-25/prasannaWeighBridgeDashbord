@@ -25,6 +25,8 @@ import IconifyIcon from "components/base/IconifyIcon";
 import { Weighbridge, Machine } from "pages/RegisterManagement/WeighbridgeRegister/WeighbridgeRegister";
 import "../../RegisterManagement/MachineRegister/MachineRegister.css";
 
+import weighBridgeApi from "services/weighBridgeApi";
+
 interface WeighbridgeDrawerProps {
   open: boolean;
   onClose: () => void;
@@ -123,9 +125,34 @@ const WeighbridgeDrawer: React.FC<WeighbridgeDrawerProps> = ({
     return isValid;
   };
 
-  const handleSubmit = () => {
-    if (validate()) {
-      onSave(form);
+  const handleSubmit = async () => {
+    if (!validate()) return;
+    const payload = {
+      Machine_Id: 1,
+      Serial_no: form.Serial_no,
+      Port: form.Port,
+      Baud_rate: form.Baud_rate,
+      Data_bit: form.Data_bit,
+      Stop_bit: form.Stop_bit,
+      Party: form.Party,
+      Created_at: form.Created_at
+    }
+    
+    try {
+      let response 
+      if (initialData && form.Weighbridge_Id > 0) {
+        response = await weighBridgeApi.updateWeighbridgeDetails(form.Weighbridge_Id, payload)
+
+      } else {
+        response = await weighBridgeApi.addWeighbridgeDetails(payload);
+      }
+      if (response?.sussess) {
+         console.log("Success", response);
+         onSave(response.data)
+         onClose();
+      }
+    } catch (error) {
+      console.error("Error subminting form:" , error)
     }
   };
 
@@ -368,3 +395,6 @@ const WeighbridgeDrawer: React.FC<WeighbridgeDrawerProps> = ({
 };
 
 export default WeighbridgeDrawer;
+
+
+

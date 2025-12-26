@@ -1,9 +1,9 @@
 <a name="readme-top"></a>
 
-<!-- PROJECT LOGO -->
+<!-- PROJECT LOGO
 <br />
 <!-- PROJECT LOGO -->
-<div align="left" >
+<!-- <div align="left" >
 <center>
       <a href="public/elegent-logo.png" align="center">
         <img src="public/elegent-logo.png" alt="Logo" width="50" height="50">
@@ -16,9 +16,9 @@
 <br />
 
 <br />
-<br />
+<br /> -->
 <!-- TABLE OF CONTENTS -->
-<details  align="left">
+<!-- <details  align="left">
   <summary>Table of Contents</summary>
   <ol>
     <li>
@@ -39,10 +39,10 @@
   </ol>
 </details>
 <br />
-<br />
+<br /> --> -->
 <!-- ABOUT THE PROJECT -->
 
-## About The Project
+<!-- ## About The Project
 
 [![Product Name Screen Shot][product-screenshot]](public/homepage1.png)
 
@@ -54,10 +54,10 @@
 [![Material][Material]][React-url]
 ![E-Chart][Apache-chart]
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">back to top</a>)</p> -->
 
 <!-- GETTING STARTED -->
-
+<!-- 
 ## Getting Started
 
 ### Prerequisites
@@ -89,7 +89,7 @@ Follow these steps to get your project up and running:
    ```
    Open your web browser and navigate to http://localhost:3000/elegent to view this application.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">back to top</a>)</p> -->
 
 <!-- LICENSE -->
 
@@ -109,7 +109,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 
-[contributors-shield]: https://img.shields.io/github/contributors/othneildrew/Best-README-Template.svg?style=for-the-badge
+<!-- [contributors-shield]: https://img.shields.io/github/contributors/othneildrew/Best-README-Template.svg?style=for-the-badge
 [contributors-url]: https://github.com/othneildrew/Best-README-Template/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/othneildrew/Best-README-Template.svg?style=for-the-badge
 [forks-url]: https://github.com/othneildrew/Best-README-Template/network/members
@@ -137,4 +137,4 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 [Bootstrap.com]: https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white
 [Bootstrap-url]: https://getbootstrap.com
 [Material]: https://img.shields.io/badge/Material%20UI-007FFF?style=for-the-badge&logo=mui&logoColor=white
-[Apache-chart]: https://img.shields.io/badge/echart-4.7.0-green
+[Apache-chart]: https://img.shields.io/badge/echart-4.7.0-green -->

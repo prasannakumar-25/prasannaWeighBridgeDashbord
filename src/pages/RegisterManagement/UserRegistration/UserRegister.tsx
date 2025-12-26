@@ -10,6 +10,7 @@ import {
   Button,
   Snackbar,
   Alert,
+  LinearProgress,
 } from "@mui/material";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -28,10 +29,11 @@ import userApi from "services/userApi";
 export type User = {
   User_Id: number;
   User_name: string; // Used as First Name or generic identifier in your code
+  Password: string;
   Full_name: string;
   Email: string;
   Mobile_number: string;
-  Role: "Admin" | "Operator" | "Viewer";
+  Role: "Admin" | "Operator" | "Supervisor";
   // status: "Active" | "Inactive";
   Created_at: string;
 };
@@ -144,12 +146,29 @@ const UserRegister: React.FC = () => {
     setDeleteDialogOpen(true);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (userToDelete !== null) {
-      setUsers((prev) => prev.filter((u) => u.User_Id !== userToDelete));
+
+    try {
+      const response = await userApi.daleteUserDateils(userToDelete);
+
+      if (response.success) {
+        setUsers((prev) => 
+        prev.filter((u) => u.User_Id !== userToDelete)
+      );
       setSnackbarMessage("User deleted successfully");
+      setSnackbarOpen(true)
+      } else {
+        setSnackbarMessage("Failed to delete User");
+        setSnackbarOpen(true);
+      }
+    } catch (error) {
+      console.error(error);
+
+      setSnackbarMessage("Something went wrong while deleting");
       setSnackbarOpen(true);
     }
+  }
     setDeleteDialogOpen(false);
     setUserToDelete(null);
   };
@@ -195,7 +214,7 @@ const UserRegister: React.FC = () => {
         </Dialog>
 
         {/* Legacy Snackbar */}
-        <Snackbar
+        {/* <Snackbar
           open={snackbarOpen}
           autoHideDuration={3000}
           onClose={() => setSnackbarOpen(false)}
@@ -204,6 +223,34 @@ const UserRegister: React.FC = () => {
           <Alert onClose={() => setSnackbarOpen(false)} severity="success" variant="filled">
             {snackbarMessage}
           </Alert>
+        </Snackbar> */}
+        <Snackbar
+            open={snackbarOpen}
+            autoHideDuration={3000}
+            onClose={() => setSnackbarOpen(false)}
+            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
+            <Alert onClose={() => setSnackbarOpen(false)} severity="success" variant="filled">
+                {snackbarMessage}
+                 <LinearProgress
+              variant="determinate"
+              value={100}
+              sx={{
+                mt: 1,
+                height: 4,
+                borderRadius: 2,
+                bgcolor: '#c8e6c9',
+                '& .MuiLinearProgress-bar': {
+                  bgcolor: '#66bb6a',
+                  animation: 'snackbarProgress 3.5s linear forwards',
+                },
+                '@keyframes snackbarProgress': {
+                  to: { width: '100%' },
+                  from: { width: '0%' },
+                },
+              }}
+            />
+            </Alert>
         </Snackbar>
 
       </div>

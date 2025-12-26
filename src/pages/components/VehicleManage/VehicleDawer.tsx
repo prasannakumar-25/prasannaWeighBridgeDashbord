@@ -26,6 +26,7 @@ import {
 } from "@mui/material";
 import IconifyIcon from "components/base/IconifyIcon";
 import { Machine, Vehicle, Vendor } from "pages/RegisterManagement/VehicleRegister/VehicleRegister";
+import vehicletypeApi from "services/vehicletypeApi";
 
 interface VehicleDrawerProps {
   open: boolean;
@@ -111,9 +112,51 @@ const VehicleDrawer: React.FC<VehicleDrawerProps> = ({
     return isValid;
   };
 
-  const handleSubmit = () => {
-    if (validate()) {
-      onSave(form);
+  // const handleSubmit = async () => {
+  //   if (!validate()) return;
+
+  //   const payload = {
+  //     Vendor_Id: 1,
+  //     Vehicle_type: form.Vehicle_type,
+  //     Tare_weight: form.Tare_weight,
+  //     Created_at: form.Created_at,
+  //   }
+  //   try {
+  //     const response = await vehicletypeApi.addVehicleDetails(payload)
+  //     if (response?.success) {
+  //       onSave(response.data);
+  //       onClose();
+  //     }
+  //   } catch (error) {
+  //     console.log("error:", error)
+  //   }
+  //   console.log("----------response----------")
+  // };
+  
+  const handleSubmit = async () => {
+    if (!validate()) return;
+
+    const payload = {
+      Vendor_Id: 1,
+      Vehicle_type: form.Vehicle_type,
+      Tare_weight: form.Tare_weight,
+      Created_at: form.Created_at,
+    }
+    try {
+      let response 
+      if (initialData && form.Vehicle_Id > 0) {
+        response = await vehicletypeApi.updateVehicleDetails(form.Vehicle_Id, payload);
+
+      } else {
+        response = await vehicletypeApi.addVehicleDetails(payload);
+      }
+      if (response?.success) {
+        console.log("Success", response);
+        onSave(response.data)
+        onClose();
+      }
+    }  catch (error) {
+      console.error("Error submitting form:", error);
     }
   };
 

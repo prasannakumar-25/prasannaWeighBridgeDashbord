@@ -23,6 +23,7 @@ import {
 import IconifyIcon from "components/base/IconifyIcon";
 import { Machine, Vendor } from "pages/RegisterManagement/MachineRegister/MachineRegister";
 import "../../RegisterManagement/MachineRegister/MachineRegister.css";
+import machineApi from "services/machineApi";
 
 // ----------------------------------------------------------------------
 // NOTE: Please ensure your 'Machine' interface in your types file 
@@ -54,11 +55,12 @@ const MachineDrawer: React.FC<MachineDrawerProps> = ({
 
   // State
   const [showPassword, setShowPassword] = useState(false);
+   
   
   // Initialize form state
   const [form, setForm] = useState<Machine & { estateVehicleType?: string; estateMaterialType?: string }>({
     Machine_Id: 0,
-    vendorId: 0,
+    Vendor_Id: 0,
     Machine_name: "",
     password: "",
     Machine_mac: "",
@@ -90,7 +92,7 @@ const MachineDrawer: React.FC<MachineDrawerProps> = ({
       } else {
         setForm({
           Machine_Id: 0,
-          vendorId: 0,
+          Vendor_Id: 0,
           Machine_name: "",
           password: "",
           Machine_mac: "",
@@ -125,42 +127,91 @@ const MachineDrawer: React.FC<MachineDrawerProps> = ({
       newErrors.password = "Password is required";
       isValid = false;
     }
-    if (!form.vendorId || form.vendorId <= 0) {
-      newErrors.vendorId = "Vendor selection is required";
-      isValid = false;
-    }
+    // if (!form.Vendor_Id || form.Vendor_Id <= 0) {
+    //   newErrors.Vendor_Id = "Vendor selection is required";
+    //   isValid = false;
+    // }
     if (form.Capacity_ton !== undefined && form.Capacity_ton < 0) {
       newErrors.Capacity_ton = "Capacity cannot be negative";
       isValid = false;
     }
+    if (!form.Machine_mac?.trim()) {
+      newErrors.Machine_mac = "Mac address is required";
+      isValid = false;
+    }
 
     // Estate Specific Validation
-    if (form.Machine_type === "Estate") {
-      if (!form.estateVehicleType) {
-        newErrors.estateVehicleType = "Vehicle type is required for Estate";
-        isValid = false;
-      }
-      if (!form.estateMaterialType) {
-        newErrors.estateMaterialType = "Material type is required for Estate";
-        isValid = false;
-      }
-    }
+    // if (form.Machine_type === "Estate") {
+    //   if (!form.estateVehicleType) {
+    //     newErrors.estateVehicleType = "Vehicle type is required for Estate";
+    //     isValid = false;
+    //   }
+    //   if (!form.estateMaterialType) {
+    //     newErrors.estateMaterialType = "Material type is required for Estate";
+    //     isValid = false;
+    //   }
+    // }
 
     setErrors(newErrors);
 
     if (!isValid) {
-      setGlobalError("Please correct the highlighted errors below.");
+      setGlobalError("Please correct the highlighted errors below.")
     } else {
       setGlobalError(null);
     }
     return isValid;
   };
 
-  const handleSubmit = () => {
-    if (validate()) {
-      onSave(form);
-    }
-  };
+  // const handleSubmit = async () => {
+  //   if(!validate()) return;
+
+  //   const payload ={
+  //      Vendor_Id: 1,
+  //      Machine_name: form.Machine_name,
+  //      Password: form.password,
+  //      Machine_mac: form.Machine_mac,
+  //      Machine_model: form.Machine_model,
+  //      Capacity_ton: form.Capacity_ton,
+  //      Last_service_date: form.Last_service_date,
+  //      Status: form.Status,
+  //      Machine_type: form.Machine_type,
+  //      Machine_location: form.Machine_location
+  //   }
+
+  //   try{
+  //     const response = await machineApi.addMachinDetails(payload)
+  //     console.log("response :", response)
+  //     if (response?.success) {
+  //       onSave(response.data);
+  //       onClose();
+  //     }
+  //   }
+  //   catch(error){
+  //     console.log("error :", error)
+  //   }
+
+  //   // console.log("---------------called-------------------")
+  //   try{
+        
+
+
+  //       const updateresponse = await machineApi.updataMachineDetailes(payload)
+  //       if(updateresponse.success)
+  //       {
+  //         console.log("successfully updated")
+  //       }
+  //       else 
+  //       {
+  //         console.log("Failed")
+  //       }
+  //     }
+  //   catch(error)
+  //   {
+  //     console.error(error)
+  //     throw error
+  //   }
+  // }
+  
 
   // Helper for the "OK" button inside Estate card
   // const handleEstateConfirm = () => {
@@ -180,6 +231,45 @@ const MachineDrawer: React.FC<MachineDrawerProps> = ({
   //      }));
   //   }
   // };
+  const handleSubmit = async () => {
+    // 1. Run Validation
+    if(!validate()) return;
+
+    // 2. Prepare Payload
+    const payload = {
+       Vendor_Id: form.Vendor_Id, // Use form value, not hardcoded 1
+       Machine_name: form.Machine_name,
+       Password: form.password,
+       Machine_mac: form.Machine_mac,
+       Machine_model: form.Machine_model,
+       Capacity_ton: form.Capacity_ton,
+       Last_service_date: form.Last_service_date,
+       Status: form.Status,
+       Machine_type: form.Machine_type,
+       Machine_location: form.Machine_location
+    };
+
+    try {
+      let response
+      if (initialData && form.Machine_Id > 0) {
+        response = await machineApi.updataMachineDetailes(form.Machine_Id, payload);
+      
+      } else {
+        
+        response = await machineApi.addMachinDetails(payload);
+      }
+
+      if (response?.success) {
+        console.log("Success:", response);
+        onSave(response.data);
+        onClose();
+      }
+    } catch(error) {
+      console.error("Error submitting form:", error);
+      
+    }
+  };
+
 
   return (
     <Drawer
@@ -311,11 +401,11 @@ const MachineDrawer: React.FC<MachineDrawerProps> = ({
                   className="input-bg-color label-black"
                   select
                   fullWidth
-                  value={form.vendorId || 0}
-                  onChange={(e) => setField("vendorId", Number(e.target.value))}
+                  value={form.Vendor_Id || 0}
+                  onChange={(e) => setField("Vendor_Id", Number(e.target.value))}
                   disabled={loading}
-                  error={!!errors.vendorId}
-                  helperText={errors.vendorId}
+                  error={!!errors.Vendor_Id}
+                  helperText={errors.Vendor_Id}
                 >
                   <MenuItem value={0} disabled sx={{ color: "text.secondary", fontStyle: "italic" }}>
                     Select Vendor

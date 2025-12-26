@@ -1,225 +1,3 @@
-// import React, { useEffect, useState } from "react";
-// import {
-//   Box,
-//   Button,
-//   Drawer,
-//   IconButton,
-//   MenuItem,
-//   Stack,
-//   TextField,
-//   Typography,
-//   Alert,
-//   useMediaQuery,
-//   useTheme,
-// } from "@mui/material";
-// import IconifyIcon from "components/base/IconifyIcon";
-// // import { User } from "./UserRegister"; // Import types from Parent
-// import { User } from "pages/RegisterManagement/UserRegistration/UserRegister";
-
-// import "../../RegisterManagement/MachineRegister/MachineRegister.css"
-
-// interface UserDrawerProps {
-//   open: boolean;
-//   onClose: () => void;
-//   onSave: (data: User) => void;
-//   initialData: User | null;
-//   loading?: boolean;
-// }
-
-// const UserDrawer: React.FC<UserDrawerProps> = ({
-//   open,
-//   onClose,
-//   onSave,
-//   initialData,
-//   loading = false,
-// }) => {
-//   const theme = useTheme();
-//   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
-//   const drawerWidth = isMdUp ? Math.min(700, Math.round(window.innerWidth * 0.55)) : window.innerWidth;
-
-//   const [formError, setFormError] = useState<string | null>(null);
-
-//   // Default Form State
-//   const defaultForm: User = {
-//     id: 0,
-//     User_name: "",
-//     Full_name: "",
-//     Email: "",
-//     Mobile_number: "",
-//     Role: "Operator",
-//     status: "Active",
-//     Created_at: new Date().toISOString(),
-//   };
-
-//   const [form, setForm] = useState<User>(defaultForm);
-
-//   // Reset or Populate form when Drawer opens
-//   useEffect(() => {
-//     if (open) {
-//       setFormError(null);
-//       if (initialData) {
-//         setForm({ ...initialData });
-//       } else {
-//         setForm({ ...defaultForm, Created_at: new Date().toISOString() });
-//       }
-//     }
-//   }, [open, initialData]);
-
-//   const setField = (key: keyof User, value: any) => {
-//     setForm((prev) => ({ ...prev, [key]: value }));
-//   };
-
-//   const validate = (): boolean => {
-//     if (!form.Full_name?.trim()) {
-//       setFormError("Full Name is required.");
-//       return false;
-//     }
-//     if (!form.Email?.trim() || !/\S+@\S+\.\S+/.test(form.Email)) {
-//       setFormError("Valid Email is required.");
-//       return false;
-//     }
-//     if (!form.Mobile_number?.trim()) {
-//       setFormError("Phone Number is required.");
-//       return false;
-//     }
-//     setFormError(null);
-//     return true;
-//   };
-
-//   const handleSubmit = () => {
-//     if (validate()) {
-//       onSave(form);
-//     }
-//   };
-
-//   return (
-//     <Drawer
-//       anchor="right"
-//       open={open}
-//       onClose={onClose}
-//       PaperProps={{
-//         sx: {
-//           width: drawerWidth,
-//           p: 3,
-//           borderTopLeftRadius: { xs: 0, md: 12 },
-//           borderBottomLeftRadius: { xs: 0, md: 12 },
-//         },
-//       }}
-//     >
-//       {/* <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-//         <Typography variant="h6" fontWeight="bold">
-//           {initialData ? "Edit User" : "Add New User"}
-//         </Typography>
-//         <IconButton onClick={onClose} aria-label="close">
-//           <IconifyIcon icon="material-symbols:close-rounded" />
-//         </IconButton>
-//       </Box> */}
-//       <Box className="drawer-header">
-//         <Typography variant="h6">{initialData ? "Edit Machine" : "Add New Machine"}</Typography>
-//         <IconButton onClick={onClose} aria-label="close">
-//             <IconifyIcon icon="material-symbols:close-rounded" />
-//         </IconButton>
-//         </Box>
-
-//       <Stack spacing={2.5}>
-//         {formError && <Alert severity="error">{formError}</Alert>}
-
-//         <TextField
-//           label="Full Name"
-//           className="input-bg-color label-black" 
-//           placeholder="e.g., John Doe"
-//           fullWidth
-//           value={form.Full_name}
-//           onChange={(e) => setField("Full_name", e.target.value)}
-//           disabled={loading}
-//         />
-
-//         <TextField
-//           label="Email Address"
-//           className="input-bg-color label-black" 
-//           placeholder="e.g., john@example.com"
-//           fullWidth
-//           value={form.Email}
-//           onChange={(e) => setField("Email", e.target.value)}
-//           disabled={loading}
-//         />
-
-//         <TextField
-//           label="Phone Number"
-//           className="input-bg-color label-black" 
-//           placeholder="e.g., +91 98765 43210"
-//           fullWidth
-//           value={form.Mobile_number}
-//           onChange={(e) => setField("Mobile_number", e.target.value)}
-//           disabled={loading}
-//         />
-
-//         <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-//           <TextField
-//             label="Role"
-//             className="input-bg-color label-black" 
-//             select
-//             fullWidth
-//             value={form.Role}
-//             onChange={(e) => setField("Role", e.target.value)}
-//             disabled={loading}
-//           >
-//             <MenuItem value="Admin">Admin</MenuItem>
-//             <MenuItem value="Operator">Operator</MenuItem>
-//             <MenuItem value="Viewer">Viewer</MenuItem>
-//           </TextField>
-
-//           <TextField
-//             label="Status"
-//             className="input-bg-color label-black" 
-//             select
-//             fullWidth
-//             value={form.status}
-//             onChange={(e) => setField("status", e.target.value)}
-//             disabled={loading}
-//           >
-//             <MenuItem value="Active">Active</MenuItem>
-//             <MenuItem value="Inactive">Inactive</MenuItem>
-//           </TextField>
-//         </Stack>
-
-//         <Stack direction="row" spacing={2} justifyContent="flex-end" pt={2}>
-//           <Button variant="text" className="cancel-button" onClick={onClose} 
-//           >
-//               Cancel
-//           </Button>
-
-//           <Button variant="contained" className="edit-button" onClick={handleSubmit} 
-//           >
-//               {initialData ? "Update Machine" : "Save Machine"}
-//           </Button>
-//           </Stack>
-
-//         {/* <Stack direction="row" spacing={2} justifyContent="flex-end" pt={2}>
-//           <Button onClick={onClose} variant="text" className="cancel-button">
-//             Cancel
-//           </Button>
-//           <Button variant="contained" onClick={handleSubmit} disabled={loading} className="edit-button">
-//             {initialData ? "Update" : "Save"}
-//           </Button>
-//         </Stack> */}
-//       </Stack>
-//     </Drawer>
-//   );
-// };
-
-// export default UserDrawer;
-
-
-
-
-
-
-
-
-
-
-
 
 import React, { useEffect, useState } from "react";
 import {
@@ -244,11 +22,12 @@ import {
 import IconifyIcon from "components/base/IconifyIcon";
 import { User } from "pages/RegisterManagement/UserRegistration/UserRegister";
 import "../../RegisterManagement/MachineRegister/MachineRegister.css";
+import userApi from "services/userApi";
 
 interface UserDrawerProps {
   open: boolean;
   onClose: () => void;
-  onSave: (data: User) => void;
+  onSave: (data:User) => void;
   initialData: User | null;
   loading?: boolean;
 }
@@ -268,6 +47,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({
   const [form, setForm] = useState<User>({
     User_Id: 0,
     User_name: "", // Usually auto-generated or same as Email, keeping empty for now
+    Password: "",
     Full_name: "",
     Email: "",
     Mobile_number: "",
@@ -280,6 +60,9 @@ const UserDrawer: React.FC<UserDrawerProps> = ({
   const [errors, setErrors] = useState<Partial<Record<keyof User, string>>>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
 
+  const [showPassword, setShowPassword] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState(false);
+
   // Reset or Populate form
   useEffect(() => {
     if (open) {
@@ -291,6 +74,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({
         setForm({
           User_Id: 0,
           User_name: "",
+          Password: "",
           Full_name: "",
           Email: "",
           Mobile_number: "",
@@ -349,11 +133,60 @@ const UserDrawer: React.FC<UserDrawerProps> = ({
     return isValid;
   };
 
-  const handleSubmit = () => {
-    if (validate()) {
-      onSave(form);
+  // const handleSubmit = async () => {
+  //   if (!validate()) return;
+
+  //   const payload = {
+  //     User_name: form.User_name,
+  //     Password: form.Password,
+  //     Full_name: form.Full_name,
+  //     Email: form.Email,
+  //     Mobile_number: form.Mobile_number,
+  //     Role: form.Role,
+  //   }
+  //   try{  
+  //     const response = await userApi.addUserDetails(payload)
+  //     if (response?.success) {
+  //       onSave(response.data);
+  //       onClose();
+  //     } else {
+  //     setSnackbarMessage(response.message || "Failed to Create user");
+  //     }
+  //   } catch (error) {
+  //     console.error("Create user error", error);
+  //     setGlobalError("Somthing went wrong. Please try again.");
+  //   }
+  //   };
+
+  const handleSubmit = async () => {
+    if(!validate()) return;
+
+    const payload = {
+      User_name: form.User_name,
+      Password: form.Password,
+      Full_name: form.Full_name,
+      Email: form.Email,
+      Mobile_number: form.Mobile_number,
+      Role: form.Role,
+    };
+
+    try {
+      let response
+      if (initialData && form.User_Id > 0) {
+        response = await userApi.updateUserDetails(form.User_Id, payload);
+      } else {
+        response = await userApi.addUserDetails(payload);
+      }
+      if (response?.success) {
+        console.log("Success :", response)
+        onSave(response.data);
+        onClose();
+      }
+    } catch(error) {
+      console.error("Reeoe submitting form:", error);
     }
-  };
+  }
+
 
   return (
     <Drawer
@@ -449,6 +282,43 @@ const UserDrawer: React.FC<UserDrawerProps> = ({
                   }}
                 />
               </Grid>
+              
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Access Password"
+                  className="input-bg-color label-black"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="*********"
+                  fullWidth
+                  value={form.Password}
+                  onChange={(e) => setField("Password", e.target.value)}
+                  disabled={loading}
+                  error={!!errors.Password}
+                  helperText={errors.Password}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="end">
+                        <IconifyIcon icon="mdi:lock-outline" />
+                      </InputAdornment>
+                    ),
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() => setShowPassword(!showPassword)}
+                          edge="end"
+                          sx={{ color: 'text.secondary' }} 
+                        >
+                          {showPassword ? (
+                            <IconifyIcon icon="ic:baseline-key-off" />
+                          ) : (
+                            <IconifyIcon icon="ic:baseline-key" />
+                          )}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
 
               <Grid item xs={12}>
                 <TextField
@@ -491,6 +361,26 @@ const UserDrawer: React.FC<UserDrawerProps> = ({
                   }}
                 />
               </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  label="UserName"
+                  className="input-bg-color label-black"
+                  placeholder="e.g. admin 1"
+                  fullWidth
+                  value={form.User_name}
+                  onChange={(e) => setField("User_name", e.target.value)}
+                  disabled={loading}
+                  error={!!errors.User_name}
+                  helperText={errors.User_name}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="end">
+                        <IconifyIcon icon="mdi:account-outline" />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
             </Grid>
           </Paper>
 
@@ -512,7 +402,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({
                 >
                   <MenuItem value="Admin">Admin</MenuItem>
                   <MenuItem value="Operator">Operator</MenuItem>
-                  <MenuItem value="Viewer">Viewer</MenuItem>
+                  <MenuItem value="Supervisor">Supervisor</MenuItem>
                 </TextField>
               </Grid>
 

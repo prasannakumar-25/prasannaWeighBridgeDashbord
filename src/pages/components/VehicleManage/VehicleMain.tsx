@@ -1,5 +1,4 @@
 
-
 import React, { useState, useMemo, ChangeEvent } from "react";
 import {
   Box,
@@ -248,19 +247,19 @@ const VehicleMain: React.FC<VehicleMainProps> = ({
         return dayjs(params.value).format('DD/ MMM/ YYYY');
       }
     },
-    {
-      field: 'status',
-      headerName: 'Status',
-      width: 120,
-      renderCell: (params: GridRenderCellParams) => (
-        <Chip
-          label={params.value}
-          color={params.value === "Active" ? "success" : "default"}
-          variant="outlined"
-          sx={{ fontWeight: 'bold' }}
-        />
-      )
-    },
+    // {
+    //   field: 'status',
+    //   headerName: 'Status',
+    //   width: 120,
+    //   renderCell: (params: GridRenderCellParams) => (
+    //     <Chip
+    //       label={params.value}
+    //       color={params.value === "Active" ? "success" : "default"}
+    //       variant="outlined"
+    //       sx={{ fontWeight: 'bold' }}
+    //     />
+    //   )
+    // },
     {
       field: 'actions',
       headerName: 'Actions',
@@ -340,22 +339,37 @@ const VehicleMain: React.FC<VehicleMainProps> = ({
 
             {/* From Date */}
             <Grid item xs={6} sm={3} md={2}>
+              <Typography variant="caption" fontWeight={300} fontSize={14} color="text.secondary" display="block" mb={0.5}>
+                  From Date
+              </Typography>
               <DatePicker
-                label="From Date"
-                value={fromDate}
-                onChange={(newValue) => setFromDate(newValue)}
-                slotProps={{ textField: { size: 'small', fullWidth: true } }}
+                  value={fromDate}
+                  onChange={(newValue) => setFromDate(newValue)}
+                  slotProps={{ 
+                      textField: { 
+                          size: "small", 
+                          fullWidth: true,
+                          InputProps: { sx: { borderRadius: 2, bgcolor: 'background.default' } }
+                      } 
+                  }}
               />
             </Grid>
 
             {/* To Date */}
             <Grid item xs={6} sm={3} md={2}>
+              <Typography variant="caption" fontWeight={300} fontSize={14} color="text.secondary" display="block" mb={0.8}>
+                  To Date
+              </Typography>
               <DatePicker
-                label="To Date"
-                value={toDate}
-                onChange={(newValue) => setToDate(newValue)}
-                slotProps={{ textField: { size: 'small', fullWidth: true } }}
-                
+                  value={toDate}
+                  onChange={(newValue) => setToDate(newValue)}
+                  slotProps={{ 
+                      textField: { 
+                          size: "small", 
+                          fullWidth: true,
+                          InputProps: { sx: { borderRadius: 2, bgcolor: 'background.default' } }
+                      } 
+                  }}
               />
             </Grid>
 
@@ -461,7 +475,7 @@ const VehicleMain: React.FC<VehicleMainProps> = ({
         </Box>
 
         {/* --- DATA GRID SECTION --- */}
-        <Box sx={{ height: 550, width: '100%' }}>
+        {/* <Box sx={{ height: 550, width: '100%' }}>
             <DataGrid
                 rows={filteredVehicles}
                 columns={columns}
@@ -500,6 +514,64 @@ const VehicleMain: React.FC<VehicleMainProps> = ({
                         borderBottom: `2px solid ${theme.palette.divider}`,
                         fontWeight: 'bold',
                     },
+                }}
+            />
+        </Box> */}
+        <Box sx={{ height: 550, width: '100%' }}>
+            <DataGrid
+                rows={filteredVehicles}
+                columns={columns}
+                getRowId={(row) => row.Created_at ? row.Vehicle_Id : Math.random()}
+                
+                // --- PAGINATION CONFIGURATION ---
+                initialState={{
+                    pagination: { 
+                        paginationModel: { pageSize: 5, page: 0 } 
+                    },
+                }}
+                // This ensures the custom picker works logically with the internal grid
+                pageSizeOptions={[5, 10, 20, 50]} 
+                
+                // --- SLOTS ---
+                slots={{
+                    loadingOverlay: LinearProgress as GridSlots['loadingOverlay'],
+                    // This replaces the default footer entirely with your custom one
+                    pagination: CustomPagination, 
+                    noRowsOverlay: () => (
+                        <Stack height="100%" alignItems="center" justifyContent="center" color="text.secondary">
+                             <IconifyIcon icon="fluent:box-search-24-regular" width={40} height={40} sx={{mb:1, opacity:0.5}}/>
+                             <Typography variant="body2">No vehicles found</Typography>
+                        </Stack>
+                    ),
+                }}
+
+                // --- STYLING ---
+                loading={loading}
+                getRowHeight={() => 65}
+                disableRowSelectionOnClick
+                disableColumnSelector
+                disableColumnMenu
+                disableColumnSorting // Optional: Keep or remove based on preference
+                
+                // Ensure the default footer doesn't conflict (though CustomPagination overrides it)
+                sx={{
+                    border: 'none',
+                    '& .MuiDataGrid-cell': {
+                        borderBottom: `1px solid ${theme.palette.divider}`,
+                    },
+                    '& .MuiDataGrid-columnHeaders': {
+                        bgcolor: theme.palette.background.default,
+                        borderBottom: `2px solid ${theme.palette.divider}`,
+                        fontWeight: 'bold',
+                        color: theme.palette.text.secondary,
+                        textTransform: 'uppercase',
+                        fontSize: '0.75rem'
+                    },
+                    // Hides the default footer provided by DataGrid if it accidentally tries to render borders
+                    '& .MuiDataGrid-footerContainer': {
+                        borderTop: `1px solid ${theme.palette.divider}`,
+                        backgroundColor: theme.palette.background.paper, 
+                    }
                 }}
             />
         </Box>

@@ -282,6 +282,6 @@ const routes: RouteObject[] = [
   },
 ];
 
-const router = createBrowserRouter(routes, { basename: '/elegent' });
+const router = createBrowserRouter(routes, { basename: '/weighbridge' });
 
 export default router;

@@ -11,6 +11,7 @@ import {
   Button,
   Snackbar,
   Alert,
+  LinearProgress,
 } from "@mui/material";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -109,8 +110,7 @@ const WeighbridgeRegister: React.FC = () => {
       { id: 1, machineName: "Machine A" },
       { id: 2, machineName: "Machine B" },
       { id: 3, machineName: "Machine C" },
-    ]);
-    fetchWeighbridge();
+    ]); 
 
     setLoading(false);
   }, []);
@@ -122,6 +122,8 @@ const WeighbridgeRegister: React.FC = () => {
   };
 
   const handleOpenEdit = (wb: Weighbridge) => {
+
+    
     setEditingItem(wb);
     setDrawerOpen(true);
   };
@@ -131,25 +133,18 @@ const WeighbridgeRegister: React.FC = () => {
     setEditingItem(null);
   };
 
-  const handleSave = (formData: Weighbridge) => {
+  const handleSave = async () => {
     setLoading(true);
-    // Simulate API save
-    setTimeout(() => {
-        if (editingItem) {
-        setWeighbridges((prev) =>
-            prev.map((item) => (item.Weighbridge_Id === editingItem.Weighbridge_Id ? { ...formData, Weighbridge_Id: editingItem.Weighbridge_Id } : item))
-        );
-        setSnackbarMessage("Weighbridge updated successfully");
-        } else {
-        const newItem: Weighbridge = { ...formData, Weighbridge_Id: Date.now() };
-        setWeighbridges((prev) => [newItem, ...prev]);
-        setSnackbarMessage("Weighbridge added successfully");
-        }
-        setLoading(false);
-        setSnackbarOpen(true)
-        handleCloseDrawer();
-    }, 400);
+    await fetchWeighbridge();
+    setSnackbarMessage(
+      editingItem 
+      ? "Weighbridge Updated successfully"
+      : "Weighbridge added successfully"
+    );
+    setSnackbarOpen(true);
+    handleCloseDrawer();
   };
+
 
   // --- Delete Logic ---
   const initiateDelete = (Weighbridge_Id: number) => {
@@ -157,14 +152,30 @@ const WeighbridgeRegister: React.FC = () => {
     setDeleteDialogOpen(true);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
+    setLoading(true);
     if (itemToDelete !== null) {
-      setWeighbridges((prev) => prev.filter((item) => item.Weighbridge_Id !== itemToDelete));
-      setSnackbarMessage("Weighbridge deleted successfully");
-      setSnackbarOpen(true);
+
+      try {
+        const response = await weighBridgeApi.deleteWeighbridgeDetails(itemToDelete);
+        if (response.success) {
+          setSnackbarMessage("Weighbridge deleted successfully")
+          setSnackbarOpen(true);
+        } else {
+          setSnackbarMessage("Failed to delete Weighbridge");
+          setSnackbarOpen(true);
+        }
+      }
+      catch (error) {
+        console.log(error)
+
+        setSnackbarMessage("Something went wrong while deleting");
+        setSnackbarOpen(true);
+      }
     }
     setDeleteDialogOpen(false);
     setItemToDelete(null);
+    setLoading(false);
   };
 
   return (
@@ -208,7 +219,7 @@ const WeighbridgeRegister: React.FC = () => {
         </Dialog>
 
         {/* Legacy Snackbar */}
-        <Snackbar
+        {/* <Snackbar
           open={snackbarOpen}
           autoHideDuration={2500}
           onClose={() => setSnackbarOpen(false)}
@@ -217,6 +228,34 @@ const WeighbridgeRegister: React.FC = () => {
           <Alert onClose={() => setSnackbarOpen(false)} severity="success" variant="filled">
             {snackbarMessage}
           </Alert>
+        </Snackbar> */}
+        <Snackbar
+            open={snackbarOpen}
+            autoHideDuration={3000}
+            onClose={() => setSnackbarOpen(false)}
+            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
+            <Alert onClose={() => setSnackbarOpen(false)} severity="success" variant="filled">
+                {snackbarMessage}
+                 <LinearProgress
+              variant="determinate"
+              value={100}
+              sx={{
+                mt: 1,
+                height: 4,
+                borderRadius: 2,
+                bgcolor: '#c8e6c9',
+                '& .MuiLinearProgress-bar': {
+                  bgcolor: '#66bb6a',
+                  animation: 'snackbarProgress 3.5s linear forwards',
+                },
+                '@keyframes snackbarProgress': {
+                  to: { width: '100%' },
+                  from: { width: '0%' },
+                },
+              }}
+            />
+            </Alert>
         </Snackbar>
 
       </div>

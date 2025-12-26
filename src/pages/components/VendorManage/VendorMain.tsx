@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   IconButton,
+  MenuItem,
   Stack,
   TextField,
   Typography,
@@ -11,6 +12,9 @@ import {
   Tooltip,
   useTheme,
   LinearProgress,
+  Menu,           // <--- ADDED
+  ListItemIcon,   // <--- ADDED
+  ListItemText,   // <--- ADDED
 } from "@mui/material";
 import { 
   DataGrid, 
@@ -22,18 +26,19 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import IconifyIcon from "components/base/IconifyIcon";
 import { useSnackbar } from 'notistack';
+import * as XLSX from 'xlsx'; // <--- ADDED: Import XLSX for Excel export
 
 // Import Types and Pagination
 import { Vendor } from "pages/RegisterManagement/VendorRegister/VendorRegister"; 
 import CustomPagination from "../VehicleManage/CustomPagination";
 
-
+import "../../RegisterManagement/MachineRegister/MachineRegister.css";
 
 interface VendorMainProps {
   vendors: Vendor[];
   onAdd: () => void;
   onEdit: (v: Vendor) => void;
-  onDelete: (id: number) => void;
+  onDelete: (Vendor_Id: number) => void;
   loading: boolean;
   onRefresh: () => void;
 }
@@ -49,11 +54,23 @@ const VendorMain: React.FC<VendorMainProps> = ({
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
 
-  // -- Filter State --
+  // -- Local Filter State --
   const [search, setSearch] = useState('');
-  const [filterGst, setFilterGst] = useState(''); // New State for GST
+  const [filterGst, setFilterGst] = useState(''); // GST Filter
   const [fromDate, setFromDate] = useState<Dayjs | null>(null);
   const [toDate, setToDate] = useState<Dayjs | null>(null);
+
+  // -- DOWNLOAD MENU STATE (ADDED) --
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const openDownloadMenu = Boolean(anchorEl);
+
+  const handleOpenDownloadMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseDownloadMenu = () => {
+    setAnchorEl(null);
+  };
 
   const handleChangeSearch = (event: ChangeEvent<HTMLInputElement>) => {
     setSearch(event.currentTarget.value);
@@ -73,17 +90,17 @@ const VendorMain: React.FC<VendorMainProps> = ({
   // -- Filter Logic --
   const filteredVendors = useMemo(() => {
     return vendors.filter((v) => {
-      // 1. Text Search (Name, Email, Phone)
+      // 1. Text Search (Name, Email, Contact_number)
       const matchesSearch =
-        v.vendorName.toLowerCase().includes(search.toLowerCase()) ||
-        (v.email || "").toLowerCase().includes(search.toLowerCase()) ||
-        (v.phone || "").includes(search);
+        v.Vendor_name.toLowerCase().includes(search.toLowerCase()) ||
+        (v.Email || "").toLowerCase().includes(search.toLowerCase()) ||
+        (v.Contact_number || "").includes(search);
 
       // 2. GST Filter
-      const matchesGst = filterGst === "" || (v.gstNumber || "").toLowerCase().includes(filterGst.toLowerCase());
+      const matchesGst = filterGst === "" || (v.Gst_number || "").toLowerCase().includes(filterGst.toLowerCase());
 
       // 3. Date Filter (Created Date)
-      const itemDate = dayjs(v.createdAt);
+      const itemDate = dayjs(v.Created_at);
       const matchesFromDate = fromDate ? itemDate.isValid() && (itemDate.isAfter(fromDate, 'day') || itemDate.isSame(fromDate, 'day')) : true;
       const matchesToDate = toDate ? itemDate.isValid() && (itemDate.isBefore(toDate, 'day') || itemDate.isSame(toDate, 'day')) : true;
 
@@ -91,38 +108,114 @@ const VendorMain: React.FC<VendorMainProps> = ({
     });
   }, [vendors, search, filterGst, fromDate, toDate]);
 
-  // -- CSV Download Logic --
-  const handleDownloadCSV = () => {
+  // -- PREPARE DATA FOR EXPORT --
+  const getExportData = () => {
     if (filteredVendors.length === 0) {
       enqueueSnackbar("No data to download", { variant: "warning" });
-      return;
+      return null;
     }
-    const headers = ["ID", "Vendor Name", "Email", "Phone", "Address", "GST Number", "Website", "Created Date"];
-    const rows = filteredVendors.map(v => [
-      v.id,
-      v.vendorName,
-      v.email || "",
-      v.phone || "",
-      v.address || "",
-      v.gstNumber || "",
-      v.website || "",
-      v.createdAt ? dayjs(v.createdAt).format('YYYY-MM-DD') : ""
-    ].join(","));
+    return filteredVendors.map(v => ({
+      "ID": v.Vendor_Id,
+      "Vendor Name": v.Vendor_name,
+      "Email": v.Email || "",
+      "Contact": v.Contact_number || "",
+      "Address": v.Address || "",
+      "GST Number": v.Gst_number || "",
+      "Website": v.Website || "",
+      "Joined Date": v.Created_at ? dayjs(v.Created_at).format('YYYY-MM-DD') : ""
+    }));
+  };
 
-    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows].join("\n");
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "vendor_register.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  // -- EXPORT TO EXCEL FUNCTION --
+  const handleExportExcel = () => {
+    const data = getExportData();
+    if (!data) return;
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Vendors");
+    
+    // Generate buffer and trigger download
+    XLSX.writeFile(workbook, "Vendor_Register.xlsx");
+    
+    handleCloseDownloadMenu();
+    enqueueSnackbar("Exported to Excel successfully", { variant: "success" });
+  };
+
+  // -- EXPORT TO WORD FUNCTION --
+  const handleExportWord = () => {
+    const data = getExportData();
+    if (!data) return;
+
+    // Create an HTML Table string
+    let tableHTML = `
+      <table border="1" style="border-collapse: collapse; width: 100%;">
+        <thead>
+          <tr style="background-color: #f2f2f2;">
+            <th>ID</th>
+            <th>Vendor Name</th>
+            <th>Email</th>
+            <th>Contact</th>
+            <th>Address</th>
+            <th>GST Number</th>
+            <th>Website</th>
+            <th>Joined Date</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    data.forEach((row) => {
+      tableHTML += `
+        <tr>
+          <td>${row["ID"]}</td>
+          <td>${row["Vendor Name"]}</td>
+          <td>${row["Email"]}</td>
+          <td>${row["Contact"]}</td>
+          <td>${row["Address"]}</td>
+          <td>${row["GST Number"]}</td>
+          <td>${row["Website"]}</td>
+          <td>${row["Joined Date"]}</td>
+        </tr>
+      `;
+    });
+
+    tableHTML += `</tbody></table>`;
+
+    // Wrap in standard HTML structure for Word
+    const preHtml = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Vendor Register</title></head><body>`;
+    const postHtml = "</body></html>";
+    const html = preHtml + tableHTML + postHtml;
+
+    // Create Blob and Download
+    const blob = new Blob(['\ufeff', html], {
+        type: 'application/msword'
+    });
+    
+    const url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(html);
+    
+    // Create download link
+    const downloadLink = document.createElement("a");
+    document.body.appendChild(downloadLink);
+    
+    if (navigator.userAgent.indexOf("MSIE") !== -1 || navigator.appVersion.indexOf("Trident/") > 0) {
+        // IE Support
+        (window.navigator as any).msSaveOrOpenBlob(blob, "Vendor_Register.doc");
+    } else {
+        downloadLink.href = url;
+        downloadLink.download = "Vendor_Register.doc";
+        downloadLink.click();
+    }
+    
+    document.body.removeChild(downloadLink);
+    handleCloseDownloadMenu();
+    enqueueSnackbar("Exported to Word successfully", { variant: "success" });
   };
 
   // -- DataGrid Columns --
   const columns: GridColDef<Vendor>[] = useMemo(() => [
     {
-      field: 'vendorName',
+      field: 'Vendor_name',
       headerName: 'Vendor Name',
       flex: 1,
       minWidth: 160,
@@ -133,37 +226,37 @@ const VendorMain: React.FC<VendorMainProps> = ({
       )
     },
     {
-      field: 'email',
+      field: 'Email',
       headerName: 'Email',
       flex: 1,
       minWidth: 180,
       renderCell: (params: any) => params.value || "—"
     },
     {
-      field: 'address',
+      field: 'Address',
       headerName: 'Address',
       flex: 0.8,
       minWidth: 130,
       renderCell: (params: any) => params.value || "—"
     },
     {
-      field: 'phone',
-      headerName: 'Phone',
+      field: 'Contact_number',
+      headerName: 'Contact_number',
       flex: 0.8,
       minWidth: 130,
       renderCell: (params: any) => params.value || "—"
     },
     {
-        field: 'createdAt',
+        field: 'Created_at',
         headerName: 'Joined Date',
         width: 140,
         renderCell: (params: any) => {
             if (!params.value) return "—";
-            return dayjs(params.value).format('DD MMM YYYY');
+            return dayjs(params.value).format('DD/ MMM/ YYYY');
         }
     },
     {
-      field: 'gstNumber',
+      field: 'Gst_number',
       headerName: 'GST / Tax',
       width: 150,
       renderCell: (params: GridRenderCellParams) => (
@@ -173,7 +266,7 @@ const VendorMain: React.FC<VendorMainProps> = ({
       )
     },
     {
-      field: 'website',
+      field: 'Website',
       headerName: 'Website',
       width: 130,
       renderCell: (params: GridRenderCellParams) => (
@@ -205,14 +298,14 @@ const VendorMain: React.FC<VendorMainProps> = ({
           <IconButton
             onClick={() => onEdit(params.row)}
             className="vm-btn vm-action-btn-edit"
-            // size="small"
+            color="primary"
           >
             <IconifyIcon icon="fluent:notepad-edit-16-regular" />
           </IconButton>
           <IconButton
-            onClick={() => onDelete(params.row.id)}
+            onClick={() => onDelete(params.row.Vendor_Id)}
             className="vm-btn vm-action-btn-delete"
-            // size="small"
+            color="error"
           >
             <IconifyIcon icon="wpf:delete" />
           </IconButton>
@@ -230,8 +323,9 @@ const VendorMain: React.FC<VendorMainProps> = ({
     >
       <main className="vm-content">
         
-        {/* --- Header --- */}
+        {/* --- Header & Filters --- */}
         <Box sx={{ p: 2.5, borderBottom: `1px solid ${theme.palette.divider}` }}>
+          
           {/* Top Row */}
           <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
             <Typography variant="h4" fontWeight="bold" color="text.primary">
@@ -251,7 +345,7 @@ const VendorMain: React.FC<VendorMainProps> = ({
 
           {/* Filter Grid */}
           <Grid container spacing={2} alignItems="center">
-            {/* Search (Name/Email/Phone) */}
+            {/* Search (Name/Email/Contact_number) */}
             <Grid item xs={12} sm={6} md={3}>
               <TextField
                 variant="outlined"
@@ -273,27 +367,42 @@ const VendorMain: React.FC<VendorMainProps> = ({
 
             {/* From Date */}
             <Grid item xs={6} sm={3} md={2}>
+              <Typography variant="caption" fontWeight={300} fontSize={14} color="text.secondary" display="block" mb={0.5}>
+                  From Date
+              </Typography>
               <DatePicker
-                label="From Date"
-                value={fromDate}
-                onChange={(newValue) => setFromDate(newValue)}
-                slotProps={{ textField: { size: 'small', fullWidth: true } }}
+                  value={fromDate}
+                  onChange={(newValue) => setFromDate(newValue)}
+                  slotProps={{ 
+                      textField: { 
+                          size: "small", 
+                          fullWidth: true,
+                          InputProps: { sx: { borderRadius: 2, bgcolor: 'background.default' } }
+                      } 
+                  }}
               />
             </Grid>
 
             {/* To Date */}
             <Grid item xs={6} sm={3} md={2}>
+              <Typography variant="caption" fontWeight={300} fontSize={14} color="text.secondary" display="block" mb={0.8}>
+                  To Date
+              </Typography>
               <DatePicker
-                label="To Date"
-                value={toDate}
-                onChange={(newValue) => setToDate(newValue)}
-                slotProps={{ textField: { size: 'small', fullWidth: true } }}
+                  value={toDate}
+                  onChange={(newValue) => setToDate(newValue)}
+                  slotProps={{ 
+                      textField: { 
+                          size: "small", 
+                          fullWidth: true,
+                          InputProps: { sx: { borderRadius: 2, bgcolor: 'background.default' } }
+                      } 
+                  }}
               />
             </Grid>
 
-            {/* ✅ New GST Filter */}
+            {/* GST Filter */}
             <Grid item xs={12} sm={6} md={2}>
-                
               <TextField
                 variant="outlined"
                 label="Filter"
@@ -307,37 +416,78 @@ const VendorMain: React.FC<VendorMainProps> = ({
 
             {/* Actions */}
             <Grid item xs={12} md={3} sx={{ display: 'flex', justifyContent: { xs: 'flex-start', md: 'flex-end' }, gap: 1 }}>
-             <Tooltip title="Claer Filters" arrow>
+             <Tooltip title="Clear Filters" arrow>
               <Button
                 variant="outlined"
                 color="secondary"
-                size="medium"
+                size="small"
                 onClick={handleClearFilters}
                 startIcon={<IconifyIcon icon="mdi:filter-off" />}
               >
-                Clear
               </Button>
               </Tooltip>
 
-              <Tooltip title="Download CSV" arrow>
+              {/* --- DOWNLOAD DROPDOWN --- */}
+              <Tooltip title="Export Options" arrow>
                 <IconButton
-                  onClick={handleDownloadCSV}
+                  onClick={handleOpenDownloadMenu}
                   sx={{
                     color: 'primary.main',
-                    '&:hover': { bgcolor: theme.palette.primary.light + '40' }
+                    backgroundColor: 'rgba(228, 244, 253, 1)',
+                    backdropFilter: 'blur(6px)',
+                    WebkitBackdropFilter: 'blur(6px)',
+                
+                    '&:hover': {
+                      backgroundColor: '#9bcdfcff',
+                      backdropFilter: 'blur(10px)',
+                      WebkitBackdropFilter: 'blur(10px)',
+                    },
                   }}
                 >
-                  <IconifyIcon icon="mdi:download" />
+                  <IconifyIcon icon="lucide:download" />
                 </IconButton>
               </Tooltip>
+
+              <Menu
+                anchorEl={anchorEl}
+                open={openDownloadMenu}
+                onClose={handleCloseDownloadMenu}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+              >
+                <MenuItem onClick={handleExportExcel}>
+                  <ListItemIcon>
+                    <IconifyIcon icon="vscode-icons:file-type-excel2" color="success.main" />
+                  </ListItemIcon>
+                  <ListItemText>Export to Excel</ListItemText>
+                </MenuItem>
+                
+                <MenuItem onClick={handleExportWord}>
+                  <ListItemIcon>
+                    <IconifyIcon icon="vscode-icons:file-type-word" color="info.main" />
+                  </ListItemIcon>
+                  <ListItemText>Export to Word</ListItemText>
+                </MenuItem>
+              </Menu>
 
               <Tooltip title="Refresh" arrow>
                 <IconButton
                   onClick={onRefresh}
                   disabled={loading}
-                  sx={{ color: 'primary.main' }}
+                  sx={{
+                    color: 'primary.main',
+                    backgroundColor: 'rgba(228, 244, 253, 1)',
+                    backdropFilter: 'blur(6px)',
+                    WebkitBackdropFilter: 'blur(6px)',
+                
+                    '&:hover': {
+                      backgroundColor: '#9bcdfcff',
+                      backdropFilter: 'blur(10px)',
+                      WebkitBackdropFilter: 'blur(10px)',
+                    },
+                  }}
                 >
-                  <IconifyIcon icon="mdi:refresh" />
+                  <IconifyIcon icon="charm:refresh" />
                 </IconButton>
               </Tooltip>
             </Grid>
@@ -349,6 +499,7 @@ const VendorMain: React.FC<VendorMainProps> = ({
             <DataGrid
                 rows={filteredVendors}
                 columns={columns}
+                getRowId={(row) => row.Vendor_Id}
                 // Pagination
                 initialState={{
                     pagination: { paginationModel: { pageSize: 5, page: 0 } },

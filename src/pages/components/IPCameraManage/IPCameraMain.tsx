@@ -1,6 +1,3 @@
-
-
-
 import React, { useState, useMemo, ChangeEvent } from "react";
 import {
   Box,
@@ -16,21 +13,24 @@ import {
   Tooltip,
   useTheme,
   LinearProgress,
+  Menu,           // <--- ADDED
+  ListItemIcon,   // <--- ADDED
+  ListItemText,   // <--- ADDED
 } from "@mui/material";
 import { 
   DataGrid, 
   GridColDef, 
   GridRenderCellParams, 
   GridSlots,
-  
 } from '@mui/x-data-grid';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import IconifyIcon from "components/base/IconifyIcon";
 import { useSnackbar } from 'notistack';
+import * as XLSX from 'xlsx'; // <--- ADDED: Import XLSX for Excel export
 
 // Import Types and Pagination
-  import { IPCamera, Machine } from "pages/RegisterManagement/IPCameraRegister/IPCameraRegister";  
+import { IPCamera, Machine } from "pages/RegisterManagement/IPCameraRegister/IPCameraRegister";  
 import CustomPagination from "../VehicleManage/CustomPagination";
 
 import "../../RegisterManagement/MachineRegister/MachineRegister.css";
@@ -57,11 +57,23 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
 
-  // -- Filter State --
+  // -- Local Filter State --
   const [search, setSearch] = useState('');
   const [filterMachineId, setFilterMachineId] = useState<number | "">("");
   const [fromDate, setFromDate] = useState<Dayjs | null>(null);
   const [toDate, setToDate] = useState<Dayjs | null>(null);
+
+  // -- DOWNLOAD MENU STATE (ADDED) --
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const openDownloadMenu = Boolean(anchorEl);
+
+  const handleOpenDownloadMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseDownloadMenu = () => {
+    setAnchorEl(null);
+  };
 
   const handleChangeSearch = (event: ChangeEvent<HTMLInputElement>) => {
     setSearch(event.currentTarget.value);
@@ -83,7 +95,7 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
         c.IP_address.includes(search);
 
       // 2. Machine Filter
-      const matchesMachine = filterMachineId === "" || c.machineId === filterMachineId;
+      const matchesMachine = filterMachineId === "" || c.Machine_Id === filterMachineId;
 
       // 3. Date Filter (Installed Date)
       const itemDate = dayjs(c.InStalled_date);
@@ -94,40 +106,110 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
     });
   }, [cameras, search, filterMachineId, fromDate, toDate]);
 
-  // -- CSV Download Logic --
-  const handleDownloadCSV = () => {
+  // -- PREPARE DATA FOR EXPORT --
+  const getExportData = () => {
     if (filteredCameras.length === 0) {
       enqueueSnackbar("No data to download", { variant: "warning" });
-      return;
+      return null;
     }
+    return filteredCameras.map(c => {
+      const machineName = machines.find(m => m.id === c.Machine_Id)?.machineName || "Unknown";
+      return {
+        "ID": c.Camera_Id,
+        "Camera Name": c.Camera_name,
+        "Machine": machineName,
+        "IP Address": c.IP_address,
+        "MAC Address": c.Mac_address || "",
+        "RTSP URL": c.RTSP_URL || "",
+        "Location": c.Location || "",
+        "Status": c.Status,
+        "Installed Date": c.InStalled_date ? dayjs(c.InStalled_date).format('YYYY-MM-DD') : ""
+      };
+    });
+  };
 
-    const headers = [
-      "Camera Name", "Machine", "IP Address", "RTSP URL", "Location", "Installed Date", "Status"
-    ];
+  // -- EXPORT TO EXCEL FUNCTION --
+  const handleExportExcel = () => {
+    const data = getExportData();
+    if (!data) return;
 
-    const rows = filteredCameras.map(c => {
-      const machineName = machines.find(m => m.id === c.machineId)?.machineName || "Unknown";
-      return [
-        c.Camera_name,
-        machineName,
-        c.IP_address,
-        c.Mac_address,
-        c.RTSP_URL || "",
-        c.HTTP_URL || "",
-        c.Location || "",
-        c.InStalled_date ? dayjs(c.InStalled_date).format('YYYY-MM-DD') : "",
-        c.Status
-      ].join(",");
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "IPCameras");
+    
+    // Generate buffer and trigger download
+    XLSX.writeFile(workbook, "IP_Camera_Register.xlsx");
+    
+    handleCloseDownloadMenu();
+    enqueueSnackbar("Exported to Excel successfully", { variant: "success" });
+  };
+
+  // -- EXPORT TO WORD FUNCTION --
+  const handleExportWord = () => {
+    const data = getExportData();
+    if (!data) return;
+
+    // Create an HTML Table string
+    let tableHTML = `
+      <table border="1" style="border-collapse: collapse; width: 100%;">
+        <thead>
+          <tr style="background-color: #f2f2f2;">
+            <th>ID</th>
+            <th>Camera Name</th>
+            <th>Machine</th>
+            <th>IP Address</th>
+            <th>MAC Address</th>
+            <th>Status</th>
+            <th>Installed Date</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    data.forEach((row) => {
+      tableHTML += `
+        <tr>
+          <td>${row["ID"]}</td>
+          <td>${row["Camera Name"]}</td>
+          <td>${row["Machine"]}</td>
+          <td>${row["IP Address"]}</td>
+          <td>${row["MAC Address"]}</td>
+          <td>${row["Status"]}</td>
+          <td>${row["Installed Date"]}</td>
+        </tr>
+      `;
     });
 
-    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows].join("\n");
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "ip_cameras.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    tableHTML += `</tbody></table>`;
+
+    // Wrap in standard HTML structure for Word
+    const preHtml = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>IP Camera Register</title></head><body>`;
+    const postHtml = "</body></html>";
+    const html = preHtml + tableHTML + postHtml;
+
+    // Create Blob and Download
+    const blob = new Blob(['\ufeff', html], {
+        type: 'application/msword'
+    });
+    
+    const url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(html);
+    
+    // Create download link
+    const downloadLink = document.createElement("a");
+    document.body.appendChild(downloadLink);
+    
+    if (navigator.userAgent.indexOf("MSIE") !== -1 || navigator.appVersion.indexOf("Trident/") > 0) {
+        // IE Support
+        (window.navigator as any).msSaveOrOpenBlob(blob, "IP_Camera_Register.doc");
+    } else {
+        downloadLink.href = url;
+        downloadLink.download = "IP_Camera_Register.doc";
+        downloadLink.click();
+    }
+    
+    document.body.removeChild(downloadLink);
+    handleCloseDownloadMenu();
+    enqueueSnackbar("Exported to Word successfully", { variant: "success" });
   };
 
   // Status Chip Color Helper
@@ -154,13 +236,13 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
         )
     },
     {
-        field: 'machineId',
+        field: 'Machine_Id',
         headerName: 'Machine',
         flex: 1,
         minWidth: 150,
         renderCell: (params: any) => {
             const row = params.row || params;
-            return machines.find(m => m.id === row.machineId)?.machineName || "—";
+            return machines.find(m => m.id === row.Machine_Id)?.machineName || "—";
         }
     },
     {
@@ -174,7 +256,6 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
         headerName: 'MAC Address',
         flex: 0.8,
         minWidth: 140,
-        // valueFormatter: (params: any) => params.value || "—"
     },
     {
         field: 'InStalled_date',
@@ -182,7 +263,7 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
         width: 140,
         renderCell: (params: any) => {
             if (!params.value) return "—";
-            return dayjs(params.value).format('DD MMM YYYY');
+            return dayjs(params.value).format('DD/ MMM/ YYYY');
         }
     },
     {
@@ -216,18 +297,18 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
             </Typography>
         )
     },
-     {
-        field: 'Password',
-        headerName: 'PassWord',
-        flex: 1,
-        minWidth: 150,
-        renderCell: (params: GridRenderCellParams) => (
-            <Typography variant="subtitle2" fontWeight={200} color="text.primary">
-                {params.value}
-            </Typography>
+    //  {
+    //     field: 'Password',
+    //     headerName: 'PassWord',
+    //     flex: 1,
+    //     minWidth: 150,
+    //     renderCell: (params: GridRenderCellParams) => (
+    //         <Typography variant="subtitle2" fontWeight={200} color="text.primary">
+    //             {params.value}
+    //         </Typography>
             
-        )
-    },
+    //     )
+    // },
     {
         field: 'Status',
         headerName: 'Status',
@@ -255,14 +336,14 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
                 <IconButton 
                     onClick={() => onEdit(params.row)}  
                     className="vm-btn vm-action-btn-edit"
-                    // size="small"
+                    color="primary"
                 >
                     <IconifyIcon icon="fluent:notepad-edit-16-regular" />
                 </IconButton>
                 <IconButton 
                     onClick={() => onDelete(params.row.Camera_Id)} 
                     className="vm-btn vm-action-btn-delete"
-                    // size="small"
+                    color="error"
                 >
                     <IconifyIcon icon="wpf:delete" />
                 </IconButton>
@@ -282,6 +363,7 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
         
         {/* --- Header & Filters --- */}
         <Box sx={{ p: 2.5, borderBottom: `1px solid ${theme.palette.divider}` }}>
+          
           {/* Top Row */}
           <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
             <Typography variant="h4" fontWeight="bold" color="text.primary">
@@ -324,14 +406,7 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
 
             {/* From Date */}
             <Grid item xs={6} sm={3} md={2}>
-              {/* <DatePicker
-                className="header-search-section"
-                label="From Date"
-                value={fromDate}
-                onChange={(newValue) => setFromDate(newValue)}
-                slotProps={{ textField: { size: 'small', fullWidth: true } }}
-              /> */}
-              <Typography variant="caption" fontWeight={600} color="text.secondary" display="block" mb={0.5}>
+              <Typography variant="caption" fontWeight={300} fontSize={14} color="text.secondary" display="block" mb={0.5}>
                   From Date
               </Typography>
               <DatePicker
@@ -349,14 +424,7 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
 
             {/* To Date */}
             <Grid item xs={6} sm={3} md={2}>
-              {/* <DatePicker
-                className="header-search-section"
-                label="To Date"
-                value={toDate}
-                onChange={(newValue) => setToDate(newValue)}
-                slotProps={{ textField: { size: 'small', fullWidth: true } }}
-              /> */}
-              <Typography variant="caption" fontWeight={600} color="text.secondary" display="block" mb={0.5}>
+              <Typography variant="caption" fontWeight={300} fontSize={14} color="text.secondary" display="block" mb={0.8}>
                   To Date
               </Typography>
               <DatePicker
@@ -372,11 +440,12 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
               />
             </Grid>
 
-            {/* Machine Filter */}
+            {/* Machine Filter Dropdown */}
             <Grid item xs={12} sm={6} md={2}>
               <TextField
                 select
                 label="Filter Machine"
+                placeholder="Filter Machine"
                 variant="outlined"
                 size="small"
                 fullWidth
@@ -396,32 +465,74 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
               <Button
                 variant="outlined"
                 color="secondary"
-                size="medium"
+                size="small"
                 onClick={handleClearFilters}
                 startIcon={<IconifyIcon icon="mdi:filter-off" />}
               >
-                Clear
               </Button>
               </Tooltip>
-              <Tooltip title="Download CSV" arrow>
+
+              {/* --- DOWNLOAD DROPDOWN (NEW) --- */}
+              <Tooltip title="Export Options" arrow>
                 <IconButton
-                  onClick={handleDownloadCSV}
+                  onClick={handleOpenDownloadMenu}
                   sx={{
                     color: 'primary.main',
-                    '&:hover': { bgcolor: theme.palette.primary.light + '40' }
+                    backgroundColor: 'rgba(228, 244, 253, 1)',
+                    backdropFilter: 'blur(6px)',
+                    WebkitBackdropFilter: 'blur(6px)',
+                
+                    '&:hover': {
+                      backgroundColor: '#9bcdfcff',
+                      backdropFilter: 'blur(10px)',
+                      WebkitBackdropFilter: 'blur(10px)',
+                    },
                   }}
                 >
-                  <IconifyIcon icon="mdi:download" />
+                  <IconifyIcon icon="lucide:download" />
                 </IconButton>
               </Tooltip>
+
+              <Menu
+                anchorEl={anchorEl}
+                open={openDownloadMenu}
+                onClose={handleCloseDownloadMenu}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+              >
+                <MenuItem onClick={handleExportExcel}>
+                  <ListItemIcon>
+                    <IconifyIcon icon="vscode-icons:file-type-excel2" color="success.main" />
+                  </ListItemIcon>
+                  <ListItemText>Export to Excel</ListItemText>
+                </MenuItem>
+                
+                <MenuItem onClick={handleExportWord}>
+                  <ListItemIcon>
+                    <IconifyIcon icon="vscode-icons:file-type-word" color="info.main" />
+                  </ListItemIcon>
+                  <ListItemText>Export to Word</ListItemText>
+                </MenuItem>
+              </Menu>
 
               <Tooltip title="Refresh" arrow>
                 <IconButton
                   onClick={onRefresh}
                   disabled={loading}
-                  sx={{ color: 'primary.main' }}
+                  sx={{
+                    color: 'primary.main',
+                    backgroundColor: 'rgba(228, 244, 253, 1)',
+                    backdropFilter: 'blur(6px)',
+                    WebkitBackdropFilter: 'blur(6px)',
+                
+                    '&:hover': {
+                      backgroundColor: '#9bcdfcff',
+                      backdropFilter: 'blur(10px)',
+                      WebkitBackdropFilter: 'blur(10px)',
+                    },
+                  }}
                 >
-                  <IconifyIcon icon="mdi:refresh" />
+                  <IconifyIcon icon="charm:refresh" />
                 </IconButton>
               </Tooltip>
             </Grid>

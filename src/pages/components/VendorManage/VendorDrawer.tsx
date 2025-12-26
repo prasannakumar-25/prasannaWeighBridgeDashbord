@@ -1,218 +1,5 @@
 
 
-// import React, { useEffect, useState } from "react";
-// import {
-//   Box,
-//   Button,
-//   Drawer,
-//   IconButton,
-//   Stack,
-//   TextField,
-//   Typography,
-//   Alert,
-//   useMediaQuery,
-//   useTheme,
-// } from "@mui/material";
-// import IconifyIcon from "components/base/IconifyIcon";
-// import { Vendor } from "pages/RegisterManagement/VendorRegister/VendorRegister"; 
-
-
-// interface VendorDrawerProps {
-//   open: boolean;
-//   onClose: () => void;
-//   onSave: (data: Vendor) => void;
-//   initialData: Vendor | null;
-//   loading: boolean;
-// }
-
-// const VendorDrawer: React.FC<VendorDrawerProps> = ({
-//   open,
-//   onClose,
-//   onSave,
-//   initialData,
-//   loading,
-// }) => {
-//   const theme = useTheme();
-//   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
-//   const drawerWidth = isMdUp ? Math.min(700, Math.round(window.innerWidth * 0.55)) : window.innerWidth;
-
-//   const [formError, setFormError] = useState<string | null>(null);
-
-//   // Default Form
-//   const defaultForm: Vendor = {
-//     id: 0,
-//     vendorName: "",
-//     phone: "",
-//     email: "",
-//     gstNumber: "",
-//     address: "",
-//     website: "",
-//   };
-
-//   const [form, setForm] = useState<Vendor>(defaultForm);
-
-//   useEffect(() => {
-//     if (open) {
-//       setFormError(null);
-//       if (initialData) {
-//         setForm({ ...initialData });
-//       } else {
-//         setForm(defaultForm);
-//       }
-//     }
-//   }, [open, initialData]);
-
-//   const setField = (key: keyof Vendor, value: any) => {
-//     setForm((prev) => ({ ...prev, [key]: value }));
-//   };
-
-//   const validate = (): boolean => {
-//     if (!form.vendorName || !form.vendorName.trim()) {
-//       setFormError("Vendor name is required.");
-//       return false;
-//     }
-//     if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-//       setFormError("Please enter a valid email address.");
-//       return false;
-//     }
-//     if (form.phone && !/^[6-9]\d{9}$/.test(form.phone)) {
-//       setFormError("Please enter a valid 10-digit phone number.");
-//       return false;
-//     }
-//     setFormError(null);
-//     return true;
-//   };
-
-//   const handleSubmit = () => {
-//     if (validate()) {
-//       onSave(form);
-//     }
-//   };
-
-//   return (
-//     <Drawer
-//       anchor="right"
-//       open={open}
-//       onClose={onClose}
-//       PaperProps={{
-//         sx: {
-//           width: drawerWidth,
-//           p: 3,
-//           borderTopLeftRadius: { xs: 0, md: 12 },
-//           borderBottomLeftRadius: { xs: 0, md: 12 },
-//         },
-//       }}
-//     >
-//       <Box className="drawer-header" display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-//         <Typography variant="h6" fontWeight="bold">
-//             {initialData ? "Edit Vendor" : "Add New Vendor"}
-//         </Typography>
-//         <IconButton onClick={onClose} aria-label="close">
-//             <IconifyIcon icon="material-symbols:close-rounded" />
-//         </IconButton>
-//       </Box>
-
-//       <Box className="drawer-content">
-//         {formError && <Alert severity="error" sx={{ mb: 2 }}>{formError}</Alert>}
-
-//         <Stack spacing={2.5}>
-//           <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-//             <TextField
-//                 label="Vendor Name (Business)"
-//                 className="input-bg-color label-black"
-//                 placeholder="Enter business or company name"
-//                 fullWidth
-//                 value={form.vendorName}
-//                 disabled={loading}
-//                 onChange={(e) => setField("vendorName", e.target.value)}
-//                 helperText="Public-facing company / vendor name"
-//             />
-//           </Stack>
-
-//           <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-//             <TextField
-//                 label="Email"
-//                 className="input-bg-color label-black"
-//                 placeholder="e.g., vendor@example.com"
-//                 fullWidth
-//                 value={form.email || ""}
-//                 disabled={loading}
-//                 onChange={(e) => setField("email", e.target.value)}
-//             />
-//           </Stack>
-
-//           <TextField
-//               label="Address (City / State)"
-//               className="input-bg-color label-black"
-//               placeholder="e.g., Chennai, Tamil Nadu"
-//               fullWidth
-//               value={form.address || ""}
-//               disabled={loading}
-//               onChange={(e) => setField("address", e.target.value)}
-//           />
-
-//           <TextField
-//             label="Phone"
-//             className="input-bg-color label-black"
-//             placeholder="e.g., +91 9876543210"
-//             fullWidth
-//             value={form.phone || ""}
-//             disabled={loading}
-//             onChange={(e) => setField("phone", e.target.value)}
-//           />
-
-
-//           <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-//             <TextField
-//                 label="GST / Tax Number"
-//                 className="input-bg-color label-black"
-//                 placeholder="Enter GST / tax identification number"
-//                 fullWidth
-//                 value={form.gstNumber || ""}
-//                 disabled={loading}
-//                 onChange={(e) => setField("gstNumber", e.target.value)}
-//             />
-//           </Stack> 
-
-//           <TextField
-//               label="Website"
-//               className="input-bg-color label-black"
-//               placeholder="e.g., https://www.company.com"
-//               fullWidth
-//               value={form.website || ""}
-//               disabled={loading}
-//               onChange={(e) => setField("website", e.target.value)}
-//           />
-
-//           <Stack direction="row" spacing={2} justifyContent="flex-end" pt={2}>
-//             <Button variant="text" className="cancel-button" onClick={onClose}>
-//               Cancel
-//             </Button>
-//             <Button variant="contained" className="edit-button" onClick={handleSubmit} disabled={loading}>
-//               {initialData ? "Update Vendor" : "Save Vendor"}
-//             </Button>
-//           </Stack>
-//         </Stack>
-//       </Box>
-//     </Drawer>
-//   );
-// };
-
-// export default VendorDrawer;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -256,13 +43,13 @@ const VendorDrawer: React.FC<VendorDrawerProps> = ({
 
   // State
   const [form, setForm] = useState<Vendor>({
-    id: 0,
-    vendorName: "",
-    phone: "",
-    email: "",
-    gstNumber: "",
-    address: "",
-    website: "",
+    Vendor_Id: 0,
+    Vendor_name: "",
+    Contact_number: "",
+    Email: "",
+    Gst_number: "",
+    Address: "",
+    Website: "",
   });
 
   // Validation State
@@ -278,13 +65,13 @@ const VendorDrawer: React.FC<VendorDrawerProps> = ({
         setForm({ ...initialData });
       } else {
         setForm({
-          id: 0,
-          vendorName: "",
-          phone: "",
-          email: "",
-          gstNumber: "",
-          address: "",
-          website: "",
+          Vendor_Id: 0,
+          Vendor_name: "",
+          Contact_number: "",
+          Email: "",
+          Gst_number: "",
+         Address: "",
+          Website: "",
         });
       }
     }
@@ -303,40 +90,47 @@ const VendorDrawer: React.FC<VendorDrawerProps> = ({
     let isValid = true;
 
     // Name Validation
-    if (!form.vendorName?.trim()) {
-      newErrors.vendorName = "Vendor name is required";
+    if (!form.Vendor_name?.trim()) {
+      newErrors.Vendor_name = "Vendor name is required";
       isValid = false;
     }
 
     // Email Validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!form.email?.trim()) {
-      newErrors.email = "Email is required";
+    const EmailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!form.Email?.trim()) {
+      newErrors.Email = "Email is required";
       isValid = false;
-    } else if (!emailRegex.test(form.email)) {
-      newErrors.email = "Please enter a valid email address";
+    } else if (!EmailRegex.test(form.Email)) {
+      newErrors.Email = "Please enter a valid EmailAddress";
       isValid = false;
     }
 
-    // Phone Validation (Indian format example based on your previous code)
-    // Phone Validation
-    if (!form.phone?.trim()) {
-      newErrors.phone = "Phone Number is required";
+    // Contact_number Validation (Indian format example based on your previous code)
+    // Contact_number Validation
+    if (!form.Contact_number?.trim()) {
+      newErrors.Contact_number = "Contact_number Number is required";
       isValid = false;
-    } else if (form.phone.length < 10) {
-        newErrors.phone = "Phone number seems too short";
+    } else if (form.Contact_number.length < 10) {
+        newErrors.Contact_number = "Contact_number number seems too short";
         isValid = false;
     }
 
 
     // GST Validation (Optional check, if provided)
-    // if (form.gstNumber && form.gstNumber.length < 5) {
-    //     newErrors.gstNumber = "GST Number seems too short";
+    // if (form.Gst_number && form.Gst_number.length < 5) {
+    //     newErrors.Gst_number = "GST Number seems too short";
     //     isValid = false;
     // }
-    if (form.gstNumber && String(form.gstNumber).trim().length < 15) {
-      newErrors.gstNumber = "GST Number must be 15 characters";
+    // if (form.Gst_number && String(form.Gst_number).trim().length < 15) {
+    //   newErrors.Gst_number = "GST Number must be 15 characters";
+    //   isValid = false;
+    // }
+    if (!form.Gst_number?.trim()) {
+      newErrors.Gst_number = "Gst_number Number is required";
       isValid = false;
+    } else if (form.Gst_number.length < 15) {
+        newErrors.Gst_number = "Gst_number must be 15 characters";
+        isValid = false;
     }
 
     setErrors(newErrors);
@@ -434,11 +228,11 @@ const VendorDrawer: React.FC<VendorDrawerProps> = ({
                   className="input-bg-color label-black"
                   placeholder="e.g. Acme Industries Ltd."
                   fullWidth
-                  value={form.vendorName}
-                  onChange={(e) => setField("vendorName", e.target.value)}
+                  value={form.Vendor_name}
+                  onChange={(e) => setField("Vendor_name", e.target.value)}
                   disabled={loading}
-                  error={!!errors.vendorName}
-                  helperText={errors.vendorName}
+                  error={!!errors.Vendor_name}
+                  helperText={errors.Vendor_name}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="end">
@@ -451,19 +245,19 @@ const VendorDrawer: React.FC<VendorDrawerProps> = ({
 
               <Grid item xs={12} sm={6}>
                 <TextField
-                  label="Email Address"
+                  label="EmailAddress"
                   className="input-bg-color label-black"
                   placeholder="vendor@example.com"
                   fullWidth
-                  value={form.email}
-                  onChange={(e) => setField("email", e.target.value)}
+                  value={form.Email}
+                  onChange={(e) => setField("Email", e.target.value)}
                   disabled={loading}
-                  error={!!errors.email}
-                  helperText={errors.email}
+                  error={!!errors.Email}
+                  helperText={errors.Email}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="end">
-                        <IconifyIcon icon="mdi:email-outline" />
+                        <IconifyIcon icon="mdi:Email-outline" />
                       </InputAdornment>
                     ),
                   }}
@@ -472,19 +266,19 @@ const VendorDrawer: React.FC<VendorDrawerProps> = ({
 
               <Grid item xs={12} sm={6}>
                 <TextField
-                  label="Phone Number"
+                  label="Contact_number Number"
                   className="input-bg-color label-black"
                   placeholder="+91 9876543210"
                   fullWidth
-                  value={form.phone}
-                  onChange={(e) => setField("phone", e.target.value)}
+                  value={form.Contact_number}
+                  onChange={(e) => setField("Contact_number", e.target.value)}
                   disabled={loading}
-                  error={!!errors.phone}
-                  helperText={errors.phone}
+                  error={!!errors.Contact_number}
+                  helperText={errors.Contact_number}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="end">
-                        <IconifyIcon icon="mdi:phone-outline" />
+                        <IconifyIcon icon="mdi:Contact_number-outline" />
                       </InputAdornment>
                     ),
                   }}
@@ -497,8 +291,8 @@ const VendorDrawer: React.FC<VendorDrawerProps> = ({
                   className="input-bg-color label-black"
                   placeholder="https://www.company.com"
                   fullWidth
-                  value={form.website || ""}
-                  onChange={(e) => setField("website", e.target.value)}
+                  value={form.Website || ""}
+                  onChange={(e) => setField("Website", e.target.value)}
                   disabled={loading}
                   InputProps={{
                     startAdornment: (
@@ -512,7 +306,7 @@ const VendorDrawer: React.FC<VendorDrawerProps> = ({
             </Grid>
           </Paper>
 
-          {/* Section 2: Legal & Address */}
+          {/* Section 2: Legal &Address */}
           <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2, borderColor: alpha(theme.palette.divider, 0.6) }}>
             <Typography variant="overline" color="text.secondary" fontWeight={700} sx={{ mb: 2, display: "block" }}>
               Legal & Location
@@ -524,11 +318,11 @@ const VendorDrawer: React.FC<VendorDrawerProps> = ({
                   className="input-bg-color label-black"
                   placeholder="e.g. 29ABCDE1234F1Z5"
                   fullWidth
-                  value={form.gstNumber || ""}
-                  onChange={(e) => setField("gstNumber", e.target.value)}
+                  value={form.Gst_number || ""}
+                  onChange={(e) => setField("Gst_number", e.target.value)}
                   disabled={loading}
-                  error={!!errors.gstNumber}
-                  helperText={errors.gstNumber}
+                  error={!!errors.Gst_number}
+                  helperText={errors.Gst_number}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="end">
@@ -541,14 +335,14 @@ const VendorDrawer: React.FC<VendorDrawerProps> = ({
 
               <Grid item xs={12}>
                 <TextField
-                  label="Business Address"
+                  label="BusinessAddress"
                   className="input-bg-color label-black"
                   placeholder="e.g. 123 Industrial Estate, Chennai"
                   fullWidth
                   multiline
                   minRows={2}
-                  value={form.address || ""}
-                  onChange={(e) => setField("address", e.target.value)}
+                  value={form.Address || ""}
+                  onChange={(e) => setField("Address", e.target.value)}
                   disabled={loading}
                   InputProps={{
                     startAdornment: (

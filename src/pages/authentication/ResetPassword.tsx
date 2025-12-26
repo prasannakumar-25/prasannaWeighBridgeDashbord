@@ -138,7 +138,7 @@ const ResetPassword = (): ReactElement => {
             <Image src={successTick} />
             <Typography variant="h3">Reset Successfully</Typography>
             <Typography variant="body1" textAlign="center" color="text.secndary">
-              Your Elegent log in password has been updated successfully
+              Your Weighbridge log in password has been updated successfully
             </Typography>
             <Button variant="contained" fullWidth LinkComponent={Link} href="/authentication/login">
               Continue to Login

@@ -10,6 +10,7 @@ import {
   Button,
   Snackbar,
   Alert,
+  LinearProgress
 } from "@mui/material";
 import IconifyIcon from "components/base/IconifyIcon";
 // import { useSnackbar } from 'notistack';
@@ -25,6 +26,7 @@ import MachineDrawer from "pages/components/MachineManage/MachineDrawer";
 
 // Custom CSS
 import "../../RegisterManagement/MachineRegister/MachineRegister.css";
+import { number } from "echarts";
 
 // --- Global Types ---
 export type Vendor = {
@@ -43,7 +45,7 @@ export type Vendor = {
 
 export type Machine = {
   Machine_Id: number;
-  vendorId: number;
+  Vendor_Id: number;
   Machine_name: string;
   password: string;
   Machine_mac?: string;
@@ -70,6 +72,7 @@ const MachineRegister: React.FC<{ onLogout?: () => void }> = () => {
   const [machineToDelete, setMachineToDelete] = useState<number | null>(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
   // const { enqueueSnackbar } = useSnackbar();
 
@@ -116,23 +119,35 @@ const MachineRegister: React.FC<{ onLogout?: () => void }> = () => {
     setEditingMachine(null);
   };
 
-  const handleSave = (form: Machine) => {
+  // const handleSave = (form: Machine) => {
+  //   setLoading(true);
+  //   // Simulate API call'
+  //   setTimeout(() => {
+  //       if (editingMachine) {
+  //         setMachines((prev) => prev.map((p) => (p.Machine_Id === editingMachine.Machine_Id ? { ...form, Machine_Id: editingMachine.Machine_Id } : p)));
+  //         setSnackbarMessage("Machine updated successfully",);
+  //       } else {
+  //         const newMachine: Machine = { ...form, Machine_Id: Date.now() };
+  //         setMachines((prev) => [newMachine, ...prev]);
+  //         setSnackbarMessage("Machine added successfully");
+  //       }
+  //       setSnackbarOpen(true);
+  //       handleCloseDrawer();
+  //   }, 400);  
+  //   setLoading(false);
+  // };
+  const handleSave = async () => {
     setLoading(true);
-    // Simulate API call'
-    setTimeout(() => {
-        if (editingMachine) {
-          setMachines((prev) => prev.map((p) => (p.Machine_Id === editingMachine.Machine_Id ? { ...form, Machine_Id: editingMachine.Machine_Id } : p)));
-          setSnackbarMessage("Machine updated successfully",);
-        } else {
-          const newMachine: Machine = { ...form, Machine_Id: Date.now() };
-          setMachines((prev) => [newMachine, ...prev]);
-          setSnackbarMessage("Machine added successfully");
-        }
-        setSnackbarOpen(true);
-        handleCloseDrawer();
-    }, 400);  
-    setLoading(false);
-  };
+     await fetchMachine();          // 🔹 refresh list from API
+     setSnackbarMessage(
+       editingMachine
+         ? "Machine updated successfully"
+         : "Machine added successfully"
+     );
+     setSnackbarOpen(true);
+     handleCloseDrawer();           // 🔹 close drawer
+    
+  }
 
   // --- Delete Logic ---
   const initiateDelete = (Machine_Id: number) => {
@@ -140,15 +155,37 @@ const MachineRegister: React.FC<{ onLogout?: () => void }> = () => {
     setDeleteDialogOpen(true);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (machineToDelete !== null) {
-      setMachines((prev) => prev.filter((v) => v.Machine_Id !== machineToDelete));
-      setSnackbarMessage("Machine deleted successfully");
-      setSnackbarOpen(true);
+      try {
+        const response = await machineApi.deleteMachineDetails(machineToDelete);
+
+        if (response.success) {
+          setMachines((prev) =>
+            prev.filter((v) => v.Machine_Id !== machineToDelete)
+          );
+
+          setSnackbarMessage("Machine deleted successfully");
+          setSnackbarSeverity("success");
+          setSnackbarOpen(true);
+        } else {
+          setSnackbarMessage("Failed to delete Machine");
+          setSnackbarSeverity("error");
+          setSnackbarOpen(true);
+        }
+      } catch (error) {
+        console.error(error);
+
+        setSnackbarMessage("Something went wrong while deleting");
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
+      }
     }
+
     setDeleteDialogOpen(false);
     setMachineToDelete(null);
   };
+
 
   return (
     // --- 2. Wrap the entire return block in LocalizationProvider ---
@@ -195,7 +232,7 @@ const MachineRegister: React.FC<{ onLogout?: () => void }> = () => {
         </Dialog>
 
         {/* 4. Snackbar */}
-        <Snackbar
+        {/* <Snackbar
           open={snackbarOpen}
           autoHideDuration={3000}
           onClose={() => setSnackbarOpen(false)}
@@ -204,6 +241,34 @@ const MachineRegister: React.FC<{ onLogout?: () => void }> = () => {
           <Alert onClose={() => setSnackbarOpen(false)} severity="success" variant="filled" sx={{ width: "100%" }}>
             {snackbarMessage}
           </Alert>
+        </Snackbar> */}
+        <Snackbar
+            open={snackbarOpen}
+            autoHideDuration={3000}
+            onClose={() => setSnackbarOpen(false)}
+            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
+            <Alert onClose={() => setSnackbarOpen(false)} severity="success" variant="filled">
+                {snackbarMessage}
+                 <LinearProgress
+              variant="determinate"
+              value={100}
+              sx={{
+                mt: 1,
+                height: 4,
+                borderRadius: 2,
+                bgcolor: '#c8e6c9',
+                '& .MuiLinearProgress-bar': {
+                  bgcolor: '#66bb6a',
+                  animation: 'snackbarProgress 3.5s linear forwards',
+                },
+                '@keyframes snackbarProgress': {
+                  to: { width: '100%' },
+                  from: { width: '0%' },
+                },
+              }}
+            />
+            </Alert>
         </Snackbar>
       </div>
     </LocalizationProvider>

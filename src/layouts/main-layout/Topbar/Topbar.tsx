@@ -18,7 +18,6 @@ import capitalizePathname from 'helpers/capitalize-pathname';
 import AccountDropdown from './AccountDropdown';
 // import LanguageDropdown from './LanguageDropdown';
 import Image from 'components/base/Image';
-// import logo from 'assets/logo/elegent-favicon-logo.png';
 import Acutuz from 'assets/logo/actuz-logo.webp';
 
 interface TopbarProps {

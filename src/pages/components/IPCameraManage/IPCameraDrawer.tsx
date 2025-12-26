@@ -24,6 +24,7 @@ import {
 import IconifyIcon from "components/base/IconifyIcon";
 import { IPCamera, Machine } from "pages/RegisterManagement/IPCameraRegister/IPCameraRegister"; 
 import "../../RegisterManagement/MachineRegister/MachineRegister.css";
+import ipCameraApi from "services/ipCameraApi";
 
 interface IPCameraDrawerProps {
   open: boolean;
@@ -50,7 +51,7 @@ const IPCameraDrawer: React.FC<IPCameraDrawerProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState<IPCamera>({
     Camera_Id: 0,
-    machineId: 0,
+    Machine_Id: 0,
     Camera_name: "",
     IP_address: "",
     RTSP_URL: "",
@@ -77,7 +78,7 @@ const IPCameraDrawer: React.FC<IPCameraDrawerProps> = ({
       } else {
         setForm({
             Camera_Id: 0,
-            machineId: 0,
+            Machine_Id: 0,
             Camera_name: "",
             IP_address: "",
             RTSP_URL: "",
@@ -109,8 +110,8 @@ const IPCameraDrawer: React.FC<IPCameraDrawerProps> = ({
       newErrors.Camera_name = "Camera name is required";
       isValid = false;
     }
-    if (!form.machineId || form.machineId === 0) {
-      newErrors.machineId = "Associated Machine is required";
+    if (!form.Machine_Id || form.Machine_Id === 0) {
+      newErrors.Machine_Id = "Associated Machine is required";
       isValid = false;
     }
     if (!form.IP_address?.trim()) {
@@ -129,9 +130,67 @@ const IPCameraDrawer: React.FC<IPCameraDrawerProps> = ({
     return isValid;
   };
 
-  const handleSubmit = () => {
-    if (validate()) {
-      onSave(form);
+  // const handleSubmit = async () => {
+  //   if (!validate()) return;
+
+  //   const payload =  {
+  //     Machine_Id: 1,
+  //     Camera_name: form.Camera_name,
+  //     IP_address: form.IP_address,
+  //     RTSP_URL: form.RTSP_URL,
+  //     HTTP_URL: form.HTTP_URL,
+  //     Username: form.Username,
+  //     Password: form.Password,
+  //     Mac_address: form.Mac_address,
+  //     Status: form.Status,
+  //     Location: form.Location,
+  //     InStalled_date: form.InStalled_date,
+  //   }
+  //   console.log("-----response form -----", form)
+
+  //   try {
+  //     const response = await ipCameraApi.addIPcameraDetails(payload);
+  //     if (response?.success) {
+  //       onSave(response.data);
+  //       onClose();
+  //     }
+  //   } catch (error) {
+  //     console.log("response: ", error)
+  //   }
+  //   console.log("-----------called------------")
+  // };
+  const handleSubmit = async () => {
+    if (!validate()) return;
+
+    const payload =  {
+      Machine_Id: 5,
+      Camera_name: form.Camera_name,
+      IP_address: form.IP_address,
+      RTSP_URL: form.RTSP_URL,
+      HTTP_URL: form.HTTP_URL,
+      Username: form.Username,
+      Password: form.Password,
+      Mac_address: form.Mac_address,
+      Status: form.Status,
+      Location: form.Location,
+      InStalled_date: form.InStalled_date,
+    }
+    try {
+      let response 
+      if (initialData && form.Camera_Id > 0) {
+        response = await ipCameraApi.updateIPcameraDetails(form.Camera_Id, payload);
+
+      } else {
+        response = await ipCameraApi.addIPcameraDetails(payload);
+
+      }
+      if (response?.success) {
+        console.log("Success", response);
+        onSave(response.data)
+        onClose();
+      }
+    } catch (error) {
+      console.error("Error submitting form: ", error)
     }
   };
 
@@ -229,11 +288,11 @@ const IPCameraDrawer: React.FC<IPCameraDrawerProps> = ({
                         className="input-bg-color label-black"
                         select
                         fullWidth
-                        value={form.machineId || 0}
-                        onChange={(e) => setField("machineId", Number(e.target.value))}
+                        value={form.Machine_Id || 0}
+                        onChange={(e) => setField("Machine_Id", Number(e.target.value))}
                         disabled={loading}
-                        error={!!errors.machineId}
-                        helperText={errors.machineId}
+                        error={!!errors.Machine_Id}
+                        helperText={errors.Machine_Id}
                     >
                         <MenuItem value={0} disabled sx={{ color: 'text.secondary', fontStyle: 'italic' }}>
                             Select Machine

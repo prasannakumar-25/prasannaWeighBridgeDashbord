@@ -1,11 +1,5 @@
 
 
-
-
-
-
-
-
 import React, { useEffect, useState } from "react";
 import {
   Dialog,
@@ -20,7 +14,7 @@ import {
 } from "@mui/material";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import Slide, { SlideProps } from "@mui/material/Slide";
+// import Slide, { SlideProps } from "@mui/material/Slide";
 
 // import { useSnackbar } from 'notistack';
 
@@ -74,24 +68,6 @@ const VehicleRegister: React.FC = () => {
   // const { enqueueSnackbar } = useSnackbar();
 
 
-  // const fetchVehicle = async ()=> {
-  //   setLoading(true);
-  //   try{
-  //     const response = await vehicletypeApi.getVehicleDetails();
-  //     if (response.success) {
-  //       setVehicles(response.data);
-  //     } else {
-  //      setSnackbarMessage(response.message || " Failed to register machine");
-  //     }
-  //   } catch (error: any) {
-  //     const errorMessage = error.response?.data.message || "Somthing error occured please try again later";
-  //     setSnackbarMessage(errorMessage);
-  //   } finally {
-  //     setSnackbarOpen(true)
-  //     setLoading(false);
-  //   }
-  // };
-
     // API Fetch-----------
   const fetchVehicle = async () => {
     setLoading(true);
@@ -113,9 +89,9 @@ const VehicleRegister: React.FC = () => {
   };
 
 
-  function SlideRightToLeft(props: SlideProps) {
-    return <Slide {...props} direction="left" />;
-  }
+  // function SlideRightToLeft(props: SlideProps) {
+  //   return <Slide {...props} direction="left" />;
+  // }
 
   // Load Data Mock
   useEffect(() => {
@@ -147,28 +123,40 @@ const VehicleRegister: React.FC = () => {
     setEditingVehicle(null);
   };
 
-  const handleSaveVehicle = async (formData: Vehicle) => {
+  // const handleSaveVehicle = async (formData: Vehicle) => {
+  //   setLoading(true);
+  //   // Mimic API Call
+  //   try {
+  //     setTimeout(() => {
+  //       if (editingVehicle) {
+  //            setVehicles(prev => prev.map(v => v.Vehicle_Id === formData.Vehicle_Id ? formData : v));
+  //            setSnackbarMessage("Vehicle updated successfully!");
+  //       } else {
+  //            const newVehicle = { ...formData, Vehicle_Id: Date.now() };
+  //            setVehicles(prev => [newVehicle, ...prev]);
+  //            setSnackbarMessage("Vehicle added successfully!");
+  //       }
+  //       setLoading(false);
+  //       setSnackbarOpen(true)
+  //       handleCloseDrawer();
+  //     }, 500); 
+  //   } catch (error) {
+  //      setSnackbarMessage("Error saving data");
+  //      setLoading(false);
+  //   }
+  // };
+    const handleSaveVehicle = async () => {
     setLoading(true);
-    // Mimic API Call
-    try {
-      setTimeout(() => {
-        if (editingVehicle) {
-             setVehicles(prev => prev.map(v => v.Vehicle_Id === formData.Vehicle_Id ? formData : v));
-             setSnackbarMessage("Vehicle updated successfully!");
-        } else {
-             const newVehicle = { ...formData, Vehicle_Id: Date.now() };
-             setVehicles(prev => [newVehicle, ...prev]);
-             setSnackbarMessage("Vehicle added successfully!");
-        }
-        setLoading(false);
-        setSnackbarOpen(true)
-        handleCloseDrawer();
-      }, 500); 
-    } catch (error) {
-       setSnackbarMessage("Error saving data");
-       setLoading(false);
-    }
-  };
+     await fetchVehicle();          // 🔹 refresh list from API
+     setSnackbarMessage(
+       editingVehicle
+         ? "Vehicle updated successfully"
+         : "Vehicle added successfully"
+     );
+     setSnackbarOpen(true);
+     handleCloseDrawer();           // 🔹 close drawer
+    
+  }
 
   // --- Delete Logic ---
   const initiateDelete = (Vehicle_Id: number) => {
@@ -176,14 +164,33 @@ const VehicleRegister: React.FC = () => {
     setDeleteDialogOpen(true);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
+    setLoading(true);
     if (vehicleToDelete !== null) {
-      setVehicles((prev) => prev.filter((v) => v.Vehicle_Id !== vehicleToDelete));
-      setSnackbarMessage("Vehicle deleted successfully");
-      setSnackbarOpen(true);
+
+      try {
+        const response = await vehicletypeApi.deleteVehicleDetails(vehicleToDelete);
+        console.log("response--------",response)
+        if (response.success) {
+          setVehicles ((prev) => prev.filter((v) => v.Vehicle_Id !== vehicleToDelete));
+          console.log("---show the error----", vehicleToDelete)
+
+          setSnackbarMessage("Vehicle deleted successfully");
+          setSnackbarOpen(true);
+        } else {
+          setSnackbarMessage("failed to delete Vehicle");
+          setSnackbarOpen(true);
+        }
+      } catch (error) {
+        console.error(error);
+
+        setSnackbarMessage("Something went wrong while deleting");
+        setSnackbarOpen(true);
+      }
     }
     setDeleteDialogOpen(false);
     setVehicleToDelete(null);
+    setLoading(false);
   };
 
   return (
@@ -232,10 +239,28 @@ const VehicleRegister: React.FC = () => {
             open={snackbarOpen}
             autoHideDuration={3000}
             onClose={() => setSnackbarOpen(false)}
-            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         >
             <Alert onClose={() => setSnackbarOpen(false)} severity="success" variant="filled">
                 {snackbarMessage}
+                 <LinearProgress
+              variant="determinate"
+              value={100}
+              sx={{
+                mt: 1,
+                height: 4,
+                borderRadius: 2,
+                bgcolor: '#c8e6c9',
+                '& .MuiLinearProgress-bar': {
+                  bgcolor: '#66bb6a',
+                  animation: 'snackbarProgress 3.5s linear forwards',
+                },
+                '@keyframes snackbarProgress': {
+                  to: { width: '100%' },
+                  from: { width: '0%' },
+                },
+              }}
+            />
             </Alert>
         </Snackbar> */}
         <Snackbar
@@ -243,8 +268,8 @@ const VehicleRegister: React.FC = () => {
           autoHideDuration={3500}
           onClose={() => setSnackbarOpen(false)}
           anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-          TransitionComponent={SlideRightToLeft}
-          TransitionProps={{ timeout: 350 }}
+          // TransitionComponent={SlideRightToLeft}
+          TransitionProps={{ timeout: 550 }}
         >
           <Alert
             severity="success"
@@ -253,8 +278,8 @@ const VehicleRegister: React.FC = () => {
             sx={{
               minWidth: 340,
               borderRadius: 2,
-              bgcolor: '#4f9154ff',
-              color: '#0a0a0aff',
+              bgcolor: '#83cc89ff',
+              color: '#000000ff',
               border: '1px solid #c8e6c9',
               boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
               fontWeight: 500,
@@ -264,7 +289,6 @@ const VehicleRegister: React.FC = () => {
           >
             {snackbarMessage}
 
-            {/* Bottom Time Progress */}
             <LinearProgress
               variant="determinate"
               value={100}
@@ -285,7 +309,6 @@ const VehicleRegister: React.FC = () => {
             />
           </Alert>
         </Snackbar>
-
 
       </div>
     </LocalizationProvider>

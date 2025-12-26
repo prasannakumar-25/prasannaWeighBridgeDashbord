@@ -27,7 +27,7 @@ const vehicletypeApi = {
             return response.data
         }
         catch (error){
-            console.error("error")
+            console.error("error")  
             throw error
         }
     },
@@ -43,7 +43,7 @@ const vehicletypeApi = {
     },
     deleteVehicleDetails : async (vehicle_id:number) => {
         try{
-            const response = await Authaxios.delete(`/delete/vehicle${vehicle_id}`)
+            const response = await Authaxios.delete(`/delete/vehicle/${vehicle_id}`)
             return response.data
         }
         catch (error){

@@ -34,7 +34,7 @@ const machineApi = {
     },
     updataMachineDetailes : async (machine_id:number, payload:object) => {
         try{
-            const response = await Authaxios.put(`/update/machine${machine_id}`,payload)
+            const response = await Authaxios.put(`/update/machine/${machine_id}`,payload)
             return response.data
         }
         catch (error){
@@ -42,7 +42,7 @@ const machineApi = {
             throw error
         }
     },
-    deleteMachineDetails : async (machine_id:Number) => {
+    deleteMachineDetails : async (machine_id:number) => {
         try{
             const response = await Authaxios.delete(`/delete/machine/${machine_id}`)
             return response.data

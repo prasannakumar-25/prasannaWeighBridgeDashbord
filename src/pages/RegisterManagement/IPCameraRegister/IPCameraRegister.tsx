@@ -10,6 +10,7 @@ import {
   Button,
   Snackbar,
   Alert,
+  LinearProgress,
 } from "@mui/material";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -32,7 +33,7 @@ export type Machine = {
 
 export type IPCamera = {
   Camera_Id: number;
-  machineId: number;
+  Machine_Id: number;
   Camera_name: string;
   IP_address: string;
   RTSP_URL: string;
@@ -116,23 +117,31 @@ const IPCameraRegister: React.FC = () => {
     setEditingCamera(null);
   };
 
-  const handleSave = (formData: IPCamera) => {
+  // const handleSave = (formData: IPCamera) => {
+  //   setLoading(true);
+  //   // Simulate API call
+  //   setTimeout(() => {
+  //     if (editingCamera) {
+  //       setCameras((prev) => prev.map((c) => (c.Camera_Id === editingCamera.Camera_Id ? { ...formData, Camera_Id: editingCamera.Camera_Id } : c)));
+  //       setSnackbarMessage("Camera updated successfully");
+  //     } else {
+  //       const newCamera: IPCamera = { ...formData, Camera_Id: Date.now() };
+  //       setCameras((prev) => [newCamera, ...prev]);
+  //       setSnackbarMessage("Camera added successfully");
+  //     }
+  //     setLoading(false);
+  //     setSnackbarOpen(true);
+  //     handleCloseDrawer();
+  //     }, 400);
+  // };
+
+  const handleSave = async () => {
     setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      if (editingCamera) {
-        setCameras((prev) => prev.map((c) => (c.Camera_Id === editingCamera.Camera_Id ? { ...formData, Camera_Id: editingCamera.Camera_Id } : c)));
-        setSnackbarMessage("Camera updated successfully");
-      } else {
-        const newCamera: IPCamera = { ...formData, Camera_Id: Date.now() };
-        setCameras((prev) => [newCamera, ...prev]);
-        setSnackbarMessage("Camera added successfully");
-      }
-      setLoading(false);
-      setSnackbarOpen(true);
-      handleCloseDrawer();
-      }, 400);
-  };
+    await fetchCamera();
+    setSnackbarMessage( editingCamera? "IPcamera updated successfully": "IPCamera added successfully");
+    setSnackbarOpen(true);
+    handleCloseDrawer();
+  }
 
   // --- Delete Logic ---
   const initiateDelete = (Camera_Id: number) => {
@@ -140,11 +149,25 @@ const IPCameraRegister: React.FC = () => {
     setDeleteDialogOpen(true);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (cameraToDelete !== null) {
-      setCameras((prev) => prev.filter((c) => c.Camera_Id !== cameraToDelete));
-      setSnackbarMessage("Camera deleted successfully");
-      setSnackbarOpen(true);
+
+      try {
+        const response = await ipCameraApi.deleteIPcameraDetails(cameraToDelete);
+        if (response.success) {
+          setCameras ((prev) => prev.filter((cam) => cam.Camera_Id !== cameraToDelete));
+          setSnackbarMessage("Camera deleted successfully");
+          setSnackbarOpen(true);
+        } else {
+          setSnackbarMessage("failed to delete IP camera")
+          setSnackbarOpen(true);
+        }
+      } catch (error) { 
+        console.log(error);
+
+        setSnackbarMessage("Something went wrong while deleting");
+        setSnackbarOpen(true);
+      }
     }
     setDeleteDialogOpen(false);
     setCameraToDelete(null);
@@ -191,7 +214,7 @@ const IPCameraRegister: React.FC = () => {
         </Dialog>
 
         {/* Legacy Snackbar */}
-        <Snackbar
+        {/* <Snackbar
           open={snackbarOpen}
           autoHideDuration={3000}
           onClose={() => setSnackbarOpen(false)}
@@ -200,6 +223,34 @@ const IPCameraRegister: React.FC = () => {
           <Alert onClose={() => setSnackbarOpen(false)} severity="success" variant="filled">
             {snackbarMessage}
           </Alert>
+        </Snackbar> */}
+        <Snackbar
+            open={snackbarOpen}
+            autoHideDuration={3000}
+            onClose={() => setSnackbarOpen(false)}
+            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
+            <Alert onClose={() => setSnackbarOpen(false)} severity="success" variant="filled">
+                {snackbarMessage}
+                 <LinearProgress
+              variant="determinate"
+              value={100}
+              sx={{
+                mt: 1,
+                height: 4,
+                borderRadius: 2,
+                bgcolor: '#c8e6c9',
+                '& .MuiLinearProgress-bar': {
+                  bgcolor: '#66bb6a',
+                  animation: 'snackbarProgress 3.5s linear forwards',
+                },
+                '@keyframes snackbarProgress': {
+                  to: { width: '100%' },
+                  from: { width: '0%' },
+                },
+              }}
+            />
+            </Alert>
         </Snackbar>
 
       </div>
