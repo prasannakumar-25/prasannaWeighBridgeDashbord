@@ -574,7 +574,7 @@ const VehicleMain: React.FC<VehicleMainProps> = ({
                     }
                 }}
             />
-        </Box>
+        </Box>  
       </main>
     </Stack>
   );
