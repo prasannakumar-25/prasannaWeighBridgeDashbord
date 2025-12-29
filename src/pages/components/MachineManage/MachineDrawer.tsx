@@ -51,7 +51,7 @@ const MachineDrawer: React.FC<MachineDrawerProps> = ({
 }) => {
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
-  const drawerWidth = isMdUp ? 650 : "100%";
+  const drawerWidth = isMdUp ? 800 : "100%";
 
   // State
   const [showPassword, setShowPassword] = useState(false);

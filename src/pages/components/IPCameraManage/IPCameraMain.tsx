@@ -98,7 +98,7 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
       const matchesMachine = filterMachineId === "" || c.Machine_Id === filterMachineId;
 
       // 3. Date Filter (Installed Date)
-      const itemDate = dayjs(c.InStalled_date);
+      const itemDate = dayjs(c.Installed_date);
       const matchesFromDate = fromDate ? itemDate.isValid() && (itemDate.isAfter(fromDate, 'day') || itemDate.isSame(fromDate, 'day')) : true;
       const matchesToDate = toDate ? itemDate.isValid() && (itemDate.isBefore(toDate, 'day') || itemDate.isSame(toDate, 'day')) : true;
 
@@ -123,26 +123,29 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
         "RTSP URL": c.RTSP_URL || "",
         "Location": c.Location || "",
         "Status": c.Status,
-        "Installed Date": c.InStalled_date ? dayjs(c.InStalled_date).format('YYYY-MM-DD') : ""
+        "Installed Date": c.Installed_date ? dayjs(c.Installed_date).format('YYYY-MM-DD') : ""
       };
     });
   };
 
   // -- EXPORT TO EXCEL FUNCTION --
-  const handleExportExcel = () => {
-    const data = getExportData();
-    if (!data) return;
-
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "IPCameras");
-    
-    // Generate buffer and trigger download
-    XLSX.writeFile(workbook, "IP_Camera_Register.xlsx");
-    
-    handleCloseDownloadMenu();
-    enqueueSnackbar("Exported to Excel successfully", { variant: "success" });
-  };
+   const handleExportExcel = () => {
+     const data = getExportData();
+     if (!data) return;
+ 
+     const worksheet = XLSX.utils.json_to_sheet(data);
+     const workbook = XLSX.utils.book_new();
+     XLSX.utils.book_append_sheet(workbook, worksheet, "IPcamera");
+     
+     // <--- CHANGED HERE: Create professional filename with timestamp
+     const fileName = `IPCamera_Register_${dayjs().format('YYYY-MM-DD_HH-mm')}.xlsx`;
+ 
+     // Generate buffer and trigger download
+     XLSX.writeFile(workbook, fileName); // <--- Use variable
+     
+     handleCloseDownloadMenu();
+     enqueueSnackbar("Exported to Excel successfully", { variant: "success" });
+   };
 
   // -- EXPORT TO WORD FUNCTION --
   const handleExportWord = () => {
@@ -193,17 +196,18 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
     });
     
     const url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(html);
-    
+    const fileName = `IPCamera_Register_${dayjs().format('YYYY-MM-DD_HH-mm')}.doc`;
+
     // Create download link
     const downloadLink = document.createElement("a");
     document.body.appendChild(downloadLink);
     
     if (navigator.userAgent.indexOf("MSIE") !== -1 || navigator.appVersion.indexOf("Trident/") > 0) {
         // IE Support
-        (window.navigator as any).msSaveOrOpenBlob(blob, "IP_Camera_Register.doc");
+        (window.navigator as any).msSaveOrOpenBlob(blob, fileName);
     } else {
         downloadLink.href = url;
-        downloadLink.download = "IP_Camera_Register.doc";
+        downloadLink.download = fileName;
         downloadLink.click();
     }
     
@@ -258,7 +262,7 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
         minWidth: 140,
     },
     {
-        field: 'InStalled_date',
+        field: 'Installed_date',
         headerName: 'Installed Date',
         width: 140,
         renderCell: (params: any) => {
@@ -556,8 +560,9 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
                     loadingOverlay: LinearProgress as GridSlots['loadingOverlay'],
                     pagination: CustomPagination,
                     noRowsOverlay: () => (
-                        <Stack height="100%" alignItems="center" justifyContent="center">
-                            No IP Cameras found
+                        <Stack height="100%" alignItems="center" justifyContent="center" color="text.secondary">
+                             <IconifyIcon icon="fluent:box-search-24-regular" width={40} height={40} sx={{mb:1, opacity:0.5}}/>
+                             <Typography variant="body2">No IP Cameras found</Typography>
                         </Stack>
                     ),
                 }}

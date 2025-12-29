@@ -39,7 +39,7 @@ const VendorDrawer: React.FC<VendorDrawerProps> = ({
 }) => {
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
-  const drawerWidth = isMdUp ? 650 : "100%";
+  const drawerWidth = isMdUp ? 800 : "100%";
 
   // State
   const [form, setForm] = useState<Vendor>({

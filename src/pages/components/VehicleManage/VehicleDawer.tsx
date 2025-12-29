@@ -1,6 +1,4 @@
 
-
-
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -49,7 +47,7 @@ const VehicleDrawer: React.FC<VehicleDrawerProps> = ({
 }) => {
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
-  const drawerWidth = isMdUp ? 650 : "100%"; // Slightly narrower for a cleaner look
+  const drawerWidth = isMdUp ? 800 : "100%"; // Slightly narrower for a cleaner look
 
   // Form State
   const [form, setForm] = useState<Vehicle>({

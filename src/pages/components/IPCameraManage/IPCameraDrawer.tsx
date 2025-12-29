@@ -45,7 +45,7 @@ const IPCameraDrawer: React.FC<IPCameraDrawerProps> = ({
 }) => {
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
-  const drawerWidth = isMdUp ? 650 : "100%";
+  const drawerWidth = isMdUp ? 800 : "100%";
 
   // State
   const [showPassword, setShowPassword] = useState(false);
@@ -61,7 +61,7 @@ const IPCameraDrawer: React.FC<IPCameraDrawerProps> = ({
     Mac_address: "",
     Status: "Offline",
     Location: "",
-    InStalled_date: new Date().toISOString().split('T')[0],
+    Installed_date: new Date().toISOString().split('T')[0],
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof IPCamera, string>>>({});
@@ -88,7 +88,7 @@ const IPCameraDrawer: React.FC<IPCameraDrawerProps> = ({
             Mac_address: "",
             Status: "Offline",
             Location: "",
-            InStalled_date: new Date().toISOString().split('T')[0],
+            Installed_date: new Date().toISOString().split('T')[0],
         });
       }
     }
@@ -144,7 +144,7 @@ const IPCameraDrawer: React.FC<IPCameraDrawerProps> = ({
   //     Mac_address: form.Mac_address,
   //     Status: form.Status,
   //     Location: form.Location,
-  //     InStalled_date: form.InStalled_date,
+  //     Installed_date: form.Installed_date,
   //   }
   //   console.log("-----response form -----", form)
 
@@ -163,7 +163,7 @@ const IPCameraDrawer: React.FC<IPCameraDrawerProps> = ({
     if (!validate()) return;
 
     const payload =  {
-      Machine_Id: 5,
+      Machine_Id: 4,
       Camera_name: form.Camera_name,
       IP_address: form.IP_address,
       RTSP_URL: form.RTSP_URL,
@@ -173,7 +173,7 @@ const IPCameraDrawer: React.FC<IPCameraDrawerProps> = ({
       Mac_address: form.Mac_address,
       Status: form.Status,
       Location: form.Location,
-      InStalled_date: form.InStalled_date,
+      Installed_date: form.Installed_date,
     }
     try {
       let response 
@@ -346,8 +346,8 @@ const IPCameraDrawer: React.FC<IPCameraDrawerProps> = ({
                         className="input-bg-color label-black"
                         type="date"
                         fullWidth
-                        value={form.InStalled_date || ""}
-                        onChange={(e) => setField("InStalled_date", e.target.value)}
+                        value={form.Installed_date || ""}
+                        onChange={(e) => setField("Installed_date", e.target.value)}
                         disabled={loading}
                         InputLabelProps={{ shrink: true }}
                     />

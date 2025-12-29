@@ -1,5 +1,4 @@
 
-
 import React, { useEffect, useState } from "react";
 import {
   Dialog,
@@ -89,9 +88,6 @@ const VehicleRegister: React.FC = () => {
   };
 
 
-  // function SlideRightToLeft(props: SlideProps) {
-  //   return <Slide {...props} direction="left" />;
-  // }
 
   // Load Data Mock
   useEffect(() => {
@@ -123,28 +119,7 @@ const VehicleRegister: React.FC = () => {
     setEditingVehicle(null);
   };
 
-  // const handleSaveVehicle = async (formData: Vehicle) => {
-  //   setLoading(true);
-  //   // Mimic API Call
-  //   try {
-  //     setTimeout(() => {
-  //       if (editingVehicle) {
-  //            setVehicles(prev => prev.map(v => v.Vehicle_Id === formData.Vehicle_Id ? formData : v));
-  //            setSnackbarMessage("Vehicle updated successfully!");
-  //       } else {
-  //            const newVehicle = { ...formData, Vehicle_Id: Date.now() };
-  //            setVehicles(prev => [newVehicle, ...prev]);
-  //            setSnackbarMessage("Vehicle added successfully!");
-  //       }
-  //       setLoading(false);
-  //       setSnackbarOpen(true)
-  //       handleCloseDrawer();
-  //     }, 500); 
-  //   } catch (error) {
-  //      setSnackbarMessage("Error saving data");
-  //      setLoading(false);
-  //   }
-  // };
+
     const handleSaveVehicle = async () => {
     setLoading(true);
      await fetchVehicle();          // 🔹 refresh list from API
@@ -235,11 +210,11 @@ const VehicleRegister: React.FC = () => {
         </Dialog>
 
         {/* 4. Global Snackbar */}
-        {/* <Snackbar
+        <Snackbar
             open={snackbarOpen}
             autoHideDuration={3000}
             onClose={() => setSnackbarOpen(false)}
-            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         >
             <Alert onClose={() => setSnackbarOpen(false)} severity="success" variant="filled">
                 {snackbarMessage}
@@ -262,54 +237,7 @@ const VehicleRegister: React.FC = () => {
               }}
             />
             </Alert>
-        </Snackbar> */}
-        <Snackbar
-          open={snackbarOpen}
-          autoHideDuration={3500}
-          onClose={() => setSnackbarOpen(false)}
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-          // TransitionComponent={SlideRightToLeft}
-          TransitionProps={{ timeout: 550 }}
-        >
-          <Alert
-            severity="success"
-            onClose={() => setSnackbarOpen(false)}
-            icon={false}
-            sx={{
-              minWidth: 340,
-              borderRadius: 2,
-              bgcolor: '#83cc89ff',
-              color: '#000000ff',
-              border: '1px solid #c8e6c9',
-              boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
-              fontWeight: 500,
-              p: 1.5,
-              pb: 0.5,
-            }}
-          >
-            {snackbarMessage}
-
-            <LinearProgress
-              variant="determinate"
-              value={100}
-              sx={{
-                mt: 1,
-                height: 4,
-                borderRadius: 2,
-                bgcolor: '#c8e6c9',
-                '& .MuiLinearProgress-bar': {
-                  bgcolor: '#66bb6a',
-                  animation: 'snackbarProgress 3.5s linear forwards',
-                },
-                '@keyframes snackbarProgress': {
-                  to: { width: '100%' },
-                  from: { width: '0%' },
-                },
-              }}
-            />
-          </Alert>
         </Snackbar>
-
       </div>
     </LocalizationProvider>
   );

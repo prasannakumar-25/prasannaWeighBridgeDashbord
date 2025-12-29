@@ -134,9 +134,11 @@ const VendorMain: React.FC<VendorMainProps> = ({
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Vendors");
-    
+
+    const fileName = `Vendor_Register_${dayjs().format('YYYY-MM-DD_HH-mm')}.xlsx`;
+
     // Generate buffer and trigger download
-    XLSX.writeFile(workbook, "Vendor_Register.xlsx");
+    XLSX.writeFile(workbook, fileName); // <--- Use variable
     
     handleCloseDownloadMenu();
     enqueueSnackbar("Exported to Excel successfully", { variant: "success" });
@@ -193,6 +195,7 @@ const VendorMain: React.FC<VendorMainProps> = ({
     });
     
     const url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(html);
+    const fileName = `Vendor_Register_${dayjs().format('YYYY-MM-DD_HH-mm')}.doc`;
     
     // Create download link
     const downloadLink = document.createElement("a");
@@ -200,10 +203,10 @@ const VendorMain: React.FC<VendorMainProps> = ({
     
     if (navigator.userAgent.indexOf("MSIE") !== -1 || navigator.appVersion.indexOf("Trident/") > 0) {
         // IE Support
-        (window.navigator as any).msSaveOrOpenBlob(blob, "Vendor_Register.doc");
+        (window.navigator as any).msSaveOrOpenBlob(blob, fileName);
     } else {
         downloadLink.href = url;
-        downloadLink.download = "Vendor_Register.doc";
+        downloadLink.download = fileName;
         downloadLink.click();
     }
     
@@ -511,8 +514,9 @@ const VendorMain: React.FC<VendorMainProps> = ({
                     loadingOverlay: LinearProgress as GridSlots['loadingOverlay'],
                     pagination: CustomPagination,
                     noRowsOverlay: () => (
-                        <Stack height="100%" alignItems="center" justifyContent="center">
-                            No Vendors found
+                        <Stack height="100%" alignItems="center" justifyContent="center" color="text.secondary">
+                             <IconifyIcon icon="fluent:box-search-24-regular" width={40} height={40} sx={{mb:1, opacity:0.5}}/>
+                             <Typography variant="body2">No Vendors found</Typography>
                         </Stack>
                     ),
                 }}

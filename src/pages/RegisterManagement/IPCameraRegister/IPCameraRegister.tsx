@@ -43,7 +43,7 @@ export type IPCamera = {
   Mac_address: string;
   Status: "Online" | "Offline" | "Error";
   Location?: string;
-  InStalled_date?: string; // Format: YYYY-MM-DD
+  Installed_date?: string; // Format: YYYY-MM-DD
 };
 
 const IPCameraRegister: React.FC = () => {
@@ -228,7 +228,7 @@ const IPCameraRegister: React.FC = () => {
             open={snackbarOpen}
             autoHideDuration={3000}
             onClose={() => setSnackbarOpen(false)}
-            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         >
             <Alert onClose={() => setSnackbarOpen(false)} severity="success" variant="filled">
                 {snackbarMessage}

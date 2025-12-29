@@ -126,9 +126,11 @@ const VehicleMain: React.FC<VehicleMainProps> = ({
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Vehicles");
-    
+
+    const fileName = `Vehicle_Register_${dayjs().format('YYYY-MM-DD_HH-mm')}.xlsx`;
+
     // Generate buffer and trigger download
-    XLSX.writeFile(workbook, "Vehicle_Register.xlsx");
+    XLSX.writeFile(workbook, fileName); // <--- Use variable
     
     handleCloseDownloadMenu();
     enqueueSnackbar("Exported to Excel successfully", { variant: "success" });
@@ -183,17 +185,18 @@ const VehicleMain: React.FC<VehicleMainProps> = ({
     });
     
     const url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(html);
-    
+    const fileName = `Vehicle_Register_${dayjs().format('YYYY-MM-DD_HH-mm')}.doc`;
+
     // Create download link
     const downloadLink = document.createElement("a");
     document.body.appendChild(downloadLink);
     
     if (navigator.userAgent.indexOf("MSIE") !== -1 || navigator.appVersion.indexOf("Trident/") > 0) {
         // IE Support
-        (window.navigator as any).msSaveOrOpenBlob(blob, "Vehicle_Register.doc");
+        (window.navigator as any).msSaveOrOpenBlob(blob, fileName);
     } else {
         downloadLink.href = url;
-        downloadLink.download = "Vehicle_Register.doc";
+        downloadLink.download =fileName;
         downloadLink.click();
     }
     
@@ -475,48 +478,7 @@ const VehicleMain: React.FC<VehicleMainProps> = ({
         </Box>
 
         {/* --- DATA GRID SECTION --- */}
-        {/* <Box sx={{ height: 550, width: '100%' }}>
-            <DataGrid
-                rows={filteredVehicles}
-                columns={columns}
-                getRowId={(row) => row.Created_at ? row.Vehicle_Id : Math.random()}
-                // Pagination Setup
-                initialState={{
-                    pagination: { paginationModel: { pageSize: 5, page: 0 } },
-                }}
-                pageSizeOptions={[5, 10, 20]}
-                
-                // Slots for Custom Components
-                slots={{
-                    loadingOverlay: LinearProgress as GridSlots['loadingOverlay'],
-                    pagination: CustomPagination,
-                    noRowsOverlay: () => (
-                        <Stack height="100%" alignItems="center" justifyContent="center">
-                            No vehicles found
-                        </Stack>
-                    ),
-                }}
-
-                // Styling
-                loading={loading}
-                getRowHeight={() => 65}
-                disableRowSelectionOnClick
-                disableColumnSelector
-                disableColumnMenu
-                disableColumnSorting
-                sx={{
-                    border: 'none',
-                    '& .MuiDataGrid-cell': {
-                        borderBottom: `1px solid ${theme.palette.divider}`,
-                    },
-                    '& .MuiDataGrid-columnHeaders': {
-                        bgcolor: theme.palette.background.default,
-                        borderBottom: `2px solid ${theme.palette.divider}`,
-                        fontWeight: 'bold',
-                    },
-                }}
-            />
-        </Box> */}
+        
         <Box sx={{ height: 550, width: '100%' }}>
             <DataGrid
                 rows={filteredVehicles}
@@ -529,7 +491,7 @@ const VehicleMain: React.FC<VehicleMainProps> = ({
                         paginationModel: { pageSize: 5, page: 0 } 
                     },
                 }}
-                // This ensures the custom picker works logically with the internal grid
+                
                 pageSizeOptions={[5, 10, 20, 50]} 
                 
                 // --- SLOTS ---

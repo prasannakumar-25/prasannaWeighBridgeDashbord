@@ -98,10 +98,10 @@ const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
   };
 
   // -- HANDLE DETAIL MODAL ACTIONS --
-  const handleOpenDetail = (wb: Weighbridge) => {
-    setSelectedWeighbridge(wb);
-    setOpenDetailModal(true);
-  };
+  // const handleOpenDetail = (wb: Weighbridge) => {
+  //   setSelectedWeighbridge(wb);
+  //   setOpenDetailModal(true);
+  // };
 
   const handleCloseDetail = () => {
     setOpenDetailModal(false);
@@ -161,16 +161,22 @@ const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
     });
   };
 
-  const handleExportExcel = () => {
-    const data = getExportData();
-    if (!data) return;
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Weighbridges");
-    XLSX.writeFile(workbook, "Weighbridge_Register.xlsx");
-    handleCloseDownloadMenu();
-    enqueueSnackbar("Exported to Excel successfully", { variant: "success" });
-  };
+    const handleExportExcel = () => {
+      const data = getExportData();
+      if (!data) return;
+  
+      const worksheet = XLSX.utils.json_to_sheet(data);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Weighbridges");
+      
+      const fileName = `Weighbridge_Register_${dayjs().format('YYYY-MM-DD_HH-mm')}.xlsx`;
+  
+      // Generate buffer and trigger download
+      XLSX.writeFile(workbook, fileName); // <--- Use variable
+      
+      handleCloseDownloadMenu();
+      enqueueSnackbar("Exported to Excel successfully", { variant: "success" });
+    };
 
   const handleExportWord = () => {
     const data = getExportData();
@@ -195,13 +201,14 @@ const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
     const html = preHtml + tableHTML + postHtml;
     const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
     const url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(html);
+    const fileName = `Weighbridge_Register_${dayjs().format('YYYY-MM-DD_HH-mm')}.doc`;
     const downloadLink = document.createElement("a");
     document.body.appendChild(downloadLink);
     if (navigator.userAgent.indexOf("MSIE") !== -1 || navigator.appVersion.indexOf("Trident/") > 0) {
-        (window.navigator as any).msSaveOrOpenBlob(blob, "Weighbridge_Register.doc");
+        (window.navigator as any).msSaveOrOpenBlob(blob, fileName);
     } else {
         downloadLink.href = url;
-        downloadLink.download = "Weighbridge_Register.doc";
+        downloadLink.download = fileName;
         downloadLink.click();
     }
     document.body.removeChild(downloadLink);
@@ -217,31 +224,36 @@ const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
         flex: 1,
         minWidth: 100,
         renderCell: (params: GridRenderCellParams) => (
-            <Tooltip title="Double click for details" arrow placement="top">
-                <Box
-                    sx={{
-                        width: '100%',
-                        height: '100%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        cursor: 'pointer', // Show hand cursor
-                        '&:hover': {
-                            color: theme.palette.primary.main,
-                            fontWeight: 'bold'
-                        }
-                    }}
-                    // TRIGGER THE DETAIL CARD ON DOUBLE CLICK
-                    onDoubleClick={(e) => {
-                        e.stopPropagation(); // Prevent row click events if any
-                        handleOpenDetail(params.row);
-                    }}
-                >
-                    <Typography variant="subtitle2" fontWeight={600} color="inherit">
-                        {params.value}
-                    </Typography>
-                </Box>
-            </Tooltip>
+          <Typography variant="subtitle2" fontWeight={600} color="text.primary">
+            {params.value}
+          </Typography>
         )
+        // renderCell: (params: GridRenderCellParams) => (
+        //     <Tooltip title="Double click for details" arrow placement="top">
+        //         <Box
+        //             sx={{
+        //                 width: '100%',
+        //                 height: '100%',
+        //                 display: 'flex',
+        //                 alignItems: 'center',
+        //                 cursor: 'pointer', // Show hand cursor
+        //                 '&:hover': {
+        //                     color: theme.palette.primary.main,
+        //                     fontWeight: 'bold'
+        //                 }
+        //             }}
+        //             // TRIGGER THE DETAIL CARD ON DOUBLE CLICK
+        //             onDoubleClick={(e) => {
+        //                 e.stopPropagation(); // Prevent row click events if any
+        //                 handleOpenDetail(params.row);
+        //             }}
+        //         >
+        //             <Typography variant="subtitle2" fontWeight={600} color="inherit">
+        //                 {params.value}
+        //             </Typography>
+        //         </Box>
+        //     </Tooltip>
+        // )
     },
     {
         field: 'machineId',
@@ -285,7 +297,7 @@ const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
     {
         field: 'Party',
         headerName: 'Party (Parity)',
-        width: 120,
+        width: 170,
     },
     {
         field: 'actions',
@@ -470,7 +482,11 @@ const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
                 slots={{
                     loadingOverlay: LinearProgress as GridSlots['loadingOverlay'],
                     pagination: CustomPagination,
-                    noRowsOverlay: () => <Stack height="100%" alignItems="center" justifyContent="center">No weighbridges found</Stack>,
+                    noRowsOverlay: () => 
+                      <Stack height="100%" alignItems="center" justifyContent="center" color="text.secondary">
+                             <IconifyIcon icon="fluent:box-search-24-regular" width={40} height={40} sx={{mb:1, opacity:0.5}}/>
+                             <Typography variant="body2">No WeighBridges found</Typography>
+                        </Stack>
                 }}
                 loading={loading}
                 getRowHeight={() => 70}

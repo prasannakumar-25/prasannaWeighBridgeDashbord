@@ -1,6 +1,4 @@
 
-
-
 import React, { useEffect, useState } from "react";
 import {
   Dialog,
@@ -143,6 +141,7 @@ const WeighbridgeRegister: React.FC = () => {
     );
     setSnackbarOpen(true);
     handleCloseDrawer();
+    setLoading(false);
   };
 
 
@@ -159,8 +158,10 @@ const WeighbridgeRegister: React.FC = () => {
       try {
         const response = await weighBridgeApi.deleteWeighbridgeDetails(itemToDelete);
         if (response.success) {
-          setSnackbarMessage("Weighbridge deleted successfully")
-          setSnackbarOpen(true);
+          setWeighbridges ((prev) => prev.filter((wb) => wb.Weighbridge_Id !== itemToDelete));
+          
+          // setSnackbarMessage("Weighbridge deleted successfully")
+          // setSnackbarOpen(true);
         } else {
           setSnackbarMessage("Failed to delete Weighbridge");
           setSnackbarOpen(true);
@@ -233,7 +234,7 @@ const WeighbridgeRegister: React.FC = () => {
             open={snackbarOpen}
             autoHideDuration={3000}
             onClose={() => setSnackbarOpen(false)}
-            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         >
             <Alert onClose={() => setSnackbarOpen(false)} severity="success" variant="filled">
                 {snackbarMessage}
@@ -264,10 +265,3 @@ const WeighbridgeRegister: React.FC = () => {
 };
 
 export default WeighbridgeRegister;
-
-
-
-
-
-
-

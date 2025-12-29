@@ -41,7 +41,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({
 }) => {
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
-  const drawerWidth = isMdUp ? 650 : "100%";
+  const drawerWidth = isMdUp ? 800 : "100%";
 
   // Form State
   const [form, setForm] = useState<User>({

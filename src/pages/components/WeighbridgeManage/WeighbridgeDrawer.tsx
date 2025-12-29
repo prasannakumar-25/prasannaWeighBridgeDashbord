@@ -46,7 +46,7 @@ const WeighbridgeDrawer: React.FC<WeighbridgeDrawerProps> = ({
 }) => {
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
-  const drawerWidth = isMdUp ? 650 : "100%";
+  const drawerWidth = isMdUp ? 800 : "100%";
 
   // State for form data and specific field errors
   const [form, setForm] = useState<Weighbridge>({
@@ -146,7 +146,7 @@ const WeighbridgeDrawer: React.FC<WeighbridgeDrawerProps> = ({
       } else {
         response = await weighBridgeApi.addWeighbridgeDetails(payload);
       }
-      if (response?.sussess) {
+      if (response?.success) {
          console.log("Success", response);
          onSave(response.data)
          onClose();
@@ -395,6 +395,3 @@ const WeighbridgeDrawer: React.FC<WeighbridgeDrawerProps> = ({
 };
 
 export default WeighbridgeDrawer;
-
-
-

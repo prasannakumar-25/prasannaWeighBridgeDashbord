@@ -124,6 +124,22 @@ const UserMain: React.FC<UserMainProps> = ({
   };
 
   // -- EXPORT TO EXCEL FUNCTION --
+  // const handleExportExcel = () => {
+  //   const data = getExportData();
+  //   if (!data) return;
+
+  //   const worksheet = XLSX.utils.json_to_sheet(data);
+  //   const workbook = XLSX.utils.book_new();
+  //   XLSX.utils.book_append_sheet(workbook, worksheet, "Users");
+    
+  //   // Generate buffer and trigger download
+  //   XLSX.writeFile(workbook, "User_Register.xlsx");
+    
+  //   handleCloseDownloadMenu();
+  //   enqueueSnackbar("Exported to Excel successfully", { variant: "success" });
+  // };
+
+  // -- EXPORT TO EXCEL FUNCTION --
   const handleExportExcel = () => {
     const data = getExportData();
     if (!data) return;
@@ -132,8 +148,11 @@ const UserMain: React.FC<UserMainProps> = ({
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Users");
     
+    // <--- CHANGED HERE: Create professional filename with timestamp
+    const fileName = `User_Register_${dayjs().format('YYYY-MM-DD_HH-mm')}.xlsx`;
+
     // Generate buffer and trigger download
-    XLSX.writeFile(workbook, "User_Register.xlsx");
+    XLSX.writeFile(workbook, fileName); // <--- Use variable
     
     handleCloseDownloadMenu();
     enqueueSnackbar("Exported to Excel successfully", { variant: "success" });
@@ -186,6 +205,7 @@ const UserMain: React.FC<UserMainProps> = ({
     });
     
     const url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(html);
+    const fileName = `User_Register_${dayjs().format('YYYY-MM-DD_HH-mm')}.doc`;
     
     // Create download link
     const downloadLink = document.createElement("a");
@@ -193,10 +213,10 @@ const UserMain: React.FC<UserMainProps> = ({
     
     if (navigator.userAgent.indexOf("MSIE") !== -1 || navigator.appVersion.indexOf("Trident/") > 0) {
         // IE Support
-        (window.navigator as any).msSaveOrOpenBlob(blob, "User_Register.doc");
+        (window.navigator as any).msSaveOrOpenBlob(blob, fileName);
     } else {
         downloadLink.href = url;
-        downloadLink.download = "User_Register.doc";
+        downloadLink.download = fileName;
         downloadLink.click();
     }
     
@@ -501,8 +521,9 @@ const UserMain: React.FC<UserMainProps> = ({
                     loadingOverlay: LinearProgress as GridSlots['loadingOverlay'],
                     pagination: CustomPagination,
                     noRowsOverlay: () => (
-                        <Stack height="100%" alignItems="center" justifyContent="center">
-                            No users found
+                        <Stack height="100%" alignItems="center" justifyContent="center" color="text.secondary">
+                             <IconifyIcon icon="fluent:box-search-24-regular" width={40} height={40} sx={{mb:1, opacity:0.5}}/>
+                             <Typography variant="body2">No users found</Typography>
                         </Stack>
                     ),
                 }}
