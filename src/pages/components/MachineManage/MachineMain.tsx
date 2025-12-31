@@ -17,6 +17,8 @@ import {
   Menu,           // <--- ADDED
   ListItemIcon,   // <--- ADDED
   ListItemText,   // <--- ADDED
+  ListSubheader,
+  Divider,
 } from "@mui/material";
 import { 
   DataGrid, 
@@ -38,25 +40,26 @@ import "../../RegisterManagement/MachineRegister/MachineRegister.css";
 
 interface MachineMainProps {
   machines: Machine[];
-  vendors: Vendor[];
   onAdd: () => void;
   onEdit: (m: Machine) => void;
   onDelete: (Machine_Id: number) => void;
+  vendorList: Vendor[]; // Received from parent
   loading: boolean;
   onRefresh: () => void;
 }
 
 const MachineMain: React.FC<MachineMainProps> = ({
   machines,
-  vendors,
   onAdd,
   onEdit,
   onDelete,
+  vendorList,
   loading,
   onRefresh,
 }) => {
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
+  // const [snackbarMessage, setSnackbarMessage] = useState(false);
 
   // -- Local Filter State --
   const [search, setSearch] = useState('');
@@ -114,11 +117,11 @@ const MachineMain: React.FC<MachineMainProps> = ({
       return null;
     }
     return filteredMachines.map(m => {
-      const vendorName = vendors.find(v => v.Vendor_Id === m.Vendor_Id)?.vendorName || "Unknown";
+      // const vendorName = vendors.find(v => v.Vendor_Id === m.Vendor_Id)?.vendorName || "Unknown";
       return {
         "ID": m.Machine_Id,
         "Machine Name": m.Machine_name,
-        "Vendor": vendorName,
+        "Vendor": m.Vendor_name || m.Vendor_Id,
         "MAC Address": m.Machine_mac || "",
         "Capacity (Ton)": m.Capacity_ton || "",
         "Type": m.Machine_type,
@@ -235,15 +238,15 @@ const MachineMain: React.FC<MachineMainProps> = ({
         )
     },
     {
-        field: 'Vendor_Id',
-        headerName: 'Vendor',
-        flex: 1,
-        minWidth: 150,
-        renderCell: (params: GridRenderCellParams) => {
-            const row = params.row || params;
-            return vendors.find(v => v.Vendor_Id === row.Vendor_Id)?.vendorName || "—";
-        }
-    },
+            field: 'Vendor_name',
+            headerName: 'Vendor',
+            minWidth: 140,
+            renderCell: (params: GridRenderCellParams) => (
+                <Typography variant="body2" color="text.primary">
+                    {params.row.Vendor_name || params.row.Vendor_Id}
+                </Typography>
+            )
+        },
     {
         field: 'Machine_mac',
         headerName: 'MAC Address',
@@ -324,7 +327,7 @@ const MachineMain: React.FC<MachineMainProps> = ({
             </Stack>
         )
     }
-  ], [vendors, onEdit, onDelete]);
+  ], [vendorList, onEdit, onDelete]);
 
   return (
     <Stack
@@ -379,7 +382,7 @@ const MachineMain: React.FC<MachineMainProps> = ({
 
             {/* From Date */}
             <Grid item xs={6} sm={3} md={2}>
-              <Typography variant="caption" fontWeight={300} fontSize={14} color="text.secondary" display="block" mb={0.5}>
+              <Typography variant="caption" fontWeight={300} fontSize={14} color="text.secondary" display="block" mb={0.8}>
                   From Date
               </Typography>
               <DatePicker
@@ -415,7 +418,7 @@ const MachineMain: React.FC<MachineMainProps> = ({
 
             {/* Vendor Filter Dropdown */}
             <Grid item xs={12} sm={6} md={2}>
-              <TextField
+              {/* <TextField
                 select
                 label="Filter Vendor"
                 placeholder="Filter Vendor"
@@ -426,10 +429,91 @@ const MachineMain: React.FC<MachineMainProps> = ({
                 onChange={(e) => setFilterVendorId(e.target.value === "" ? "" : Number(e.target.value))}
               >
                 <MenuItem value=""><em>All Vendors</em></MenuItem>
-                {vendors.map((v) => (
-                  <MenuItem key={v.Vendor_Id} value={v.Vendor_Id}>{v.vendorName}</MenuItem>
+                {vendorList.map((v) => (
+                  <MenuItem key={v.Vendor_Id} value={v.Vendor_Id}>{v.Vendor_name}</MenuItem>
+                ))}
+              </TextField> */}
+
+              <TextField
+                select
+                label="Filter Vendor"
+                placeholder="Filter Vendor"
+                variant="outlined"
+                size="small"
+                fullWidth
+                value={filterVendorId}
+                onChange={(e) => setFilterVendorId(e.target.value === "" ? "" : Number(e.target.value))}
+                
+                // 1. Style the Dropdown Container
+                SelectProps={{
+                  MenuProps: {
+                    PaperProps: {
+                      sx: {
+                        mt: 1, // Add space between input and menu
+                        borderRadius: 2,
+                        boxShadow: '0px 4px 20px rgba(0,0,0,0.1)', // Soft modern shadow
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        maxHeight: 300,
+                      },
+                    },
+                    MenuListProps: { sx: { py: 1 } }, // Remove default padding for cleaner margins
+                  },
+                }}
+              >
+                {/* 2. Style "All Vendors" Option */}
+                <MenuItem 
+                  value="" 
+                  sx={{
+                    borderRadius: 1.5,
+                    mx: 1, // Horizontal margin
+                    my: 0.5, // Vertical spacing
+                    py: 1,
+                    transition: 'all 0.2s ease-in-out',
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      transform: 'translateX(5px)', // Slide effect
+                    },
+                  }}
+                >
+                  <em style={{ fontWeight: 500, color: 'text.secondary' }}>All Vendors</em>
+                </MenuItem>
+
+                {/* 3. Style Dynamic Options */}
+                {vendorList.map((v) => (
+                  <MenuItem 
+                    key={v.Vendor_Id} 
+                    value={v.Vendor_Id}
+                    sx={{
+                      borderRadius: 1.5,
+                      mx: 1,
+                      my: 0.5,
+                      py: 1,
+                      transition: 'all 0.2s ease-in-out',
+                      
+                      // Hover State
+                      '&:hover': {
+                        bgcolor: 'primary.lighter', // Or 'rgba(25, 118, 210, 0.08)'
+                        transform: 'translateX(5px)',
+                        fontWeight: 600,
+                      },
+
+                      // Selected State
+                      '&.Mui-selected': {
+                        bgcolor: 'primary.main',
+                        color: 'common.white',
+                        fontWeight: 600,
+                        '&:hover': {
+                          bgcolor: 'primary.dark',
+                        },
+                      }
+                    }}
+                  >
+                    {v.Vendor_name}
+                  </MenuItem>
                 ))}
               </TextField>
+
             </Grid>
 
             {/* Actions */}
@@ -466,7 +550,7 @@ const MachineMain: React.FC<MachineMainProps> = ({
                 </IconButton>
               </Tooltip>
 
-              <Menu
+              {/* <Menu
                 anchorEl={anchorEl}
                 open={openDownloadMenu}
                 onClose={handleCloseDownloadMenu}
@@ -486,9 +570,128 @@ const MachineMain: React.FC<MachineMainProps> = ({
                   </ListItemIcon>
                   <ListItemText>Export to Word</ListItemText>
                 </MenuItem>
+              </Menu> */}
+
+              <Menu
+                anchorEl={anchorEl}
+                open={openDownloadMenu}
+                onClose={handleCloseDownloadMenu}
+                // TransitionComponent={Fade} 
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                
+                // 1. Container Styling (Glassmorphism & Shadow)
+                PaperProps={{
+                  elevation: 0,
+                  sx: {
+                    overflow: 'visible',
+                    filter: 'drop-shadow(0px 4px 20px rgba(0,0,0,0.1))', // Deep, soft shadow
+                    mt: 1.5,
+                    minWidth: 220,
+                    borderRadius: 3, // Modern rounded edges
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    
+                    // The "Speech Bubble" Arrow
+                    '&:before': {
+                      content: '""',
+                      display: 'block',
+                      position: 'absolute',
+                      top: 0,
+                      right: 14,
+                      width: 10,
+                      height: 10,
+                      bgcolor: 'background.paper',
+                      transform: 'translateY(-50%) rotate(45deg)',
+                      zIndex: 0,
+                      borderTop: '1px solid',
+                      borderLeft: '1px solid',
+                      borderColor: 'divider',
+                    },
+                  },
+                }}
+              >
+                {/* Option 1: Excel */}
+                <MenuItem 
+                  onClick={handleExportExcel}
+                  sx={{ 
+                    py: 1.5, // Taller rows for modern feel
+                    mx: 1,   // Spacing on sides for "floating" feel
+                    my: 0.5,
+                    borderRadius: 1.5,
+                    transition: 'all 0.3s ease',
+                    
+                    // HOVER EFFECTS
+                    '&:hover': {
+                      bgcolor: 'success.lighter', // Requires theme setup, or use 'rgba(0, 200, 83, 0.08)'
+                      transform: 'translateX(4px)', // Slight slide to the right
+                      
+                      // Target the Icon inside on hover
+                      '& .MuiListItemIcon-root': {
+                        transform: 'scale(1.2)', // Icon grows
+                        filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.2))'
+                      },
+                      // Target the Text inside on hover
+                      '& .MuiListItemText-primary': {
+                        color: 'success.dark',
+                        fontWeight: 'bold',
+                      }
+                    }
+                  }}
+                >
+                  <ListItemIcon sx={{ transition: 'transform 0.2s ease-in-out' }}>
+                    <IconifyIcon icon="vscode-icons:file-type-excel2" width={24} />
+                  </ListItemIcon>
+                  <ListItemText 
+                    primary="Export to Excel" 
+                    primaryTypographyProps={{ 
+                      variant: 'body2', 
+                      sx: { transition: 'color 0.2s ease' } 
+                    }} 
+                  />
+                </MenuItem>
+
+                {/* Option 2: Word */}
+                <MenuItem 
+                  onClick={handleExportWord}
+                  sx={{ 
+                    py: 1.5,
+                    mx: 1,
+                    my: 0.5,
+                    borderRadius: 1.5,
+                    transition: 'all 0.3s ease',
+                    
+                    // HOVER EFFECTS
+                    '&:hover': {
+                      bgcolor: 'info.lighter', // or 'rgba(24, 144, 255, 0.08)'
+                      transform: 'translateX(4px)',
+                      
+                      '& .MuiListItemIcon-root': {
+                        transform: 'scale(1.2) rotate(-5deg)', // Icon grows and tilts slightly
+                        filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.2))'
+                      },
+                      '& .MuiListItemText-primary': {
+                        color: 'info.dark',
+                        fontWeight: 'bold',
+                      }
+                    }
+                  }}
+                >
+                  <ListItemIcon sx={{ transition: 'transform 0.2s ease-in-out' }}>
+                    <IconifyIcon icon="vscode-icons:file-type-word" width={24} />
+                  </ListItemIcon>
+                  <ListItemText 
+                    primary="Export to Word" 
+                    primaryTypographyProps={{ 
+                      variant: 'body2', 
+                      sx: { transition: 'color 0.2s ease' } 
+                    }} 
+                  />
+                </MenuItem>
               </Menu>
 
-              <Tooltip title="Refresh" arrow>
+
+              <Tooltip title="Refresh Dataq" arrow>
                 <IconButton
                   onClick={onRefresh}
                   disabled={loading}

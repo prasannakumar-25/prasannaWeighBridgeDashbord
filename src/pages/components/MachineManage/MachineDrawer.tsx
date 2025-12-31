@@ -37,7 +37,7 @@ interface MachineDrawerProps {
   onClose: () => void;
   onSave: (data: Machine) => void;
   initialData: Machine | null;
-  vendors: Vendor[];
+  vendorList: Vendor[]; // Received from parent
   loading: boolean;
 }
 
@@ -46,7 +46,7 @@ const MachineDrawer: React.FC<MachineDrawerProps> = ({
   onClose,
   onSave,
   initialData,
-  vendors,
+  vendorList,
   loading,
 }) => {
   const theme = useTheme();
@@ -127,10 +127,10 @@ const MachineDrawer: React.FC<MachineDrawerProps> = ({
       newErrors.password = "Password is required";
       isValid = false;
     }
-    // if (!form.Vendor_Id || form.Vendor_Id <= 0) {
-    //   newErrors.Vendor_Id = "Vendor selection is required";
-    //   isValid = false;
-    // }
+    if (!form.Vendor_Id || form.Vendor_Id <= 0) {
+      newErrors.Vendor_Id = "Vendor selection is required";
+      isValid = false;
+    }
     if (form.Capacity_ton !== undefined && form.Capacity_ton < 0) {
       newErrors.Capacity_ton = "Capacity cannot be negative";
       isValid = false;
@@ -139,18 +139,6 @@ const MachineDrawer: React.FC<MachineDrawerProps> = ({
       newErrors.Machine_mac = "Mac address is required";
       isValid = false;
     }
-
-    // Estate Specific Validation
-    // if (form.Machine_type === "Estate") {
-    //   if (!form.estateVehicleType) {
-    //     newErrors.estateVehicleType = "Vehicle type is required for Estate";
-    //     isValid = false;
-    //   }
-    //   if (!form.estateMaterialType) {
-    //     newErrors.estateMaterialType = "Material type is required for Estate";
-    //     isValid = false;
-    //   }
-    // }
 
     setErrors(newErrors);
 
@@ -162,75 +150,10 @@ const MachineDrawer: React.FC<MachineDrawerProps> = ({
     return isValid;
   };
 
-  // const handleSubmit = async () => {
-  //   if(!validate()) return;
 
-  //   const payload ={
-  //      Vendor_Id: 1,
-  //      Machine_name: form.Machine_name,
-  //      Password: form.password,
-  //      Machine_mac: form.Machine_mac,
-  //      Machine_model: form.Machine_model,
-  //      Capacity_ton: form.Capacity_ton,
-  //      Last_service_date: form.Last_service_date,
-  //      Status: form.Status,
-  //      Machine_type: form.Machine_type,
-  //      Machine_location: form.Machine_location
-  //   }
-
-  //   try{
-  //     const response = await machineApi.addMachinDetails(payload)
-  //     console.log("response :", response)
-  //     if (response?.success) {
-  //       onSave(response.data);
-  //       onClose();
-  //     }
-  //   }
-  //   catch(error){
-  //     console.log("error :", error)
-  //   }
-
-  //   // console.log("---------------called-------------------")
-  //   try{
-        
-
-
-  //       const updateresponse = await machineApi.updataMachineDetailes(payload)
-  //       if(updateresponse.success)
-  //       {
-  //         console.log("successfully updated")
-  //       }
-  //       else 
-  //       {
-  //         console.log("Failed")
-  //       }
-  //     }
-  //   catch(error)
-  //   {
-  //     console.error(error)
-  //     throw error
-  //   }
-  // }
   
 
-  // Helper for the "OK" button inside Estate card
-  // const handleEstateConfirm = () => {
-  //   // Just a visual confirmation or partial validation
-  //   if (!form.estateVehicleType || !form.estateMaterialType) {
-  //      setErrors(prev => ({
-  //        ...prev,
-  //        estateVehicleType: !form.estateVehicleType ? "Required" : undefined,
-  //        estateMaterialType: !form.estateMaterialType ? "Required" : undefined
-  //      }));
-  //   } else {
-  //      // Clear estate errors if filled
-  //      setErrors(prev => ({
-  //        ...prev,
-  //        estateVehicleType: undefined,
-  //        estateMaterialType: undefined
-  //      }));
-  //   }
-  // };
+
   const handleSubmit = async () => {
     // 1. Run Validation
     if(!validate()) return;
@@ -396,23 +319,119 @@ const MachineDrawer: React.FC<MachineDrawerProps> = ({
               </Grid>
 
               <Grid item xs={12} sm={6}>
+                {/* <TextField
+                    label="Select Vendor"
+                    select
+                    fullWidth
+                    value={form.Vendor_Id === 0 ? "" : form.Vendor_Id} // Handle 0 as empty
+                    onChange={(e) => setField("Vendor_Id", Number(e.target.value))}
+                    disabled={loading}
+                    error={!!errors.Vendor_Id} // Show error if not selected
+                    helperText={errors.Vendor_Id}
+                    className="input-bg-color label-black"
+                >
+                    {vendorList.map((vendor) => (
+                        <MenuItem key={vendor.Vendor_Id} value={vendor.Vendor_Id}>
+                            {vendor.Vendor_name}
+                        </MenuItem>
+                    ))}
+                </TextField> */}
+
+
                 <TextField
-                  label="Associated Vendor"
-                  className="input-bg-color label-black"
+                  label="Select Vendor"
                   select
                   fullWidth
-                  value={form.Vendor_Id || 0}
+                  value={form.Vendor_Id === 0 ? "" : form.Vendor_Id}
                   onChange={(e) => setField("Vendor_Id", Number(e.target.value))}
                   disabled={loading}
                   error={!!errors.Vendor_Id}
                   helperText={errors.Vendor_Id}
+                  className="input-bg-color label-black"
+                  
+                  // 1. Customize the Dropdown Container (The "Paper")
+                  SelectProps={{
+                    MenuProps: {
+                      PaperProps: {
+                        sx: {
+                          borderRadius: 2,
+                          marginTop: 1,
+                          boxShadow: '0px 4px 20px rgba(0,0,0,0.1)', // Soft modern shadow
+                          border: '1px solid',
+                          borderColor: 'divider',
+                          maxHeight: 300, // Good for long lists
+                        },
+                      },
+                      // Remove default padding to handle our own margins
+                      MenuListProps: { sx: { py: 1 } } 
+                    },
+                  }}
                 >
-                  <MenuItem value={0} disabled sx={{ color: "text.secondary", fontStyle: "italic" }}>
-                    Select Vendor
+                  {/* Placeholder option (Optional, if you want a clear option) */}
+                  <MenuItem value="" disabled sx={{ fontSize: '0.85rem', color: 'text.secondary' }}>
+                    <em>Choose a vendor...</em>
                   </MenuItem>
-                  {vendors.map((v) => (
-                    <MenuItem key={v.Vendor_Id} value={v.Vendor_Id}>
-                      {v.vendorName}
+
+                  {vendorList.map((vendor) => (
+                    <MenuItem
+                      key={vendor.Vendor_Id}
+                      value={vendor.Vendor_Id}
+                      divider={false} // Turn off default lines
+                      sx={{
+                        // 2. The "Floating Pill" Shape
+                        borderRadius: '10px',
+                        margin: '6px 10px', // Creates space around the item
+                        padding: '10px 16px',
+                        transition: 'all 0.2s ease-in-out',
+
+                        // 3. Hover Effects
+                        '&:hover': {
+                          backgroundColor: 'primary.lighter', // or 'rgba(25, 118, 210, 0.08)'
+                          transform: 'translateX(5px)', // Slide right effect
+                          '& .vendor-avatar': {
+                            transform: 'scale(1.1) rotate(-5deg)', // Avatar animation
+                          }
+                        },
+
+                        // 4. Selected State Styling
+                        '&.Mui-selected': {
+                          backgroundColor: 'primary.main',
+                          color: 'common.white',
+                          '&:hover': {
+                            backgroundColor: 'primary.dark',
+                          },
+                          // Change sub-text color when selected
+                          '& .vendor-id-text': {
+                            color: 'rgba(255,255,255,0.7)', 
+                          }
+                        }
+                      }}
+                    >
+                      {/* Layout for Avatar + Text */}
+                      <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                        
+                        {/* Generated Avatar based on Name */}
+                        <Avatar 
+                          className="vendor-avatar"
+                          sx={{ 
+                            width: 28, 
+                            height: 28, 
+                            mr: 2, 
+                            fontSize: '0.75rem',
+                            bgcolor: 'primary.main', // or dynamic colors
+                            transition: 'transform 0.2s'
+                          }}
+                        >
+                          {vendor.Vendor_name ? vendor.Vendor_name.charAt(0).toUpperCase() : 'V'}
+                        </Avatar>
+
+                        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                          <Typography variant="body2" fontWeight={600}>
+                            {vendor.Vendor_name}
+                          </Typography>
+                          
+                        </Box>
+                      </Box>
                     </MenuItem>
                   ))}
                 </TextField>
@@ -527,79 +546,7 @@ const MachineDrawer: React.FC<MachineDrawerProps> = ({
                 />
               </Grid>
 
-              {/* ----- ESTATE CONFIGURATION CARD (Conditional) ----- */}
-              {/* <Grid item xs={12}>
-                <Collapse in={form.Machine_type === "Estate"} timeout="auto" unmountOnExit>
-                  <Paper
-                    elevation={0}
-                    sx={{
-                      p: 2,
-                      mt: 1,
-                      border: `1px dashed ${theme.palette.primary.main}`,
-                      bgcolor: alpha(theme.palette.primary.main, 0.04),
-                      borderRadius: 2,
-                    }}
-                  >
-                    <Stack direction="row" alignItems="center" spacing={1} mb={2}>
-                        <IconifyIcon icon="mdi:nature-people" color={theme.palette.primary.main} />
-                        <Typography variant="subtitle2" color="primary.main" fontWeight={700}>
-                            Estate Details
-                        </Typography>
-                    </Stack>
-
-                    <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                select
-                                label="Vehicle Option"
-                                fullWidth
-                                size="small"
-                                value={form.estateVehicleType || ""}
-                                onChange={(e) => setField("estateVehicleType", e.target.value)}
-                                error={!!errors.estateVehicleType}
-                                helperText={errors.estateVehicleType}
-                                sx={{ bgcolor: 'background.paper' }}
-                            >
-                                <MenuItem value="Own Vehicle">Own Vehicle</MenuItem>
-                                <MenuItem value="Other Vehicle">Other Vehicle</MenuItem>
-                            </TextField>
-                        </Grid>
-
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                select
-                                label="Material Type"
-                                fullWidth
-                                size="small"
-                                value={form.estateMaterialType || ""}
-                                onChange={(e) => setField("estateMaterialType", e.target.value)}
-                                error={!!errors.estateMaterialType}
-                                helperText={errors.estateMaterialType}
-                                sx={{ bgcolor: 'background.paper' }}
-                            >
-                                <MenuItem value="Own Leaf">Own Leaf</MenuItem>
-                                <MenuItem value="Baught Leaf">Baught Leaf</MenuItem>
-                                <MenuItem value="Dispatch Material">Dispatch Material</MenuItem>
-                                <MenuItem value="Other Material">Other Material</MenuItem>
-                            </TextField>
-                        </Grid>
-                        
-                        <Grid item xs={12} display="flex" justifyContent="flex-end">
-                             <Button 
-                                variant="contained" 
-                                size="small"
-                                color="primary" 
-                                onClick={handleEstateConfirm}
-                                startIcon={<IconifyIcon icon="mdi:check-circle-outline" />}
-                                sx={{ borderRadius: 20, px: 3, textTransform: 'none' }}
-                             >
-                                OK
-                             </Button>
-                        </Grid>
-                    </Grid>
-                  </Paper>
-                </Collapse>
-              </Grid> */}
+              
               {/* ------------------------------------------------ */}
 
               <Grid item xs={12}>

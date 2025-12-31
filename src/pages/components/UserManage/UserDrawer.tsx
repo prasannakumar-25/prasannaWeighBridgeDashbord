@@ -133,30 +133,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({
     return isValid;
   };
 
-  // const handleSubmit = async () => {
-  //   if (!validate()) return;
 
-  //   const payload = {
-  //     User_name: form.User_name,
-  //     Password: form.Password,
-  //     Full_name: form.Full_name,
-  //     Email: form.Email,
-  //     Mobile_number: form.Mobile_number,
-  //     Role: form.Role,
-  //   }
-  //   try{  
-  //     const response = await userApi.addUserDetails(payload)
-  //     if (response?.success) {
-  //       onSave(response.data);
-  //       onClose();
-  //     } else {
-  //     setSnackbarMessage(response.message || "Failed to Create user");
-  //     }
-  //   } catch (error) {
-  //     console.error("Create user error", error);
-  //     setGlobalError("Somthing went wrong. Please try again.");
-  //   }
-  //   };
 
   const handleSubmit = async () => {
     if(!validate()) return;

@@ -31,7 +31,7 @@ interface VehicleDrawerProps {
   onClose: () => void;
   onSave: (vehicleData: Vehicle) => void;
   initialData: Vehicle | null;
-  vendors: Vendor[];
+  vendorList: Vendor[]; // Received from parent
   machines: Machine[];
   loading?: boolean;
 }
@@ -41,7 +41,7 @@ const VehicleDrawer: React.FC<VehicleDrawerProps> = ({
   onClose,
   onSave,
   initialData,
-  vendors,
+  vendorList,
   machines,
   loading = false,
 }) => {
@@ -53,7 +53,7 @@ const VehicleDrawer: React.FC<VehicleDrawerProps> = ({
   const [form, setForm] = useState<Vehicle>({
     Vehicle_Id: 0,
     Vehicle_type: "",
-    Vendor_Id: undefined,
+    Vendor_Id: 0,
     customerId: undefined,
     Tare_weight: undefined,
     status: "Active",
@@ -110,38 +110,18 @@ const VehicleDrawer: React.FC<VehicleDrawerProps> = ({
     return isValid;
   };
 
-  // const handleSubmit = async () => {
-  //   if (!validate()) return;
-
-  //   const payload = {
-  //     Vendor_Id: 1,
-  //     Vehicle_type: form.Vehicle_type,
-  //     Tare_weight: form.Tare_weight,
-  //     Created_at: form.Created_at,
-  //   }
-  //   try {
-  //     const response = await vehicletypeApi.addVehicleDetails(payload)
-  //     if (response?.success) {
-  //       onSave(response.data);
-  //       onClose();
-  //     }
-  //   } catch (error) {
-  //     console.log("error:", error)
-  //   }
-  //   console.log("----------response----------")
-  // };
-  
   const handleSubmit = async () => {
     if (!validate()) return;
 
     const payload = {
-      Vendor_Id: 1,
+      Vendor_Id: form.Vendor_Id,
       Vehicle_type: form.Vehicle_type,
       Tare_weight: form.Tare_weight,
       Created_at: form.Created_at,
     }
     try {
       let response 
+      console.log("---response---", response)
       if (initialData && form.Vehicle_Id > 0) {
         response = await vehicletypeApi.updateVehicleDetails(form.Vehicle_Id, payload);
 
@@ -153,9 +133,10 @@ const VehicleDrawer: React.FC<VehicleDrawerProps> = ({
         onSave(response.data)
         onClose();
       }
-    }  catch (error) {
+    } catch (error) {
       console.error("Error submitting form:", error);
     }
+    console.log ("----------called----------")
   };
 
   const getVendorMachines = () => {
@@ -272,6 +253,7 @@ const VehicleDrawer: React.FC<VehicleDrawerProps> = ({
                   disabled={loading}
                   error={!!errors.Tare_weight}
                   helperText={errors.Tare_weight}
+                  className="input-bg-color label-black"
                   InputProps={{
                     endAdornment: <InputAdornment position="end">kg</InputAdornment>,
                   }}
@@ -286,20 +268,115 @@ const VehicleDrawer: React.FC<VehicleDrawerProps> = ({
               Configuration
             </Typography>
             <Stack spacing={2}>
+              
+              {/* <TextField
+                  label="Select Vendor"
+                  select
+                  fullWidth
+                  value={form.Vendor_Id === 0 ? "" : form.Vendor_Id} // Handle 0 as empty
+                  onChange={(e) => setField("Vendor_Id", Number(e.target.value))}
+                  disabled={loading}
+                  error={!!errors.Vendor_Id} // Show error if not selected
+                  helperText={errors.Vendor_Id}
+                  className="input-bg-color label-black"
+              >
+                  {vendorList.map((vendor) => (
+                      <MenuItem key={vendor.Vendor_Id} value={vendor.Vendor_Id}>
+                          {vendor.Vendor_name}
+                      </MenuItem>
+                  ))}
+              </TextField> */}
+
               <TextField
-                label="Associated Vendor"
+                label="Select Vendor"
                 select
                 fullWidth
-                value={form.Vendor_Id || 0}
-                onChange={(e) => setField("Vendor_Id", Number(e.target.value) || undefined)}
+                value={form.Vendor_Id === 0 ? "" : form.Vendor_Id}
+                onChange={(e) => setField("Vendor_Id", Number(e.target.value))}
                 disabled={loading}
+                error={!!errors.Vendor_Id}
+                helperText={errors.Vendor_Id}
+                className="input-bg-color label-black"
+                
+                // 1. Customize the Dropdown Container (The "Paper")
+                SelectProps={{
+                  MenuProps: {
+                    PaperProps: {
+                      sx: {
+                        borderRadius: 2,
+                        marginTop: 1,
+                        boxShadow: '0px 4px 20px rgba(0,0,0,0.1)', // Soft modern shadow
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        maxHeight: 300, // Good for long lists
+                      },
+                    },
+                    // Remove default padding to handle our own margins
+                    MenuListProps: { sx: { py: 1 } } 
+                  },
+                }}
               >
-                <MenuItem value={0} sx={{ color: 'text.secondary' }}>
-                  <em>No Vendor Linked</em>
+                {/* Placeholder option (Optional, if you want a clear option) */}
+                <MenuItem value="" disabled sx={{ fontSize: '0.85rem', color: 'text.secondary' }}>
+                  <em>Choose a vendor...</em>
                 </MenuItem>
-                {vendors.map((v) => (
-                  <MenuItem key={v.Vendor_Id} value={v.Vendor_Id}>
-                    {v.vendorName}
+                {vendorList.map((vendor) => (
+                  <MenuItem
+                    key={vendor.Vendor_Id}
+                    value={vendor.Vendor_Id}
+                    divider={false} // Turn off default lines
+                    sx={{
+                      // 2. The "Floating Pill" Shape
+                      borderRadius: '10px',
+                      margin: '6px 10px', // Creates space around the item
+                      padding: '10px 16px',
+                      transition: 'all 0.2s ease-in-out',
+                      // 3. Hover Effects
+                      '&:hover': {
+                        backgroundColor: 'primary.lighter', // or 'rgba(25, 118, 210, 0.08)'
+                        transform: 'translateX(5px)', // Slide right effect
+                        '& .vendor-avatar': {
+                          transform: 'scale(1.1) rotate(-5deg)', // Avatar animation
+                        }
+                      },
+                      // 4. Selected State Styling
+                      '&.Mui-selected': {
+                        backgroundColor: 'primary.main',
+                        color: 'common.white',
+                        '&:hover': {
+                          backgroundColor: 'primary.dark',
+                        },
+                        // Change sub-text color when selected
+                        '& .vendor-id-text': {
+                          color: 'rgba(255,255,255,0.7)', 
+                        }
+                      }
+                    }}
+                  >
+                    {/* Layout for Avatar + Text */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                      
+                      {/* Generated Avatar based on Name */}
+                      <Avatar 
+                        className="vendor-avatar"
+                        sx={{ 
+                          width: 28, 
+                          height: 28, 
+                          mr: 2, 
+                          fontSize: '0.75rem',
+                          bgcolor: 'primary.main', // or dynamic colors
+                          transition: 'transform 0.2s'
+                        }}
+                      >
+                        {vendor.Vendor_name ? vendor.Vendor_name.charAt(0).toUpperCase() : 'V'}
+                      </Avatar>
+                      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                        <Typography variant="body2" fontWeight={600}>
+                          {vendor.Vendor_name}
+                        </Typography>
+                        
+                      </Box>
+                    </Box>
                   </MenuItem>
                 ))}
               </TextField>

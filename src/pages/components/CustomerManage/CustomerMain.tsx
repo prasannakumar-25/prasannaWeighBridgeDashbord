@@ -13,9 +13,9 @@ import {
   Tooltip,
   useTheme,
   LinearProgress,
-  Menu,           // <--- ADDED
-  ListItemIcon,   // <--- ADDED
-  ListItemText,   // <--- ADDED
+  Menu,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
 import { 
   DataGrid, 
@@ -27,25 +27,24 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import IconifyIcon from "components/base/IconifyIcon";
 import { useSnackbar } from 'notistack';
-import * as XLSX from 'xlsx'; // <--- ADDED: Import XLSX for Excel export
+import * as XLSX from 'xlsx'; 
 
-// Import Types and Pagination
-import { User } from "pages/RegisterManagement/UserRegistration/UserRegister";  
-import CustomPagination from "../VehicleManage/CustomPagination"
-
+// Import Types
+import { Customer } from "pages/RegisterManagement/CustomerRegister/CustomerRegister";
+import CustomPagination from "../VehicleManage/CustomPagination";
 import "../../RegisterManagement/MachineRegister/MachineRegister.css";
 
-interface UserMainProps {
-  users: User[];
+interface CustomerMainProps {
+  customers: Customer[];
   onAdd: () => void;
-  onEdit: (user: User) => void;
-  onDelete: (User_Id: number) => void;
+  onEdit: (customer: Customer) => void;
+  onDelete: (Customer_Id: number) => void;
   loading: boolean;
   onRefresh: () => void;
 }
 
-const UserMain: React.FC<UserMainProps> = ({
-  users,
+const CustomerMain: React.FC<CustomerMainProps> = ({
+  customers,
   onAdd,
   onEdit,
   onDelete,
@@ -57,11 +56,11 @@ const UserMain: React.FC<UserMainProps> = ({
 
   // -- Local Filter State --
   const [search, setSearch] = useState('');
-  const [filterRole, setFilterRole] = useState<string>("");
+  const [filterStatus, setFilterStatus] = useState<string>("");
   const [fromDate, setFromDate] = useState<Dayjs | null>(null);
   const [toDate, setToDate] = useState<Dayjs | null>(null);
 
-  // -- DOWNLOAD MENU STATE (ADDED) --
+  // -- DOWNLOAD MENU STATE --
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const openDownloadMenu = Boolean(anchorEl);
 
@@ -79,101 +78,85 @@ const UserMain: React.FC<UserMainProps> = ({
 
   const handleClearFilters = () => {
     setSearch("");
-    setFilterRole("");
+    setFilterStatus("");
     setFromDate(null);
     setToDate(null);
   };
 
   // -- Filter Logic --
-  const filteredUsers = useMemo(() => {
-    return users.filter((u) => {
-      // 1. Text Search (Name or Email)
+  const filteredCustomers = useMemo(() => {
+    return customers.filter((c) => {
+      // 1. Text Search (Name, Code, Email)
+      const searchLower = search.toLowerCase();
       const matchesSearch =
-        u.Full_name.toLowerCase().includes(search.toLowerCase()) ||
-        u.Email.toLowerCase().includes(search.toLowerCase());
+        c.Customer_name.toLowerCase().includes(searchLower) ||
+        c.Customer_code.toLowerCase().includes(searchLower) ||
+        c.Email.toLowerCase().includes(searchLower);
 
-      // 2. Role Filter
-      const matchesRole = filterRole === "" || u.Role === filterRole;
+      // 2. Status Filter
+      const matchesStatus = filterStatus === "" || c.Status === filterStatus;
 
       // 3. Date Filter
-      const itemDate = dayjs(u.Created_at);
+      const itemDate = dayjs(c.Created_at);
       const matchesFromDate = fromDate ? itemDate.isValid() && (itemDate.isAfter(fromDate, 'day') || itemDate.isSame(fromDate, 'day')) : true;
       const matchesToDate = toDate ? itemDate.isValid() && (itemDate.isBefore(toDate, 'day') || itemDate.isSame(toDate, 'day')) : true;
 
-      return matchesSearch && matchesRole && matchesFromDate && matchesToDate;
+      return matchesSearch && matchesStatus && matchesFromDate && matchesToDate;
     });
-  }, [users, search, filterRole, fromDate, toDate]);
+  }, [customers, search, filterStatus, fromDate, toDate]);
 
   // -- PREPARE DATA FOR EXPORT --
   const getExportData = () => {
-    if (filteredUsers.length === 0) {
+    if (filteredCustomers.length === 0) {
       enqueueSnackbar("No data to download", { variant: "warning" });
       return null;
     }
-    return filteredUsers.map(u => {
-      return {
-        "ID": u.User_Id,
-        "Password": u.Password,
-        "Full Name": u.Full_name,
-        "Email": u.Email,
-        "Phone": u.Mobile_number,
-        "Role": u.Role,
-        "Joined Date": u.Created_at ? dayjs(u.Created_at).format('YYYY-MM-DD') : ""
-      };
-    });
+    return filteredCustomers.map(c => ({
+      "ID": c.Customer_Id,
+      "Code": c.Customer_code,
+      "Customer Name": c.Customer_name,
+      "Vendor": c.Vendor_name || c.Vendor_Id,
+      "Email": c.Email,
+      "Contact": c.Contact_number,
+      "GST No": c.Gst_number,
+      "Address": c.Address,
+      "Status": c.Status,
+      "Created Date": c.Created_at ? dayjs(c.Created_at).format('YYYY-MM-DD') : ""
+    }));
   };
 
-  // -- EXPORT TO EXCEL FUNCTION --
-  // const handleExportExcel = () => {
-  //   const data = getExportData();
-  //   if (!data) return;
-
-  //   const worksheet = XLSX.utils.json_to_sheet(data);
-  //   const workbook = XLSX.utils.book_new();
-  //   XLSX.utils.book_append_sheet(workbook, worksheet, "Users");
-    
-  //   // Generate buffer and trigger download
-  //   XLSX.writeFile(workbook, "User_Register.xlsx");
-    
-  //   handleCloseDownloadMenu();
-  //   enqueueSnackbar("Exported to Excel successfully", { variant: "success" });
-  // };
-
-  // -- EXPORT TO EXCEL FUNCTION --
+  // -- EXPORT TO EXCEL --
   const handleExportExcel = () => {
     const data = getExportData();
     if (!data) return;
 
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Users");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Customers");
     
-    // <--- CHANGED HERE: Create professional filename with timestamp
-    const fileName = `User_Register_${dayjs().format('YYYY-MM-DD_HH-mm')}.xlsx`;
-
-    // Generate buffer and trigger download
-    XLSX.writeFile(workbook, fileName); // <--- Use variable
+    const fileName = `Customer_Register_${dayjs().format('YYYY-MM-DD_HH-mm')}.xlsx`;
+    XLSX.writeFile(workbook, fileName);
     
     handleCloseDownloadMenu();
     enqueueSnackbar("Exported to Excel successfully", { variant: "success" });
   };
 
-  // -- EXPORT TO WORD FUNCTION --
+  // -- EXPORT TO WORD --
   const handleExportWord = () => {
     const data = getExportData();
     if (!data) return;
 
-    // Create an HTML Table string
     let tableHTML = `
       <table border="1" style="border-collapse: collapse; width: 100%;">
         <thead>
           <tr style="background-color: #f2f2f2;">
-            <th>ID</th>
-            <th>Full Name</th>
+            <th>Code</th>
+            <th>Name</th>
+            <th>Vendor</th>
             <th>Email</th>
-            <th>Phone</th>
-            <th>Role</th>
-            <th>Joined Date</th>
+            <th>Contact</th>
+            <th>GST</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>
@@ -182,37 +165,31 @@ const UserMain: React.FC<UserMainProps> = ({
     data.forEach((row) => {
       tableHTML += `
         <tr>
-          <td>${row["ID"]}</td>
-          <td>${row["Full Name"]}</td>
+          <td>${row["Code"]}</td>
+          <td>${row["Customer Name"]}</td>
+          <td>${row["Vendor"]}</td>
           <td>${row["Email"]}</td>
-          <td>${row["Phone"]}</td>
-          <td>${row["Role"]}</td>
-          <td>${row["Joined Date"]}</td>
+          <td>${row["Contact"]}</td>
+          <td>${row["GST No"]}</td>
+          <td>${row["Status"]}</td>
         </tr>
       `;
     });
 
     tableHTML += `</tbody></table>`;
 
-    // Wrap in standard HTML structure for Word
-    const preHtml = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>User Register</title></head><body>`;
+    const preHtml = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Customer Register</title></head><body>`;
     const postHtml = "</body></html>";
     const html = preHtml + tableHTML + postHtml;
 
-    // Create Blob and Download
-    const blob = new Blob(['\ufeff', html], {
-        type: 'application/msword'
-    });
-    
+    const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
     const url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(html);
-    const fileName = `User_Register_${dayjs().format('YYYY-MM-DD_HH-mm')}.doc`;
+    const fileName = `Customer_Register_${dayjs().format('YYYY-MM-DD_HH-mm')}.doc`;
     
-    // Create download link
     const downloadLink = document.createElement("a");
     document.body.appendChild(downloadLink);
     
     if (navigator.userAgent.indexOf("MSIE") !== -1 || navigator.appVersion.indexOf("Trident/") > 0) {
-        // IE Support
         (window.navigator as any).msSaveOrOpenBlob(blob, fileName);
     } else {
         downloadLink.href = url;
@@ -225,69 +202,71 @@ const UserMain: React.FC<UserMainProps> = ({
     enqueueSnackbar("Exported to Word successfully", { variant: "success" });
   };
 
-  // Helper for Chip Colors
-  const getRoleColor = (role: string) => {
-    switch (role) {
-      case "Admin": return "primary";
-      case "Operator": return "info";
-      case "Supervisor": return "default";
-      default: return "default";
-    }
+  const getStatusColor = (status: string) => {
+    return status === "Active" ? "success" : "error";
   };
 
-  // -- DataGrid Columns Definition --
-  const columns: GridColDef<User>[] = useMemo(() => [
+  // -- DataGrid Columns --
+  const columns: GridColDef<Customer>[] = useMemo(() => [
     {
-        field: 'Full_name',
-        headerName: 'Full Name',
-        minWidth: 160,
+        field: 'Customer_code',
+        headerName: 'Code',
+        width: 100,
+        renderCell: (params: GridRenderCellParams) => (
+            <Typography variant="body2" fontWeight={600} color="text.secondary">
+                {params.value}
+            </Typography>
+        )
+    },
+    {
+        field: 'Customer_name',
+        headerName: 'Customer Name',
+        minWidth: 120,
+        flex: 1,
         renderCell: (params: GridRenderCellParams) => (
             <Typography variant="subtitle2" fontWeight={600} color="text.primary">
                 {params.value}
             </Typography>
         )
     },
-    // {
-    //     field: 'Password',
-    //     headerName: 'Machine Password',
-    //     flex: 0.8,
-    //     minWidth: 140,
-    // },
+    {
+        field: 'Vendor_name', // Assuming mapped or using valueGetter
+        headerName: 'Vendor',
+        minWidth: 120,
+        renderCell: (params: GridRenderCellParams) => (
+            <Typography variant="body2" color="text.primary">
+                {params.row.Vendor_name || params.row.Vendor_Id}
+            </Typography>
+        )
+    },
     {
         field: 'Email',
-        headerName: 'Email Address',
-        flex: 1,
-        minWidth: 200,
+        headerName: 'Email',
+        minWidth: 180,
     },
     {
-        field: 'Mobile_number',
-        headerName: 'Phone Number',
-        flex: 0.8,
-        minWidth: 140,
+        field: 'Contact_number',
+        headerName: 'Phone',
+        width: 140,
     },
     {
-        field: 'Role',
-        headerName: 'Role',
-        width: 130,
+        field: 'Gst_number',
+        headerName: 'GST No',
+        width: 170,
+    },
+    {
+        field: 'Status',
+        headerName: 'Status',
+        width: 100,
         renderCell: (params: GridRenderCellParams) => (
             <Chip 
                 label={params.value} 
-                color={getRoleColor(params.value as string) as any}
+                color={getStatusColor(params.value as string) as any}
                 size="small" 
                 variant="outlined"
                 sx={{ fontWeight: 600 }}
             />
         )
-    },
-    {
-        field: 'Created_at',
-        headerName: 'Joined Date',
-        flex: 0.8,
-        minWidth: 140,
-        renderCell: (params: any) => {
-            if (!params.value) return "—";
-            return dayjs(params.value).format('DD/ MMM/ YYYY');
-        }
     },
     {
         field: 'actions',
@@ -307,7 +286,7 @@ const UserMain: React.FC<UserMainProps> = ({
                     <IconifyIcon icon="fluent:notepad-edit-16-regular" />
                 </IconButton>
                 <IconButton 
-                    onClick={() => onDelete(params.row.User_Id)} 
+                    onClick={() => onDelete(params.row.Customer_Id)} 
                     className="vm-btn vm-action-btn-delete"
                     color="error"
                 >
@@ -330,31 +309,29 @@ const UserMain: React.FC<UserMainProps> = ({
         {/* --- Header & Filters --- */}
         <Box sx={{ p: 2.5, borderBottom: `1px solid ${theme.palette.divider}` }}>
           
-          {/* Top Row */}
           <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
             <Typography variant="h4" fontWeight="bold" color="text.primary">
-                User Register
+                Customer Register
             </Typography>
-            <Tooltip title="Add User" placement="top" arrow>
+            <Tooltip title="Add Customer" placement="top" arrow>
             <Button
               variant="contained"
               onClick={onAdd}
-              startIcon={<IconifyIcon icon="gridicons:user-add"/>}
+              startIcon={<IconifyIcon icon="mdi:account-plus"/>}
               sx={{ px: 3, py: 1, borderRadius: 2 }}
             >
-              Add User
+              Add Customer
             </Button>
             </Tooltip>
           </Stack>
 
-          {/* Filter Grid */}
           <Grid container spacing={2} alignItems="center">
             {/* Search */}
             <Grid item xs={12} sm={6} md={3}>
               <TextField
                 variant="outlined"
                 label="Search"
-                placeholder="Search name or Email..."
+                placeholder="Name, Code or Email..."
                 size="small"
                 fullWidth
                 value={search}
@@ -371,87 +348,61 @@ const UserMain: React.FC<UserMainProps> = ({
 
             {/* From Date */}
             <Grid item xs={6} sm={3} md={2}>
-              <Typography variant="caption" fontWeight={300} fontSize={14} color="text.secondary" display="block" mb={0.5}>
-                  From Date
-              </Typography>
+              <Typography variant="caption" fontWeight={300} fontSize={14} color="text.secondary" display="block" mb={0.8}>From Date</Typography>
               <DatePicker
                   value={fromDate}
                   onChange={(newValue) => setFromDate(newValue)}
                   slotProps={{ 
-                      textField: { 
-                          size: "small", 
-                          fullWidth: true,
-                          InputProps: { sx: { borderRadius: 2, bgcolor: 'background.default' } }
-                      } 
+                      textField: { size: "small", fullWidth: true, InputProps: { sx: { borderRadius: 2 } } } 
                   }}
               />
             </Grid>
 
             {/* To Date */}
             <Grid item xs={6} sm={3} md={2}>
-              <Typography variant="caption" fontWeight={300} fontSize={14} color="text.secondary" display="block" mb={0.8}>
-                  To Date
-              </Typography>
+              <Typography variant="caption" fontWeight={300} fontSize={14} color="text.secondary" display="block" mb={0.8}>To Date</Typography>
               <DatePicker
                   value={toDate}
                   onChange={(newValue) => setToDate(newValue)}
                   slotProps={{ 
-                      textField: { 
-                          size: "small", 
-                          fullWidth: true,
-                          InputProps: { sx: { borderRadius: 2, bgcolor: 'background.default' } }
-                      } 
+                      textField: { size: "small", fullWidth: true, InputProps: { sx: { borderRadius: 2 } } } 
                   }}
               />
             </Grid>
 
-            {/* Role Filter Dropdown */}
+            {/* Status Filter */}
             <Grid item xs={12} sm={6} md={2}>
               <TextField
                 select
                 variant="outlined"
-                label="Filter Role"
-                placeholder="Filter Role"
+                label="Filter Status"
                 size="small"
                 fullWidth
-                value={filterRole}
-                onChange={(e) => setFilterRole(e.target.value)}
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                // sx={{ mt: 2.5 }} // Align with dates visually
               >
-                <MenuItem value=""><em>All Roles</em></MenuItem>
-                <MenuItem value="Admin">Admin</MenuItem>
-                <MenuItem value="Operator">Operator</MenuItem>
-                <MenuItem value="Supervisor">Supervisor</MenuItem>
+                <MenuItem value=""><em>All Status</em></MenuItem>
+                <MenuItem value="Active">Active</MenuItem>
+                <MenuItem value="Inactive">Inactive</MenuItem>
               </TextField>
             </Grid>
 
             {/* Actions */}
-            <Grid item xs={12} md={3} sx={{ display: 'flex', justifyContent: { xs: 'flex-start', md: 'flex-end' }, gap: 1 }}>
+            <Grid item xs={12} md={3} sx={{ display: 'flex', justifyContent: { xs: 'flex-start', md: 'flex-end' }, gap: 1, mt: 2.5 }}>
               <Tooltip title="Clear Filters" arrow>
-              <Button
-                variant="outlined"
-                color="secondary"
-                size="small"
-                onClick={handleClearFilters}
-                startIcon={<IconifyIcon icon="mdi:filter-off" />}
-              >
-              </Button>
+                <Button variant="outlined" color="secondary" size="small" onClick={handleClearFilters}>
+                  <IconifyIcon icon="mdi:filter-off" />
+                </Button>
               </Tooltip>
 
-              {/* --- DOWNLOAD DROPDOWN --- */}
               <Tooltip title="Export Options" arrow>
                 <IconButton
                   onClick={handleOpenDownloadMenu}
                   sx={{
                     color: 'primary.main',
-                    backgroundColor: 'rgba(228, 244, 253, 1)',
-                    backdropFilter: 'blur(6px)',
-                    WebkitBackdropFilter: 'blur(6px)',
-                
-                    '&:hover': {
-                      backgroundColor: '#9bcdfcff',
-                      backdropFilter: 'blur(10px)',
-                      WebkitBackdropFilter: 'blur(10px)',
-                    },
+                    bgcolor: 'rgba(228, 244, 253, 1)',
+                    '&:hover': { bgcolor: '#9bcdfcff' },
                   }}
                 >
                   <IconifyIcon icon="lucide:download" />
@@ -466,20 +417,14 @@ const UserMain: React.FC<UserMainProps> = ({
                 transformOrigin={{ vertical: 'top', horizontal: 'right' }}
               >
                 <MenuItem onClick={handleExportExcel}>
-                  <ListItemIcon>
-                    <IconifyIcon icon="vscode-icons:file-type-excel2" color="success.main" />
-                  </ListItemIcon>
+                  <ListItemIcon><IconifyIcon icon="vscode-icons:file-type-excel2" /></ListItemIcon>
                   <ListItemText>Export to Excel</ListItemText>
                 </MenuItem>
-                
                 <MenuItem onClick={handleExportWord}>
-                  <ListItemIcon>
-                    <IconifyIcon icon="vscode-icons:file-type-word" color="info.main" />
-                  </ListItemIcon>
+                  <ListItemIcon><IconifyIcon icon="vscode-icons:file-type-word" /></ListItemIcon>
                   <ListItemText>Export to Word</ListItemText>
                 </MenuItem>
               </Menu> */}
-
 
                <Menu
                   anchorEl={anchorEl}
@@ -605,15 +550,8 @@ const UserMain: React.FC<UserMainProps> = ({
                   disabled={loading}
                   sx={{
                     color: 'primary.main',
-                    backgroundColor: 'rgba(228, 244, 253, 1)',
-                    backdropFilter: 'blur(6px)',
-                    WebkitBackdropFilter: 'blur(6px)',
-                
-                    '&:hover': {
-                      backgroundColor: '#9bcdfcff',
-                      backdropFilter: 'blur(10px)',
-                      WebkitBackdropFilter: 'blur(10px)',
-                    },
+                    bgcolor: 'rgba(228, 244, 253, 1)',
+                    '&:hover': { bgcolor: '#9bcdfcff' },
                   }}
                 >
                   <IconifyIcon icon="charm:refresh" />
@@ -623,42 +561,36 @@ const UserMain: React.FC<UserMainProps> = ({
           </Grid>
         </Box>
 
-        {/* --- DATA GRID SECTION --- */}
-        <Box sx={{ height: 550, width: '100%' }}>
+        {/* --- DATA GRID --- */}
+        <Box sx={{ height: 530, width: '100%' }}>
             <DataGrid
-                rows={filteredUsers}
+                rows={filteredCustomers}
                 columns={columns}
-                getRowId={(row) => row.User_Id}
-                // Pagination Setup
+                getRowId={(row) => row.Customer_Id}
                 initialState={{
                     pagination: { paginationModel: { pageSize: 5, page: 0 } },
                 }}
                 pageSizeOptions={[5, 10, 20]}
-                
-                // Slots for Custom Components
                 slots={{
                     loadingOverlay: LinearProgress as GridSlots['loadingOverlay'],
                     pagination: CustomPagination,
                     noRowsOverlay: () => (
                         <Stack height="100%" alignItems="center" justifyContent="center" color="text.secondary">
                              <IconifyIcon icon="fluent:box-search-24-regular" width={40} height={40} sx={{mb:1, opacity:0.5}}/>
-                             <Typography variant="body2">No users found</Typography>
+                             <Typography variant="body2">No customers found</Typography>
                         </Stack>
                     ),
                 }}
-
-                // Styling
                 loading={loading}
                 getRowHeight={() => 70}
                 disableRowSelectionOnClick
                 disableColumnSelector
                 disableColumnMenu
                 disableColumnSorting
+
                 sx={{
                     border: 'none',
-                    '& .MuiDataGrid-cell': {
-                        borderBottom: `1px solid ${theme.palette.divider}`,
-                    },
+                    '& .MuiDataGrid-cell': { borderBottom: `1px solid ${theme.palette.divider}` },
                     '& .MuiDataGrid-columnHeaders': {
                         bgcolor: theme.palette.background.default,
                         borderBottom: `2px solid ${theme.palette.divider}`,
@@ -672,4 +604,4 @@ const UserMain: React.FC<UserMainProps> = ({
   );
 };
 
-export default UserMain;
+export default CustomerMain;

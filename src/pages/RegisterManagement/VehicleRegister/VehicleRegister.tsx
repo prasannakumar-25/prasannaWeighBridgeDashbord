@@ -23,11 +23,12 @@ import VehicleDrawer from "pages/components/VehicleManage/VehicleDawer";
 
 import IconifyIcon from "components/base/IconifyIcon";
 import vehicletypeApi from "services/vehicletypeApi";
+import vendorApi from "services/vendorApi";
 
 // --- Types ---
 export type Vendor = {
   Vendor_Id: number;
-  vendorName: string;
+  Vendor_name: string;
 };
 
 export type Machine = {
@@ -41,6 +42,7 @@ export type Vehicle = {
   Vehicle_Id: number;
   Vehicle_type: string;
   Vendor_Id?: number;
+  Vendor_name?: string;
   customerId?: number;
   Tare_weight?: number;
   status: "Active" | "Inactive";
@@ -77,7 +79,15 @@ const VehicleRegister: React.FC = () => {
         setVehicles(response.data);
       } else {
         setSnackbarMessage(response.message || "Failed to fetch vehicle data");
+        setSnackbarOpen(true);
       }
+
+        // 2. Fetch Vendors (For the dropdown in Drawer)
+      const vendorRes = await vendorApi.getVendordetails();
+      if (vendorRes.success) {
+        setVendors(vendorRes.data);
+      } 
+
     } catch (error: any) {
       const errorMessage = error.response?.data.message || "Something error occurred please try again later";
       setSnackbarMessage(errorMessage);
@@ -93,13 +103,6 @@ const VehicleRegister: React.FC = () => {
   useEffect(() => {
     setLoading(true);
     fetchVehicle();
-    // setVendors([
-    //     { id: 1, vendorName: "TechCorp Industries" },
-    //     { id: 2, vendorName: "Global Logistics" }
-    // ]);
-    // setMachines([
-    //     { id: 101, vendorId: 1, machineName: "Machine A", machineType: "Company" }
-    // ]);
     setLoading(false);
   }, []);
 
@@ -120,17 +123,17 @@ const VehicleRegister: React.FC = () => {
   };
 
 
-    const handleSaveVehicle = async () => {
-    setLoading(true);
-     await fetchVehicle();          // 🔹 refresh list from API
-     setSnackbarMessage(
-       editingVehicle
-         ? "Vehicle updated successfully"
-         : "Vehicle added successfully"
-     );
-     setSnackbarOpen(true);
-     handleCloseDrawer();           // 🔹 close drawer
-    
+  const handleSaveVehicle = async () => {
+  setLoading(true);
+   await fetchVehicle();          // 🔹 refresh list from API
+   setSnackbarMessage(
+     editingVehicle
+       ? "Vehicle updated successfully"
+       : "Vehicle added successfully"
+   );
+   setSnackbarOpen(true);
+   handleCloseDrawer();           // 🔹 close drawer
+   setLoading(false);
   }
 
   // --- Delete Logic ---
@@ -175,10 +178,10 @@ const VehicleRegister: React.FC = () => {
         {/* 1. Main Table View */}
         <VehicleMain 
             vehicles={vehicles}
-            vendors={vendors}
             onAdd={handleOpenAdd}
             onEdit={handleOpenEdit}
             onDelete={initiateDelete}
+            vendorList={vendors} // <--- Passing Vendors here
             onRefresh={fetchVehicle}
             loading={loading}
         />
@@ -190,7 +193,7 @@ const VehicleRegister: React.FC = () => {
             onClose={handleCloseDrawer}
             onSave={handleSaveVehicle}
             initialData={editingVehicle}
-            vendors={vendors}
+            vendorList={vendors} // <--- Passing Vendors here
             machines={machines}
             loading={loading}
         />

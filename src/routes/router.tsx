@@ -11,6 +11,7 @@ import UserRegister from 'pages/RegisterManagement/UserRegistration/UserRegister
 import VehicleRegister from 'pages/RegisterManagement/VehicleRegister/VehicleRegister';
 import IPCameraRegister from 'pages/RegisterManagement/IPCameraRegister/IPCameraRegister';
 import WeighbridgeRegister from 'pages/RegisterManagement/WeighbridgeRegister/WeighbridgeRegister';
+import CustomerRegister from 'pages/RegisterManagement/CustomerRegister/CustomerRegister';
 
 
 
@@ -66,7 +67,6 @@ const routes: RouteObject[] = [
         children: [
           {
             path: paths.login,
-            // element: <Login />,
             element: (
               // <MainLayout>
                 <Suspense fallback={<PageLoader />}>
@@ -166,6 +166,28 @@ const routes: RouteObject[] = [
             <MainLayout>
               <Suspense fallback={<PageLoader />}>
                 <UserRegister />
+              </Suspense>
+            </MainLayout>,
+          },
+          
+        ],
+      },
+      {
+        path: rootPaths.customerRoot,
+        element: (
+          // <AuthLayout>
+            <Suspense fallback={<PageLoader />}>
+              <Outlet />
+            </Suspense>
+          // </AuthLayout>
+        ),
+        children: [
+          {
+            path: paths.customer,
+            element: 
+            <MainLayout>
+              <Suspense fallback={<PageLoader />}>
+                <CustomerRegister />
               </Suspense>
             </MainLayout>,
           },

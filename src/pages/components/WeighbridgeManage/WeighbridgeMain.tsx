@@ -44,7 +44,7 @@ import "../../RegisterManagement/MachineRegister/MachineRegister.css";
 
 interface WeighbridgeMainProps {
   weighbridges: Weighbridge[];
-  machines: Machine[];
+  machineList: Machine[];
   onAdd: () => void;
   onEdit: (wb: Weighbridge) => void;
   onDelete: (Weighbridge_Id: number) => void;
@@ -54,7 +54,7 @@ interface WeighbridgeMainProps {
 
 const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
   weighbridges,
-  machines,
+  machineList,
   onAdd,
   onEdit,
   onDelete,
@@ -122,12 +122,18 @@ const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
     }
   };
 
-  // -- Filter Logic --
+// -- Filter Logic --
   const filteredWeighbridges = useMemo(() => {
     return weighbridges.filter((wb) => {
+      // SAFEGUARD: Check if property exists before lowercasing. 
+      // We use (wb.Field || "") to ensure it falls back to an empty string if null/undefined.
+      const serial = (wb.Serial_no || "").toString().toLowerCase();
+      const party = (wb.Party || "").toString().toLowerCase();
+      const searchLower = search.toLowerCase();
+
       const matchesSearch =
-        wb.Serial_no.toLowerCase().includes(search.toLowerCase()) ||
-        wb.Party.toLowerCase().includes(search.toLowerCase());
+        serial.includes(searchLower) ||
+        party.includes(searchLower);
 
       const matchesMachine = filterMachineId === "" || wb.Machine_Id === filterMachineId;
 
@@ -146,11 +152,11 @@ const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
       return null;
     }
     return filteredWeighbridges.map(wb => {
-      const machineName = machines.find(m => m.id === wb.Machine_Id)?.machineName || "Unknown";
+      // const machineName = machines.find(m => m.id === wb.Machine_Id)?.machineName || "Unknown";
       return {
         "ID": wb.Weighbridge_Id,
         "Serial No": wb.Serial_no,
-        "Machine": machineName,
+        "Machine": wb.Machine_name || wb.Machine_Id,
         "Port": wb.Port,
         "Baud Rate": wb.Baud_rate,
         "Data Bit": wb.Data_bit,
@@ -228,41 +234,16 @@ const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
             {params.value}
           </Typography>
         )
-        // renderCell: (params: GridRenderCellParams) => (
-        //     <Tooltip title="Double click for details" arrow placement="top">
-        //         <Box
-        //             sx={{
-        //                 width: '100%',
-        //                 height: '100%',
-        //                 display: 'flex',
-        //                 alignItems: 'center',
-        //                 cursor: 'pointer', // Show hand cursor
-        //                 '&:hover': {
-        //                     color: theme.palette.primary.main,
-        //                     fontWeight: 'bold'
-        //                 }
-        //             }}
-        //             // TRIGGER THE DETAIL CARD ON DOUBLE CLICK
-        //             onDoubleClick={(e) => {
-        //                 e.stopPropagation(); // Prevent row click events if any
-        //                 handleOpenDetail(params.row);
-        //             }}
-        //         >
-        //             <Typography variant="subtitle2" fontWeight={600} color="inherit">
-        //                 {params.value}
-        //             </Typography>
-        //         </Box>
-        //     </Tooltip>
-        // )
+      
     },
     {
-        field: 'machineId',
+        field: 'Machine_name',
         headerName: 'Machine',
         flex: 1,
         minWidth: 100,
         renderCell: (params: any) => {
              const row = params.row || params;
-             return machines.find(m => m.id === row.Machine_Id)?.machineName || "—";
+             return machineList.find(m => m.Machine_Id === row.Machine_Id)?.Machine_name || "—";
         }
     },
     {
@@ -326,7 +307,7 @@ const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
             </Stack>
         )
     }
-  ], [machines, onEdit, onDelete, theme]);
+  ], [machineList, onEdit, onDelete, theme]);
 
   // -- Helper for Detail Card Row --
   const DetailRow = ({ label, value, icon }: { label: string, value: string | React.ReactNode, icon: string }) => (
@@ -408,7 +389,7 @@ const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
             </Grid>
 
             <Grid item xs={6} sm={3} md={2}>
-              <Typography variant="caption" fontWeight={300} fontSize={14} color="text.secondary" display="block" mb={0.5}>
+              <Typography variant="caption" fontWeight={300} fontSize={14} color="text.secondary" display="block" mb={0.8}>
                   From Date
               </Typography>
               <DatePicker
@@ -430,7 +411,7 @@ const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
             </Grid>
 
             <Grid item xs={12} sm={6} md={2}>
-              <TextField
+              {/* <TextField
                 select
                 label="Filter Machine"
                 variant="outlined"
@@ -440,10 +421,91 @@ const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
                 onChange={(e) => setFilterMachineId(e.target.value === "" ? "" : Number(e.target.value))}
               >
                 <MenuItem value=""><em>All Machines</em></MenuItem>
-                {machines.map((m) => (
-                  <MenuItem key={m.id} value={m.id}>{m.machineName}</MenuItem>
+                {machineList.map((m) => (
+                  <MenuItem key={m.Machine_Id} value={m.Machine_Id}>{m.Machine_name}</MenuItem>
+                ))}
+              </TextField> */}
+
+              <TextField
+                select
+                label="Filter Machine"
+                placeholder="Filter Machine"
+                variant="outlined"
+                size="small"
+                fullWidth
+                value={filterMachineId}
+                onChange={(e) => setFilterMachineId(e.target.value === "" ? "" : Number(e.target.value))}
+                
+                // 1. Style the Dropdown Container (Matches Vendor Filter)
+                SelectProps={{
+                  MenuProps: {
+                    PaperProps: {
+                      sx: {
+                        mt: 1, // Add space between input and menu
+                        borderRadius: 2,
+                        boxShadow: '0px 4px 20px rgba(0,0,0,0.1)', // Soft modern shadow
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        maxHeight: 300,
+                      },
+                    },
+                    MenuListProps: { sx: { py: 1 } }, // Remove default padding for cleaner margins
+                  },
+                }}
+              >
+                {/* 2. Style "All Machines" Option */}
+                <MenuItem 
+                  value="" 
+                  sx={{
+                    borderRadius: 1.5,
+                    mx: 1, // Horizontal margin
+                    my: 0.5, // Vertical spacing
+                    py: 1,
+                    transition: 'all 0.2s ease-in-out',
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      transform: 'translateX(5px)', // Slide effect
+                    },
+                  }}
+                >
+                  <em style={{ fontWeight: 500, color: 'text.secondary' }}>All Machines</em>
+                </MenuItem>
+
+                {/* 3. Style Dynamic Options */}
+                {machineList.map((m) => (
+                  <MenuItem 
+                    key={m.Machine_Id} 
+                    value={m.Machine_Id}
+                    sx={{
+                      borderRadius: 1.5,
+                      mx: 1,
+                      my: 0.5,
+                      py: 1,
+                      transition: 'all 0.2s ease-in-out',
+                      
+                      // Hover State
+                      '&:hover': {
+                        bgcolor: 'primary.lighter', // Or use 'rgba(25, 118, 210, 0.08)'
+                        transform: 'translateX(5px)',
+                        fontWeight: 600,
+                      },
+
+                      // Selected State
+                      '&.Mui-selected': {
+                        bgcolor: 'primary.main',
+                        color: 'common.white',
+                        fontWeight: 600,
+                        '&:hover': {
+                          bgcolor: 'primary.dark',
+                        },
+                      }
+                    }}
+                  >
+                    {m.Machine_name}
+                  </MenuItem>
                 ))}
               </TextField>
+
             </Grid>
 
             <Grid item xs={12} md={3} sx={{ display: 'flex', justifyContent: { xs: 'flex-start', md: 'flex-end' }, gap: 1 }}>
@@ -457,12 +519,131 @@ const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
                 </IconButton>
               </Tooltip>
 
-              <Menu anchorEl={anchorEl} open={openDownloadMenu} onClose={handleCloseDownloadMenu} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} transformOrigin={{ vertical: 'top', horizontal: 'right' }}>
+              {/* <Menu anchorEl={anchorEl} open={openDownloadMenu} onClose={handleCloseDownloadMenu} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} transformOrigin={{ vertical: 'top', horizontal: 'right' }}>
                 <MenuItem onClick={handleExportExcel}><ListItemIcon><IconifyIcon icon="vscode-icons:file-type-excel2" color="success.main" /></ListItemIcon><ListItemText>Export to Excel</ListItemText></MenuItem>
                 <MenuItem onClick={handleExportWord}><ListItemIcon><IconifyIcon icon="vscode-icons:file-type-word" color="info.main" /></ListItemIcon><ListItemText>Export to Word</ListItemText></MenuItem>
+              </Menu> */}
+
+
+              <Menu
+                anchorEl={anchorEl}
+                open={openDownloadMenu}
+                onClose={handleCloseDownloadMenu}
+                // TransitionComponent={Fade} 
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                
+                // 1. Container Styling (Glassmorphism & Shadow)
+                PaperProps={{
+                  elevation: 0,
+                  sx: {
+                    overflow: 'visible',
+                    filter: 'drop-shadow(0px 4px 20px rgba(0,0,0,0.1))', // Deep, soft shadow
+                    mt: 1.5,
+                    minWidth: 220,
+                    borderRadius: 3, // Modern rounded edges
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    
+                    // The "Speech Bubble" Arrow
+                    '&:before': {
+                      content: '""',
+                      display: 'block',
+                      position: 'absolute',
+                      top: 0,
+                      right: 14,
+                      width: 10,
+                      height: 10,
+                      bgcolor: 'background.paper',
+                      transform: 'translateY(-50%) rotate(45deg)',
+                      zIndex: 0,
+                      borderTop: '1px solid',
+                      borderLeft: '1px solid',
+                      borderColor: 'divider',
+                    },
+                  },
+                }}
+              >
+                {/* Option 1: Excel */}
+                <MenuItem 
+                  onClick={handleExportExcel}
+                  sx={{ 
+                    py: 1.5, // Taller rows for modern feel
+                    mx: 1,   // Spacing on sides for "floating" feel
+                    my: 0.5,
+                    borderRadius: 1.5,
+                    transition: 'all 0.3s ease',
+                    
+                    // HOVER EFFECTS
+                    '&:hover': {
+                      bgcolor: 'success.lighter', // Requires theme setup, or use 'rgba(0, 200, 83, 0.08)'
+                      transform: 'translateX(4px)', // Slight slide to the right
+                      
+                      // Target the Icon inside on hover
+                      '& .MuiListItemIcon-root': {
+                        transform: 'scale(1.2)', // Icon grows
+                        filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.2))'
+                      },
+                      // Target the Text inside on hover
+                      '& .MuiListItemText-primary': {
+                        color: 'success.dark',
+                        fontWeight: 'bold',
+                      }
+                    }
+                  }}
+                >
+                  <ListItemIcon sx={{ transition: 'transform 0.2s ease-in-out' }}>
+                    <IconifyIcon icon="vscode-icons:file-type-excel2" width={24} />
+                  </ListItemIcon>
+                  <ListItemText 
+                    primary="Export to Excel" 
+                    primaryTypographyProps={{ 
+                      variant: 'body2', 
+                      sx: { transition: 'color 0.2s ease' } 
+                    }} 
+                  />
+                </MenuItem>
+
+                {/* Option 2: Word */}
+                <MenuItem 
+                  onClick={handleExportWord}
+                  sx={{ 
+                    py: 1.5,
+                    mx: 1,
+                    my: 0.5,
+                    borderRadius: 1.5,
+                    transition: 'all 0.3s ease',
+                    
+                    // HOVER EFFECTS
+                    '&:hover': {
+                      bgcolor: 'info.lighter', // or 'rgba(24, 144, 255, 0.08)'
+                      transform: 'translateX(4px)',
+                      
+                      '& .MuiListItemIcon-root': {
+                        transform: 'scale(1.2) rotate(-5deg)', // Icon grows and tilts slightly
+                        filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.2))'
+                      },
+                      '& .MuiListItemText-primary': {
+                        color: 'info.dark',
+                        fontWeight: 'bold',
+                      }
+                    }
+                  }}
+                >
+                  <ListItemIcon sx={{ transition: 'transform 0.2s ease-in-out' }}>
+                    <IconifyIcon icon="vscode-icons:file-type-word" width={24} />
+                  </ListItemIcon>
+                  <ListItemText 
+                    primary="Export to Word" 
+                    primaryTypographyProps={{ 
+                      variant: 'body2', 
+                      sx: { transition: 'color 0.2s ease' } 
+                    }} 
+                  />
+                </MenuItem>
               </Menu>
 
-              <Tooltip title="Refresh" arrow>
+              <Tooltip title="Refresh Data" arrow>
                 <IconButton onClick={onRefresh} disabled={loading} sx={{ color: 'primary.main', bgcolor: 'rgba(228, 244, 253, 1)', '&:hover': { bgcolor: '#9bcdfcff' } }}>
                   <IconifyIcon icon="charm:refresh" />
                 </IconButton>
@@ -543,7 +724,7 @@ const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
                             <Grid item xs={12}>
                                 <DetailRow 
                                     label="Machine Name" 
-                                    value={machines.find(m => m.id === selectedWeighbridge.Machine_Id)?.machineName || "Unknown"} 
+                                    value={machineList.find(m => m.Machine_Id === selectedWeighbridge.Machine_Id)?.Machine_Id || "Unknown"} 
                                     icon="mdi:factory"
                                 />
                                 <DetailRow 

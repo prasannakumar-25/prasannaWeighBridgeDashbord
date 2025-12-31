@@ -37,7 +37,7 @@ import "../../RegisterManagement/MachineRegister/MachineRegister.css";
 
 interface IPCameraMainProps {
   cameras: IPCamera[];
-  machines: Machine[];
+  machineList: Machine[];
   onAdd: () => void;
   onEdit: (cam: IPCamera) => void;
   onDelete: (Camera_Id: number) => void;
@@ -47,7 +47,7 @@ interface IPCameraMainProps {
 
 const IPCameraMain: React.FC<IPCameraMainProps> = ({
   cameras,
-  machines,
+  machineList,
   onAdd,
   onEdit,
   onDelete,
@@ -113,11 +113,11 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
       return null;
     }
     return filteredCameras.map(c => {
-      const machineName = machines.find(m => m.id === c.Machine_Id)?.machineName || "Unknown";
+      // const machineName = machines.find(m => m.id === c.Machine_Id)?.machineName || "Unknown";
       return {
         "ID": c.Camera_Id,
         "Camera Name": c.Camera_name,
-        "Machine": machineName,
+        "Machine": c.Machine_name || c.Machine_Id,
         "IP Address": c.IP_address,
         "MAC Address": c.Mac_address || "",
         "RTSP URL": c.RTSP_URL || "",
@@ -240,14 +240,19 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
         )
     },
     {
-        field: 'Machine_Id',
+        field: 'Machine_name',
         headerName: 'Machine',
         flex: 1,
         minWidth: 150,
-        renderCell: (params: any) => {
-            const row = params.row || params;
-            return machines.find(m => m.id === row.Machine_Id)?.machineName || "—";
-        }
+        renderCell: (params: GridRenderCellParams) => (
+            <Typography variant="body2" color="text.primary">
+                {params.row.Machine_name || params.row.Machine_Id}
+            </Typography>
+        )
+        // renderCell: (params: any) => {
+        //     const row = params.row || params;
+        //     return machines.find(m => m.id === row.Machine_Id)?.machineName || "—";
+        // }
     },
     {
         field: 'IP_address',
@@ -354,7 +359,7 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
             </Stack>
         )
     }
-  ], [machines, onEdit, onDelete]);
+  ], [machineList, onEdit, onDelete]);
 
   return (
     <Stack
@@ -410,7 +415,7 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
 
             {/* From Date */}
             <Grid item xs={6} sm={3} md={2}>
-              <Typography variant="caption" fontWeight={300} fontSize={14} color="text.secondary" display="block" mb={0.5}>
+              <Typography variant="caption" fontWeight={300} fontSize={14} color="text.secondary" display="block" mb={0.8}>
                   From Date
               </Typography>
               <DatePicker
@@ -446,7 +451,7 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
 
             {/* Machine Filter Dropdown */}
             <Grid item xs={12} sm={6} md={2}>
-              <TextField
+              {/* <TextField
                 select
                 label="Filter Machine"
                 placeholder="Filter Machine"
@@ -457,10 +462,91 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
                 onChange={(e) => setFilterMachineId(e.target.value === "" ? "" : Number(e.target.value))}
               >
                 <MenuItem value=""><em>All Machines</em></MenuItem>
-                {machines.map((m) => (
-                  <MenuItem key={m.id} value={m.id}>{m.machineName}</MenuItem>
+                {machineList.map((m) => (
+                  <MenuItem key={m.Machine_Id} value={m.Machine_Id}>{m.Machine_name}</MenuItem>
+                ))}
+              </TextField> */}
+
+              <TextField
+                select
+                label="Filter Machine"
+                placeholder="Filter Machine"
+                variant="outlined"
+                size="small"
+                fullWidth
+                value={filterMachineId}
+                onChange={(e) => setFilterMachineId(e.target.value === "" ? "" : Number(e.target.value))}
+                
+                // 1. Style the Dropdown Container (Matches Vendor Filter)
+                SelectProps={{
+                  MenuProps: {
+                    PaperProps: {
+                      sx: {
+                        mt: 1, // Add space between input and menu
+                        borderRadius: 2,
+                        boxShadow: '0px 4px 20px rgba(0,0,0,0.1)', // Soft modern shadow
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        maxHeight: 300,
+                      },
+                    },
+                    MenuListProps: { sx: { py: 1 } }, // Remove default padding for cleaner margins
+                  },
+                }}
+              >
+                {/* 2. Style "All Machines" Option */}
+                <MenuItem 
+                  value="" 
+                  sx={{
+                    borderRadius: 1.5,
+                    mx: 1, // Horizontal margin
+                    my: 0.5, // Vertical spacing
+                    py: 1,
+                    transition: 'all 0.2s ease-in-out',
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      transform: 'translateX(5px)', // Slide effect
+                    },
+                  }}
+                >
+                  <em style={{ fontWeight: 500, color: 'text.secondary' }}>All Machines</em>
+                </MenuItem>
+
+                {/* 3. Style Dynamic Options */}
+                {machineList.map((m) => (
+                  <MenuItem 
+                    key={m.Machine_Id} 
+                    value={m.Machine_Id}
+                    sx={{
+                      borderRadius: 1.5,
+                      mx: 1,
+                      my: 0.5,
+                      py: 1,
+                      transition: 'all 0.2s ease-in-out',
+                      
+                      // Hover State
+                      '&:hover': {
+                        bgcolor: 'primary.lighter', // Or use 'rgba(25, 118, 210, 0.08)'
+                        transform: 'translateX(5px)',
+                        fontWeight: 600,
+                      },
+
+                      // Selected State
+                      '&.Mui-selected': {
+                        bgcolor: 'primary.main',
+                        color: 'common.white',
+                        fontWeight: 600,
+                        '&:hover': {
+                          bgcolor: 'primary.dark',
+                        },
+                      }
+                    }}
+                  >
+                    {m.Machine_name}
+                  </MenuItem>
                 ))}
               </TextField>
+
             </Grid>
 
             {/* Actions */}
@@ -497,7 +583,7 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
                 </IconButton>
               </Tooltip>
 
-              <Menu
+              {/* <Menu
                 anchorEl={anchorEl}
                 open={openDownloadMenu}
                 onClose={handleCloseDownloadMenu}
@@ -517,9 +603,127 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
                   </ListItemIcon>
                   <ListItemText>Export to Word</ListItemText>
                 </MenuItem>
+              </Menu> */}
+
+              <Menu
+                anchorEl={anchorEl}
+                open={openDownloadMenu}
+                onClose={handleCloseDownloadMenu}
+                // TransitionComponent={Fade} 
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                
+                // 1. Container Styling (Glassmorphism & Shadow)
+                PaperProps={{
+                  elevation: 0,
+                  sx: {
+                    overflow: 'visible',
+                    filter: 'drop-shadow(0px 4px 20px rgba(0,0,0,0.1))', // Deep, soft shadow
+                    mt: 1.5,
+                    minWidth: 220,
+                    borderRadius: 3, // Modern rounded edges
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    
+                    // The "Speech Bubble" Arrow
+                    '&:before': {
+                      content: '""',
+                      display: 'block',
+                      position: 'absolute',
+                      top: 0,
+                      right: 14,
+                      width: 10,
+                      height: 10,
+                      bgcolor: 'background.paper',
+                      transform: 'translateY(-50%) rotate(45deg)',
+                      zIndex: 0,
+                      borderTop: '1px solid',
+                      borderLeft: '1px solid',
+                      borderColor: 'divider',
+                    },
+                  },
+                }}
+              >
+                {/* Option 1: Excel */}
+                <MenuItem 
+                  onClick={handleExportExcel}
+                  sx={{ 
+                    py: 1.5, // Taller rows for modern feel
+                    mx: 1,   // Spacing on sides for "floating" feel
+                    my: 0.5,
+                    borderRadius: 1.5,
+                    transition: 'all 0.3s ease',
+                    
+                    // HOVER EFFECTS
+                    '&:hover': {
+                      bgcolor: 'success.lighter', // Requires theme setup, or use 'rgba(0, 200, 83, 0.08)'
+                      transform: 'translateX(4px)', // Slight slide to the right
+                      
+                      // Target the Icon inside on hover
+                      '& .MuiListItemIcon-root': {
+                        transform: 'scale(1.2)', // Icon grows
+                        filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.2))'
+                      },
+                      // Target the Text inside on hover
+                      '& .MuiListItemText-primary': {
+                        color: 'success.dark',
+                        fontWeight: 'bold',
+                      }
+                    }
+                  }}
+                >
+                  <ListItemIcon sx={{ transition: 'transform 0.2s ease-in-out' }}>
+                    <IconifyIcon icon="vscode-icons:file-type-excel2" width={24} />
+                  </ListItemIcon>
+                  <ListItemText 
+                    primary="Export to Excel" 
+                    primaryTypographyProps={{ 
+                      variant: 'body2', 
+                      sx: { transition: 'color 0.2s ease' } 
+                    }} 
+                  />
+                </MenuItem>
+
+                {/* Option 2: Word */}
+                <MenuItem 
+                  onClick={handleExportWord}
+                  sx={{ 
+                    py: 1.5,
+                    mx: 1,
+                    my: 0.5,
+                    borderRadius: 1.5,
+                    transition: 'all 0.3s ease',
+                    
+                    // HOVER EFFECTS
+                    '&:hover': {
+                      bgcolor: 'info.lighter', // or 'rgba(24, 144, 255, 0.08)'
+                      transform: 'translateX(4px)',
+                      
+                      '& .MuiListItemIcon-root': {
+                        transform: 'scale(1.2) rotate(-5deg)', // Icon grows and tilts slightly
+                        filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.2))'
+                      },
+                      '& .MuiListItemText-primary': {
+                        color: 'info.dark',
+                        fontWeight: 'bold',
+                      }
+                    }
+                  }}
+                >
+                  <ListItemIcon sx={{ transition: 'transform 0.2s ease-in-out' }}>
+                    <IconifyIcon icon="vscode-icons:file-type-word" width={24} />
+                  </ListItemIcon>
+                  <ListItemText 
+                    primary="Export to Word" 
+                    primaryTypographyProps={{ 
+                      variant: 'body2', 
+                      sx: { transition: 'color 0.2s ease' } 
+                    }} 
+                  />
+                </MenuItem>
               </Menu>
 
-              <Tooltip title="Refresh" arrow>
+              <Tooltip title="Refresh Data" arrow>
                 <IconButton
                   onClick={onRefresh}
                   disabled={loading}

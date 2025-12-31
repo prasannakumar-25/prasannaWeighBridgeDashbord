@@ -186,7 +186,7 @@ const Topbar = ({ handleDrawerToggle }: TopbarProps): ReactElement => {
         width: { lg: `calc(100% - ${drawerWidth}px + 18px)` },
         ml: { lg: `${drawerWidth}px` },
         boxShadow: 'none',
-        bgcolor: 'transparent', // Matches your screenshot background
+        // bgcolor: 'transparent', 
       }}
     >
       <Toolbar
@@ -199,7 +199,7 @@ const Topbar = ({ handleDrawerToggle }: TopbarProps): ReactElement => {
         <Stack direction="row" gap={1}>
           <Link href="/" width={40} height={40} display={{ xs: 'block', lg: 'none' }}>
             <IconButton color="inherit" sx={{ p: 0.75, bgcolor: 'inherit' }}>
-              <Image src={Acutuz} width={1} height={1} />
+              <Image src={Acutuz} width={1} height={1} />   
             </IconButton>
           </Link>
           <IconButton
@@ -228,7 +228,7 @@ const Topbar = ({ handleDrawerToggle }: TopbarProps): ReactElement => {
           justifyContent={'center'}
           position="absolute"
           left="50%"
-          sx={{ transform: 'translateX(-50%)' }}
+          sx={{ transform: 'translateX(-90%)' }}
         >
           <Typography 
             variant="h1" 

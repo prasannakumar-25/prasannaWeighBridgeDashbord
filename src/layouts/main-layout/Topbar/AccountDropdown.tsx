@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import IconifyIcon from 'components/base/IconifyIcon';
 import { MouseEvent, ReactElement, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 // import profile from 'assets/profile/profile.jpg';
 
 const AccountDropdown = (): ReactElement => {
@@ -22,6 +23,13 @@ const AccountDropdown = (): ReactElement => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const navigate = useNavigate ()
+
+  const handleLogOut=()=>{
+    navigate("/authentication/login");
+  }
+
   return (
     <>
       <Button
@@ -68,7 +76,7 @@ const AccountDropdown = (): ReactElement => {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <MenuItem onClick={handleClose}>
+        {/* <MenuItem onClick={handleClose}>
           <ListItemIcon>
             <IconifyIcon icon="ion:home-sharp" />
           </ListItemIcon>
@@ -83,8 +91,8 @@ const AccountDropdown = (): ReactElement => {
           >
             Home
           </ListItemText>
-        </MenuItem>
-        <MenuItem onClick={handleClose}>
+        </MenuItem> */}
+        {/* <MenuItem onClick={handleClose}>
           <ListItemIcon>
             <IconifyIcon icon="mdi:account-outline" />
           </ListItemIcon>
@@ -99,8 +107,8 @@ const AccountDropdown = (): ReactElement => {
           >
             Profile
           </ListItemText>
-        </MenuItem>
-        <MenuItem onClick={handleClose}>
+        </MenuItem> */}
+        {/* <MenuItem onClick={handleClose}>
           <ListItemIcon>
             <IconifyIcon icon="material-symbols:settings" />
           </ListItemIcon>
@@ -115,8 +123,8 @@ const AccountDropdown = (): ReactElement => {
           >
             Settings
           </ListItemText>
-        </MenuItem>
-        <Divider />
+        </MenuItem> */}
+        {/* <Divider /> */}
         <MenuItem
           onClick={handleClose}
           disableRipple
@@ -126,7 +134,7 @@ const AccountDropdown = (): ReactElement => {
           <ListItemIcon>
             <IconifyIcon icon="ri:logout-circle-line" color="error.main" />
           </ListItemIcon>
-          <ListItemText
+          <ListItemText onClick={handleLogOut}
             sx={(theme) => ({
               '& .MuiListItemText-primary': {
                 fontSize: theme.typography.body1.fontSize,
@@ -134,6 +142,7 @@ const AccountDropdown = (): ReactElement => {
                 fontWeight: theme.typography.body1.fontWeight,
               },
             })}
+            
           >
             Logout
           </ListItemText>

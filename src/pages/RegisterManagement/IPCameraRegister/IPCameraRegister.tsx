@@ -24,16 +24,18 @@ import IPCameraDrawer from "pages/components/IPCameraManage/IPCameraDrawer";
 import "../../RegisterManagement/MachineRegister/MachineRegister.css";
 import IconifyIcon from "components/base/IconifyIcon";
 import ipCameraApi from "services/ipCameraApi";
+import machineApi from "services/machineApi";
 
 // --- Global Types ---
 export type Machine = {
-  id: number;
-  machineName: string;
+  Machine_Id: number;
+  Machine_name: string;
 };
 
 export type IPCamera = {
   Camera_Id: number;
   Machine_Id: number;
+  Machine_name?: string;
   Camera_name: string;
   IP_address: string;
   RTSP_URL: string;
@@ -75,7 +77,15 @@ const IPCameraRegister: React.FC = () => {
         console.log("Ip camera Data", response.data)
       } else {
         setSnackbarMessage(response.message || "Failed to register IPcamera");
+        setSnackbarOpen(true);
       }
+      
+      // 2. Fetch Vendors (For the dropdown in Drawer)
+      const machineRes = await machineApi.getMachineDetails();
+      if (machineRes.success) {
+        setMachines(machineRes.data);
+      } 
+
     } catch (error: any) {
       const errorMessage = error.response?.data.message || "Somthing error occured try again later";
       setSnackbarMessage(errorMessage)
@@ -91,13 +101,6 @@ const IPCameraRegister: React.FC = () => {
   useEffect(() => {
     setLoading(true);
     fetchCamera();
-    setMachines([
-        { id: 1, machineName: "Machine A" },
-        { id: 2, machineName: "Machine B" },
-        { id: 3, machineName: "Machine C" },
-    ]);
-    fetchCamera();
-
     setLoading(false);
   }, []);
 
@@ -117,31 +120,42 @@ const IPCameraRegister: React.FC = () => {
     setEditingCamera(null);
   };
 
-  // const handleSave = (formData: IPCamera) => {
-  //   setLoading(true);
-  //   // Simulate API call
-  //   setTimeout(() => {
-  //     if (editingCamera) {
-  //       setCameras((prev) => prev.map((c) => (c.Camera_Id === editingCamera.Camera_Id ? { ...formData, Camera_Id: editingCamera.Camera_Id } : c)));
-  //       setSnackbarMessage("Camera updated successfully");
-  //     } else {
-  //       const newCamera: IPCamera = { ...formData, Camera_Id: Date.now() };
-  //       setCameras((prev) => [newCamera, ...prev]);
-  //       setSnackbarMessage("Camera added successfully");
-  //     }
-  //     setLoading(false);
-  //     setSnackbarOpen(true);
-  //     handleCloseDrawer();
-  //     }, 400);
-  // };
 
   const handleSave = async () => {
     setLoading(true);
     await fetchCamera();
-    setSnackbarMessage( editingCamera? "IPcamera updated successfully": "IPCamera added successfully");
+    setSnackbarMessage( editingCamera
+      ? "IPcamera updated successfully"
+      : "IPCamera added successfully");
     setSnackbarOpen(true);
     handleCloseDrawer();
   }
+
+    // const handleSave = (formData: IPCamera) => {
+    //   setLoading(true);
+    //   setTimeout(() => {
+    //     if (editingCamera) {
+    //       setCameras((prev) => 
+    //         prev.map((ip) => (ip.Machine_Id === editingCamera.Machine_Id ? { ...formData, Machine_Id: editingCamera.Machine_Id } : ip))
+    //       );
+    //       setSnackbarMessage("IPcamer updated successfully");
+    //       setSnackbarOpen(true);
+    //     } else {
+    //       const selectedVendor = machines.find(v => v.Machine_Id === formData.Machine_Id);
+    //       const newCustomer: IPCamera = { 
+    //           ...formData, 
+    //           Machine_Id: Date.now(),
+    //           Machine_name : selectedVendor?.Machine_name 
+    //       };
+    //       setCameras((prev) => [newCustomer, ...prev]);
+    //       setSnackbarMessage("IP Camera added successfully");
+    //       setSnackbarOpen(true);
+    //     }
+    //     setSnackbarOpen(true);
+    //     handleCloseDrawer();
+    //     setLoading(false);
+    //   }, 400);
+    // };
 
   // --- Delete Logic ---
   const initiateDelete = (Camera_Id: number) => {
@@ -180,7 +194,7 @@ const IPCameraRegister: React.FC = () => {
         {/* 1. Main View (DataGrid & Filters) */}
         <IPCameraMain
           cameras={cameras}
-          machines={machines}
+          machineList={machines}
           onAdd={handleOpenAdd}
           onEdit={handleOpenEdit}
           onDelete={initiateDelete}
@@ -195,7 +209,7 @@ const IPCameraRegister: React.FC = () => {
           onClose={handleCloseDrawer}
           onSave={handleSave}
           initialData={editingCamera}
-          machines={machines}
+          machineList={machines} // <--- Passing here
           loading={loading}
         />
 

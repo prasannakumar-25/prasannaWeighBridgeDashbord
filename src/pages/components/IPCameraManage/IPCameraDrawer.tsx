@@ -31,7 +31,7 @@ interface IPCameraDrawerProps {
   onClose: () => void;
   onSave: (data: IPCamera) => void;
   initialData: IPCamera | null;
-  machines: Machine[];
+  machineList: Machine[];
   loading: boolean;
 }
 
@@ -40,7 +40,7 @@ const IPCameraDrawer: React.FC<IPCameraDrawerProps> = ({
   onClose,
   onSave,
   initialData,
-  machines,
+  machineList,
   loading,
 }) => {
   const theme = useTheme();
@@ -130,40 +130,11 @@ const IPCameraDrawer: React.FC<IPCameraDrawerProps> = ({
     return isValid;
   };
 
-  // const handleSubmit = async () => {
-  //   if (!validate()) return;
-
-  //   const payload =  {
-  //     Machine_Id: 1,
-  //     Camera_name: form.Camera_name,
-  //     IP_address: form.IP_address,
-  //     RTSP_URL: form.RTSP_URL,
-  //     HTTP_URL: form.HTTP_URL,
-  //     Username: form.Username,
-  //     Password: form.Password,
-  //     Mac_address: form.Mac_address,
-  //     Status: form.Status,
-  //     Location: form.Location,
-  //     Installed_date: form.Installed_date,
-  //   }
-  //   console.log("-----response form -----", form)
-
-  //   try {
-  //     const response = await ipCameraApi.addIPcameraDetails(payload);
-  //     if (response?.success) {
-  //       onSave(response.data);
-  //       onClose();
-  //     }
-  //   } catch (error) {
-  //     console.log("response: ", error)
-  //   }
-  //   console.log("-----------called------------")
-  // };
   const handleSubmit = async () => {
     if (!validate()) return;
 
     const payload =  {
-      Machine_Id: 4,
+      Machine_Id: form.Machine_Id,
       Camera_name: form.Camera_name,
       IP_address: form.IP_address,
       RTSP_URL: form.RTSP_URL,
@@ -297,9 +268,9 @@ const IPCameraDrawer: React.FC<IPCameraDrawerProps> = ({
                         <MenuItem value={0} disabled sx={{ color: 'text.secondary', fontStyle: 'italic' }}>
                             Select Machine
                         </MenuItem>
-                        {machines.map((m) => (
-                        <MenuItem key={m.id} value={m.id}>
-                            {m.machineName}
+                        {machineList.map((m) => (
+                        <MenuItem key={m.Machine_Id} value={m.Machine_Id}>
+                            {m.Machine_name}
                         </MenuItem>
                         ))}
                     </TextField>
@@ -317,7 +288,6 @@ const IPCameraDrawer: React.FC<IPCameraDrawerProps> = ({
                     >
                         <MenuItem value="Online">Online</MenuItem>
                         <MenuItem value="Offline">Offline</MenuItem>
-                        <MenuItem value="Error">Error</MenuItem>
                     </TextField>
                 </Grid>
 

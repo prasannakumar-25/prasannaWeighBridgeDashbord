@@ -8,41 +8,41 @@ export interface NavItem {
 }
 
 const navItems: NavItem[] = [
+  // {
+  //   title: 'Authentication',
+  //   path: 'authentication',
+  //   icon: 'f7:exclamationmark-shield-fill',
+  //   active: true,
+  //   collapsible: true,
+  //   sublist: [ 
+  //     {
+  //       title: 'Sign In',
+  //       path: 'login',
+  //       active: true,
+  //       collapsible: false,
+  //     },
+  //     {
+  //       title: 'Sign Up',
+  //       path: 'sign-up',
+  //       active: true,
+  //       collapsible: false,
+  //     },
+  //     {
+  //       title: 'Forgot password',
+  //       path: 'forgot-password',
+  //       active: true,
+  //       collapsible: false,
+  //     },
+  //     {
+  //       title: 'Reset password',
+  //       path: 'reset-password',
+  //       active: true,
+  //       collapsible: false,
+  //     },
+  //   ],
+  // },
   {
-    title: 'Authentication',
-    path: 'authentication',
-    icon: 'f7:exclamationmark-shield-fill',
-    active: true,
-    collapsible: true,
-    sublist: [ 
-      {
-        title: 'Sign In',
-        path: 'login',
-        active: true,
-        collapsible: false,
-      },
-      {
-        title: 'Sign Up',
-        path: 'sign-up',
-        active: true,
-        collapsible: false,
-      },
-      {
-        title: 'Forgot password',
-        path: 'forgot-password',
-        active: true,
-        collapsible: false,
-      },
-      {
-        title: 'Reset password',
-        path: 'reset-password',
-        active: true,
-        collapsible: false,
-      },
-    ],
-  },
-  {
-    title: 'Home',
+    title: 'Dashboard',
     path: '/',
     icon: 'ion:home-sharp',
     active: true,
@@ -62,95 +62,95 @@ const navItems: NavItem[] = [
       },
     ],
   },
-  {
-    title: 'Resgister',
-    path: 'register',
-    icon: 'game-icons:archive-register',
-    active: true,
-    collapsible: true,
-    sublist: [
-      {
-        title: 'Vendor',
-        path: 'vendor',
-        active: true,
-        collapsible: false,
-        sublist: [
-          {
-            title: 'Overview',
-            path: '#!',
-            active: false,
-            collapsible: false,
-          },
-          {
-            title: 'All Projects',
-            path: '#!',
-            active: false,
-            collapsible: false,
-          },
-        ],
-      },
-      {
-        title: 'MachineRegister',
-        path: '#!',
-        active: false,
-        collapsible: false,
-        sublist: [
-          {
-            title: 'All Users',
-            path: '#!',
-            active: false,
-            collapsible: false,
-          },
-          {
-            title: 'Add user',
-            path: '#!',
-            active: false,
-            collapsible: false,
-          },
-        ],
-      },
-      {
-        title: 'Users',
-        path: '#!',
-        active: false,
-        collapsible: false,
-        sublist: [
-          {
-            title: 'Setting',
-            path: '#!',
-            active: false,
-            collapsible: false,
-          },
-          {
-            title: 'Billing',
-            path: '#!',
-            active: false,
-            collapsible: false,
-          },
-          {
-            title: 'Invoice',
-            path: '#!',
-            active: false,
-            collapsible: false,
-          },
-        ],
-      },
-      {
-        title: 'Projects',
-        path: '#!',
-        active: false,
-        collapsible: false,
-        sublist: [
-          {
-            title: 'Timeline',
-            path: '#!',
-            active: false,
-            collapsible: false,
-          },
-        ],
-      },
-    ],
-  },
+  // {
+  //   title: 'Resgister',
+  //   path: 'register',
+  //   icon: 'game-icons:archive-register',
+  //   active: true,
+  //   collapsible: true,
+  //   sublist: [
+  //     {
+  //       title: 'Vendor',
+  //       path: 'vendor',
+  //       active: true,
+  //       collapsible: false,
+  //       sublist: [
+  //         {
+  //           title: 'Overview',
+  //           path: '#!',
+  //           active: false,
+  //           collapsible: false,
+  //         },
+  //         {
+  //           title: 'All Projects',
+  //           path: '#!',
+  //           active: false,
+  //           collapsible: false,
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       title: 'MachineRegister',
+  //       path: '#!',
+  //       active: false,
+  //       collapsible: false,
+  //       sublist: [
+  //         {
+  //           title: 'All Users',
+  //           path: '#!',
+  //           active: false,
+  //           collapsible: false,
+  //         },
+  //         {
+  //           title: 'Add user',
+  //           path: '#!',
+  //           active: false,
+  //           collapsible: false,
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       title: 'Users',
+  //       path: '#!',
+  //       active: false,
+  //       collapsible: false,
+  //       sublist: [
+  //         {
+  //           title: 'Setting',
+  //           path: '#!',
+  //           active: false,
+  //           collapsible: false,
+  //         },
+  //         {
+  //           title: 'Billing',
+  //           path: '#!',
+  //           active: false,
+  //           collapsible: false,
+  //         },
+  //         {
+  //           title: 'Invoice',
+  //           path: '#!',
+  //           active: false,
+  //           collapsible: false,
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       title: 'Projects',
+  //       path: '#!',
+  //       active: false,
+  //       collapsible: false,
+  //       sublist: [
+  //         {
+  //           title: 'Timeline',
+  //           path: '#!',
+  //           active: false,
+  //           collapsible: false,
+  //         },
+  //       ],
+  //     },
+  //   ],
+  // },
   //   {
   //   title: 'Authentication',
   //   path: 'authentication',
@@ -206,10 +206,17 @@ const navItems: NavItem[] = [
       // },
       //  ]
   },
+  // {
+  //   title: 'UserRgister',
+  //   path: '/userManagement',
+  //   icon: 'mdi:user-group-outline',
+  //   active: true,
+  //   collapsible: false,
+  // },
   {
-    title: 'UserRgister',
-    path: '/userManagement',
-    icon: 'mdi:user-group-outline',
+    title: 'CustomerRegister',
+    path: '/customerRegister',
+    icon: 'raphael:customer',
     active: true,
     collapsible: false,
   },
@@ -291,68 +298,68 @@ const navItems: NavItem[] = [
   //   ],
   // },
 
-  {
-    title: 'Notification',
-    path: '#!',
-    icon: 'zondicons:notifications',
-    active: true,
-    collapsible: true,
-    sublist: [
-      {
-        title: 'VnedorNf',
-        path: '/',
-        active: true,
-        collapsible: false,
-      },
-      {
-        title: 'MachineNf',
-        path: '/',
-        active: true,
-        collapsible: false,
-      },
-      {
-        title: 'CustomerNf',
-        path: '/',
-        active: true,
-        collapsible: false,
-      },
-    ]
-  },
+  // {
+  //   title: 'Notification',
+  //   path: '#!',
+  //   icon: 'zondicons:notifications',
+  //   active: true,
+  //   collapsible: true,
+  //   sublist: [
+  //     {
+  //       title: 'VnedorNf',
+  //       path: '/',
+  //       active: true,
+  //       collapsible: false,
+  //     },
+  //     {
+  //       title: 'MachineNf',
+  //       path: '/',
+  //       active: true,
+  //       collapsible: false,
+  //     },
+  //     {
+  //       title: 'CustomerNf',
+  //       path: '/',
+  //       active: true,
+  //       collapsible: false,
+  //     },
+  //   ]
+  // },
   
-  {
-    title: 'Calendar',
-    path: '#!',
-    icon: 'ph:calendar',
-    active: true,
-    collapsible: true,
-    sublist: [
-      {
-        title: 'Sign In',
-        path: '/login',
-        active: true,
-        collapsible: false,
-      },
-      {
-        title: 'Sign Up',
-        path: 'sign-up',
-        active: true,
-        collapsible: false,
-      },
-      {
-        title: 'Forgot password',
-        path: 'forgot-password',
-        active: true,
-        collapsible: false,
-      },
-    ]
-  },
-  {
-    title: 'Message',
-    path: '#!',
-    icon: 'ph:chat-circle-dots-fill',
-    active: true,
-    collapsible: false,
-  },
+  // {
+  //   title: 'Calendar',
+  //   path: '#!',
+  //   icon: 'ph:calendar',
+  //   active: true,
+  //   collapsible: true,
+  //   sublist: [
+  //     {
+  //       title: 'Sign In',
+  //       path: '/login',
+  //       active: true,
+  //       collapsible: false,
+  //     },
+  //     {
+  //       title: 'Sign Up',
+  //       path: 'sign-up',
+  //       active: true,
+  //       collapsible: false,
+  //     },
+  //     {
+  //       title: 'Forgot password',
+  //       path: 'forgot-password',
+  //       active: true,
+  //       collapsible: false,
+  //     },
+  //   ]
+  // },
+  // {
+  //   title: 'Message',
+  //   path: '#!',
+  //   icon: 'ph:chat-circle-dots-fill',
+  //   active: true,
+  //   collapsible: false,
+  // },
 ];
 
 export default navItems;
