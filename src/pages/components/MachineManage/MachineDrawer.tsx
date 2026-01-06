@@ -25,12 +25,7 @@ import { Machine, Vendor } from "pages/RegisterManagement/MachineRegister/Machin
 import "../../RegisterManagement/MachineRegister/MachineRegister.css";
 import machineApi from "services/machineApi";
 
-// ----------------------------------------------------------------------
-// NOTE: Please ensure your 'Machine' interface in your types file 
-// includes these two new optional fields to avoid TypeScript errors:
-// estateVehicleType?: string;
-// estateMaterialType?: string;
-// ----------------------------------------------------------------------
+
 
 interface MachineDrawerProps {
   open: boolean;
@@ -115,42 +110,115 @@ const MachineDrawer: React.FC<MachineDrawerProps> = ({
     }
   };
 
+  // const validate = (): boolean => {
+  //   const newErrors: any = {};
+  //   let isValid = true;
+
+  //   const macRegex =
+  //   /^([0-9A-F]{2}[:-]){5}([0-9A-F]{2})$|^([0-9A-F]{4}\.){2}([0-9A-F]{4})$/;
+
+  //   const mac = form.Machine_mac?.trim().toUpperCase();
+
+  //   if (!form.Machine_name?.trim()) { 
+  //     newErrors.Machine_name = "Machine name is required";
+  //     isValid = false;
+  //   }
+  //   if (!form.password?.trim()) {
+  //     newErrors.password = "Password is required";
+  //     isValid = false;
+  //   }
+  //   if (!form.Vendor_Id || form.Vendor_Id <= 0) {
+  //     newErrors.Vendor_Id = "Vendor selection is required";
+  //     isValid = false;
+  //   }
+  //   if (form.Capacity_ton !== undefined && form.Capacity_ton < 0) {
+  //     newErrors.Capacity_ton = "Capacity cannot be negative";
+  //     isValid = false;
+  //   }
+  //   if (!mac) {
+  //     newErrors.Machine_mac = "MAC address is required";
+  //     isValid = false;
+  //   } else if (!macRegex.test(mac)) {
+  //     newErrors.Machine_mac =
+  //       "Invalid MAC address (Format: AA:BB:CC:DD:EE:FF)";
+  //     isValid = false;
+  //   }
+
+  //   setErrors(newErrors);
+
+  //   if (!isValid) {
+  //     setGlobalError("Please correct the highlighted errors below.")
+  //   } else {
+  //     setGlobalError(null);
+  //   }
+  //   return isValid;
+  // };
+
+
+
   const validate = (): boolean => {
-    const newErrors: any = {};
+    const newErrors: Record<string, string> = {};
     let isValid = true;
 
-    if (!form.Machine_name?.trim()) {
-      newErrors.Machine_name = "Machine name is required";
+    // --- 1. Machine Name Validation ---
+    const name = form.Machine_name?.trim();
+    if (!name) {
+      newErrors.Machine_name = "Machine name is required.";
+      isValid = false;
+    } else if (name.length < 3) {
+      newErrors.Machine_name = "Machine name must be at least 3 characters.";
+      isValid = false;
+    } else if (name.length > 50) {
+      newErrors.Machine_name = "Machine name cannot exceed 50 characters.";
       isValid = false;
     }
-    if (!form.password?.trim()) {
-      newErrors.password = "Password is required";
+
+    // --- 2. Password Validation ---
+    // Enforcing a minimum length prevents weak setup keys
+    const pwd = form.password?.trim();
+    if (!pwd) {
+      newErrors.password = "Access password is required.";
+      isValid = false;
+    } else if (pwd.length < 6) {
+      newErrors.password = "Password must be at least 6 characters.";
       isValid = false;
     }
-    if (!form.Vendor_Id || form.Vendor_Id <= 0) {
-      newErrors.Vendor_Id = "Vendor selection is required";
+
+    // --- 3. Vendor Validation ---
+    if (!form.Vendor_Id || form.Vendor_Id === 0) {
+      newErrors.Vendor_Id = "Please select a valid vendor associated with this machine.";
       isValid = false;
     }
+
+    // --- 4. Professional MAC Address Validation ---
+    const mac = form.Machine_mac?.trim().toUpperCase();
+    const macRegex = /^([0-9A-F]{2}[:-]){5}([0-9A-F]{2})$/;
+
+
+    if (!mac) {
+      newErrors.Machine_mac = "MAC address is required.";
+      isValid = false;
+    } else if (!macRegex.test(mac)) {
+      newErrors.Machine_mac = "Invalid format. Expected: XX:XX:XX:XX:XX:XX";
+      isValid = false;
+    } 
+
+    // --- Capacity Validation (Keep existing logic) ---
     if (form.Capacity_ton !== undefined && form.Capacity_ton < 0) {
-      newErrors.Capacity_ton = "Capacity cannot be negative";
-      isValid = false;
-    }
-    if (!form.Machine_mac?.trim()) {
-      newErrors.Machine_mac = "Mac address is required";
+      newErrors.Capacity_ton = "Capacity cannot be negative.";
       isValid = false;
     }
 
     setErrors(newErrors);
 
     if (!isValid) {
-      setGlobalError("Please correct the highlighted errors below.")
+      setGlobalError("Form contains errors. Please check the fields highlighted below.");
     } else {
       setGlobalError(null);
     }
+
     return isValid;
   };
-
-
   
 
 
@@ -444,6 +512,8 @@ const MachineDrawer: React.FC<MachineDrawerProps> = ({
                   placeholder="e.g. AA:BB:CC:DD:EE:FF"
                   fullWidth
                   value={form.Machine_mac || ""}
+                  error={!!errors.Machine_mac}
+                  helperText={errors.Machine_mac}
                   onChange={(e) => setField("Machine_mac", e.target.value)}
                   disabled={loading}
                   InputProps={{

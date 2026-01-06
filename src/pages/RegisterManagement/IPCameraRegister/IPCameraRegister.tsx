@@ -242,7 +242,7 @@ const IPCameraRegister: React.FC = () => {
             open={snackbarOpen}
             autoHideDuration={3000}
             onClose={() => setSnackbarOpen(false)}
-            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
         >
             <Alert onClose={() => setSnackbarOpen(false)} severity="success" variant="filled">
                 {snackbarMessage}

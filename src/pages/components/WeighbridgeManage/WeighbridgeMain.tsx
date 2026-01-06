@@ -17,12 +17,14 @@ import {
   Menu,
   ListItemIcon,
   ListItemText,
-  Dialog,             // <--- ADDED
-  DialogTitle,        // <--- ADDED
-  DialogContent,      // <--- ADDED
-  DialogActions,      // <--- ADDED
-  Divider,            // <--- ADDED
-  Chip,               // <--- ADDED
+  Dialog,        
+  DialogTitle,   
+  DialogContent, 
+  DialogActions, 
+  Divider,       
+  Chip,
+  Snackbar,
+  Alert
 } from "@mui/material";
 import { 
   DataGrid, 
@@ -62,7 +64,6 @@ const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
   onRefresh,
 }) => {
   const theme = useTheme();
-  const { enqueueSnackbar } = useSnackbar();
 
   // -- Local Filter State --
   const [search, setSearch] = useState('');
@@ -77,6 +78,8 @@ const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
   // -- DETAIL CARD STATE (NEW) --
   const [selectedWeighbridge, setSelectedWeighbridge] = useState<Weighbridge | null>(null);
   const [openDetailModal, setOpenDetailModal] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   const handleOpenDownloadMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -97,11 +100,6 @@ const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
     setToDate(null);
   };
 
-  // -- HANDLE DETAIL MODAL ACTIONS --
-  // const handleOpenDetail = (wb: Weighbridge) => {
-  //   setSelectedWeighbridge(wb);
-  //   setOpenDetailModal(true);
-  // };
 
   const handleCloseDetail = () => {
     setOpenDetailModal(false);
@@ -148,7 +146,8 @@ const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
   // -- EXPORT LOGIC --
   const getExportData = () => {
     if (filteredWeighbridges.length === 0) {
-      enqueueSnackbar("No data to download", { variant: "warning" });
+      setSnackbarMessage("No data to download");
+      setSnackbarOpen(true);
       return null;
     }
     return filteredWeighbridges.map(wb => {
@@ -181,7 +180,8 @@ const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
       XLSX.writeFile(workbook, fileName); // <--- Use variable
       
       handleCloseDownloadMenu();
-      enqueueSnackbar("Exported to Excel successfully", { variant: "success" });
+      setSnackbarMessage("Exported to Excel successfully");
+      setSnackbarOpen(true);
     };
 
   const handleExportWord = () => {
@@ -219,7 +219,8 @@ const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
     }
     document.body.removeChild(downloadLink);
     handleCloseDownloadMenu();
-    enqueueSnackbar("Exported to Word successfully", { variant: "success" });
+    setSnackbarMessage("Exported to Word successfully");
+    setSnackbarOpen(true);
   };
 
   // -- DataGrid Columns Definition --
@@ -651,6 +652,35 @@ const WeighbridgeMain: React.FC<WeighbridgeMainProps> = ({
             </Grid>
           </Grid>
         </Box>
+
+        <Snackbar
+            open={snackbarOpen}
+            autoHideDuration={3000}
+            onClose={() => setSnackbarOpen(false)}
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        >
+            <Alert onClose={() => setSnackbarOpen(false)} severity="success" variant="filled">
+                {snackbarMessage}
+                 <LinearProgress
+              variant="determinate"
+              value={100}
+              sx={{
+                mt: 1,
+                height: 4,
+                borderRadius: 2,
+                bgcolor: '#c8e6c9',
+                '& .MuiLinearProgress-bar': {
+                  bgcolor: '#66bb6a',
+                  animation: 'snackbarProgress 3.5s linear forwards',
+                },
+                '@keyframes snackbarProgress': {
+                  to: { width: '100%' },
+                  from: { width: '0%' },
+                },
+              }}
+            />
+            </Alert>
+        </Snackbar>
 
         {/* --- DATA GRID SECTION --- */}
         <Box sx={{ height: 550, width: '100%' }}>

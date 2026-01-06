@@ -119,8 +119,8 @@ const CustomerRegister: React.FC = () => {
      await fetchData();          // 🔹 refresh list from API
      setSnackbarMessage(
        editingCustomer
-         ? "Machine updated successfully"
-         : "Machine added successfully"
+         ? "Customer updated successfully"
+         : "Customer added successfully"
      );
      setSnackbarOpen(true);
      handleCloseDrawer();          // 🔹 close drawer
@@ -231,7 +231,7 @@ const CustomerRegister: React.FC = () => {
             open={snackbarOpen}
             autoHideDuration={3000}
             onClose={() => setSnackbarOpen(false)}
-            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
         >
             <Alert onClose={() => setSnackbarOpen(false)} severity="success" variant="filled">
                 {snackbarMessage}

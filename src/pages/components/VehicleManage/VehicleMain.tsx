@@ -10,13 +10,14 @@ import {
   Typography,
   InputAdornment,
   Grid,
-  Chip,
   Tooltip,
   useTheme,
   LinearProgress,
-  Menu,           // <--- ADDED
-  ListItemIcon,   // <--- ADDED
-  ListItemText,   // <--- ADDED
+  Menu,
+  ListItemIcon,
+  ListItemText,
+  Snackbar,
+  Alert
 } from "@mui/material";
 import { 
   DataGrid, 
@@ -54,7 +55,6 @@ const VehicleMain: React.FC<VehicleMainProps> = ({
 
 }) => {
   const theme = useTheme();
-  const { enqueueSnackbar } = useSnackbar();
 
   // -- Local Filter State --
   const [search, setSearch] = useState('');
@@ -65,6 +65,8 @@ const VehicleMain: React.FC<VehicleMainProps> = ({
   // -- DOWNLOAD MENU STATE (ADDED) --
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const openDownloadMenu = Boolean(anchorEl);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   const handleOpenDownloadMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -74,22 +76,49 @@ const VehicleMain: React.FC<VehicleMainProps> = ({
     setAnchorEl(null);
   };
 
-  // -- Filter Logic --
-  const filteredVehicles = useMemo(() => {
-    return vehicles.filter((v) => {
-      const matchesSearch = v.Vehicle_type.toLowerCase().includes(search.toLowerCase());
-      const matchesVendor = filterVendorId === "" || v.Vendor_Id === filterVendorId;
-      const itemDate = dayjs(v.Created_at);
-      const matchesFromDate = fromDate ? itemDate.isValid() && (itemDate.isAfter(fromDate, 'day') || itemDate.isSame(fromDate, 'day')) : true;
-      const matchesToDate = toDate ? itemDate.isValid() && (itemDate.isBefore(toDate, 'day') || itemDate.isSame(toDate, 'day')) : true;
 
-      return matchesSearch && matchesVendor && matchesFromDate && matchesToDate;
-    });
-  }, [vehicles, search, filterVendorId, fromDate, toDate]);
+
+  const filteredVehicles = useMemo(() => {
+  return vehicles.filter((v) => {
+    // 1. Text Search (Vehicle Type)
+    const matchesSearch =
+      v.Vehicle_type?.toLowerCase().includes(search.toLowerCase());
+
+    // 2. Vendor Filter
+    const matchesVendor =
+      filterVendorId === "" || v.Vendor_Id === Number(filterVendorId);
+
+    // 3. Date Filter
+    const itemDate = dayjs(v.Created_at);
+    const matchesFromDate = fromDate
+      ? itemDate.isValid() &&
+        (itemDate.isAfter(fromDate, "day") ||
+          itemDate.isSame(fromDate, "day"))
+      : true;
+
+    const matchesToDate = toDate
+      ? itemDate.isValid() &&
+        (itemDate.isBefore(toDate, "day") ||
+          itemDate.isSame(toDate, "day"))
+      : true;
+
+    return (
+      matchesSearch &&
+      matchesVendor &&
+      matchesFromDate &&
+      matchesToDate
+    );
+  });
+}, [vehicles, search, filterVendorId, fromDate, toDate]);
+
+
+
 
   const handleChangeSearch = (event: ChangeEvent<HTMLInputElement>) => {
     setSearch(event.currentTarget.value);
   };
+
+
 
   const handleClearFilters = () => {
     setSearch("");
@@ -101,7 +130,8 @@ const VehicleMain: React.FC<VehicleMainProps> = ({
   // -- PREPARE DATA FOR EXPORT --
   const getExportData = () => {
     if (filteredVehicles.length === 0) {
-      enqueueSnackbar("No data to download", { variant: "warning" });
+      setSnackbarMessage("No data to download");
+      setSnackbarOpen(true);
       return null;
     }
     return filteredVehicles.map(v => {
@@ -133,7 +163,8 @@ const VehicleMain: React.FC<VehicleMainProps> = ({
     XLSX.writeFile(workbook, fileName); // <--- Use variable
     
     handleCloseDownloadMenu();
-    enqueueSnackbar("Exported to Excel successfully", { variant: "success" });
+    setSnackbarMessage("Exported to Excel successfully");
+    setSnackbarOpen(true);
   };
 
   // -- EXPORT TO WORD FUNCTION --
@@ -185,7 +216,7 @@ const VehicleMain: React.FC<VehicleMainProps> = ({
     });
     
     const url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(html);
-    const fileName = `Vehicle_Register_${dayjs().format('YYYY-MM-DD_HH-mm')}.doc`;
+    const fileName = `Vehicle_Register_${dayjs().format('YYYY-MM-DD/HH-mm')}.doc`;
 
     // Create download link
     const downloadLink = document.createElement("a");
@@ -202,7 +233,8 @@ const VehicleMain: React.FC<VehicleMainProps> = ({
     
     document.body.removeChild(downloadLink);
     handleCloseDownloadMenu();
-    enqueueSnackbar("Exported to Word successfully", { variant: "success" });
+    setSnackbarMessage("Exported to Word successfully");
+    setSnackbarOpen(true);
   };
 
   // -- DataGrid Columns Definition --
@@ -674,6 +706,36 @@ const VehicleMain: React.FC<VehicleMainProps> = ({
             </Grid>
           </Grid>
         </Box>
+
+        {/* 4. Global Snackbar */}
+        <Snackbar
+            open={snackbarOpen}
+            autoHideDuration={3000}
+            onClose={() => setSnackbarOpen(false)}
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        >
+            <Alert onClose={() => setSnackbarOpen(false)} severity="success" variant="filled">
+                {snackbarMessage}
+                 <LinearProgress
+              variant="determinate"
+              value={100}
+              sx={{
+                mt: 1,
+                height: 4,
+                borderRadius: 2,
+                bgcolor: '#c8e6c9',
+                '& .MuiLinearProgress-bar': {
+                  bgcolor: '#66bb6a',
+                  animation: 'snackbarProgress 3.5s linear forwards',
+                },
+                '@keyframes snackbarProgress': {
+                  to: { width: '100%' },
+                  from: { width: '0%' },
+                },
+              }}
+            />
+            </Alert>
+        </Snackbar>
 
         {/* --- DATA GRID SECTION --- */}
         

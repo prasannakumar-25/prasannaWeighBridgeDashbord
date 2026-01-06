@@ -10,6 +10,7 @@ import {
   Snackbar,
   Alert,
   LinearProgress,
+  Box
 } from "@mui/material";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -199,7 +200,7 @@ const VehicleRegister: React.FC = () => {
         />
 
         {/* 3. Global Dialogs */}
-        <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)} maxWidth="xs" fullWidth>
+        {/* <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)} maxWidth="xs" fullWidth>
             <DialogTitle>Confirm Delete</DialogTitle>
             <DialogContent>
                 <Typography>Are you sure you want to delete this Vehicle?</Typography>
@@ -210,14 +211,107 @@ const VehicleRegister: React.FC = () => {
                 startIcon={<IconifyIcon icon = "wpf:delete"/>}
                 >Delete</Button>
             </DialogActions> 
-        </Dialog>
+        </Dialog> */}
+
+         
+        <Dialog
+  open={deleteDialogOpen}
+  onClose={() => setDeleteDialogOpen(false)}
+  maxWidth="xs"
+  fullWidth
+  PaperProps={{
+    sx: {
+      borderRadius: 2.5,
+      overflow: "hidden",
+    },
+  }}
+>
+  {/* Header */}
+  <Box
+    sx={{
+      px: 3,
+      py: 2,
+      bgcolor: "grey.100",
+      borderBottom: "1px solid",
+      borderColor: "divider",
+      display: "flex",
+      alignItems: "center",
+      gap: 1.5,
+    }}
+  >
+    <IconifyIcon
+      icon="mdi:alert-circle-outline"
+      style={{ fontSize: 24, color: "#d32f2f" }}
+    />
+    <Typography variant="h6" fontWeight={600}>
+      Confirm Delete
+    </Typography>
+  </Box>
+
+  {/* Content */}
+  <DialogContent sx={{ px: 3, py: 2.5 }}>
+    <Typography variant="body1">
+      Are you sure you want to delete this vehicle?
+    </Typography>
+
+    <Typography
+      variant="body2"
+      color="text.secondary"
+      sx={{ mt: 1 }}
+    >
+      This action cannot be undone and will permanently remove the record.
+    </Typography>
+  </DialogContent>
+
+  {/* Actions */}
+  <DialogActions
+    sx={{
+      px: 3,
+      py: 2,
+      borderTop: "1px solid",
+      borderColor: "divider",
+      justifyContent: "flex-end",
+      gap: 1,
+    }}
+  >
+    <Button
+      onClick={() => setDeleteDialogOpen(false)}
+      variant="outlined"
+      color="inherit"
+      sx={{
+        textTransform: "none",
+        borderRadius: 2,
+      }}
+    >
+      Cancel
+    </Button>
+
+    <Button
+      onClick={confirmDelete}
+      variant="contained"
+      color="error"
+      startIcon={<IconifyIcon icon="mdi:delete-outline" />}
+      sx={{
+        textTransform: "none",
+        borderRadius: 2,
+        boxShadow: "0 6px 14px rgba(211,47,47,0.35)",
+      }}
+    >
+      Delete
+    </Button>
+  </DialogActions>
+</Dialog>
+
+
+
+
 
         {/* 4. Global Snackbar */}
         <Snackbar
             open={snackbarOpen}
             autoHideDuration={3000}
             onClose={() => setSnackbarOpen(false)}
-            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
         >
             <Alert onClose={() => setSnackbarOpen(false)} severity="success" variant="filled">
                 {snackbarMessage}

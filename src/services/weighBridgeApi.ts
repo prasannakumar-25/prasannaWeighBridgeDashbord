@@ -4,7 +4,7 @@ import Authaxios from "../axios/axios";
 const weighBridgeApi = {
     addWeighbridgeDetails : async (payload:object) => {
         try{
-            const response = await Authaxios.post("add/weighbridge", payload)
+            const response = await Authaxios.post("/add/weighbridge", payload)
             return response.data
         }
         catch (error){
@@ -34,7 +34,7 @@ const weighBridgeApi = {
     },
     updateWeighbridgeDetails : async (weighbridge_id:number, payload:object) => {
         try{
-            const response = await Authaxios.put(`update/weighbridge/${weighbridge_id}`,payload)
+            const response = await Authaxios.put(`/update/weighbridge/${weighbridge_id}`,payload)
             return response.data
         }
         catch (error){

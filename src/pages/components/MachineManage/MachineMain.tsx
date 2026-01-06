@@ -14,11 +14,11 @@ import {
   Tooltip,
   useTheme,
   LinearProgress,
-  Menu,           // <--- ADDED
-  ListItemIcon,   // <--- ADDED
-  ListItemText,   // <--- ADDED
-  ListSubheader,
-  Divider,
+  Menu,        
+  ListItemIcon,
+  ListItemText,
+  Snackbar,
+  Alert
 } from "@mui/material";
 import { 
   DataGrid, 
@@ -58,14 +58,14 @@ const MachineMain: React.FC<MachineMainProps> = ({
   onRefresh,
 }) => {
   const theme = useTheme();
-  const { enqueueSnackbar } = useSnackbar();
-  // const [snackbarMessage, setSnackbarMessage] = useState(false);
 
   // -- Local Filter State --
   const [search, setSearch] = useState('');
   const [filterVendorId, setFilterVendorId] = useState<number | "">("");
   const [fromDate, setFromDate] = useState<Dayjs | null>(null);
   const [toDate, setToDate] = useState<Dayjs | null>(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("")
 
   // -- DOWNLOAD MENU STATE (ADDED) --
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -113,7 +113,8 @@ const MachineMain: React.FC<MachineMainProps> = ({
   // -- PREPARE DATA FOR EXPORT --
   const getExportData = () => {
     if (filteredMachines.length === 0) {
-      enqueueSnackbar("No data to download", { variant: "warning" });
+      setSnackbarMessage("No data to download");
+      setSnackbarOpen(true);
       return null;
     }
     return filteredMachines.map(m => {
@@ -148,7 +149,8 @@ const MachineMain: React.FC<MachineMainProps> = ({
     XLSX.writeFile(workbook, fileName); // <--- Use variable
     
     handleCloseDownloadMenu();
-    enqueueSnackbar("Exported to Excel successfully", { variant: "success" });
+    setSnackbarMessage("Exported to Excel successfully");
+    setSnackbarOpen(true);
   };
 
   // -- EXPORT TO WORD FUNCTION --
@@ -221,7 +223,8 @@ const MachineMain: React.FC<MachineMainProps> = ({
     
     document.body.removeChild(downloadLink);
     handleCloseDownloadMenu();
-    enqueueSnackbar("Exported to Word successfully", { variant: "success" });
+    setSnackbarMessage("Exported to Word successfully");
+    setSnackbarOpen(true);
   };
 
   // -- DataGrid Columns Definition --
@@ -714,6 +717,35 @@ const MachineMain: React.FC<MachineMainProps> = ({
             </Grid>
           </Grid>
         </Box>
+
+        <Snackbar
+            open={snackbarOpen}
+            autoHideDuration={3000}
+            onClose={() => setSnackbarOpen(false)}
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        >
+            <Alert onClose={() => setSnackbarOpen(false)} severity="success" variant="filled">
+                {snackbarMessage}
+                 <LinearProgress
+              variant="determinate"
+              value={100}
+              sx={{
+                mt: 1,
+                height: 4,
+                borderRadius: 2,
+                bgcolor: '#c8e6c9',
+                '& .MuiLinearProgress-bar': {
+                  bgcolor: '#66bb6a',
+                  animation: 'snackbarProgress 3.5s linear forwards',
+                },
+                '@keyframes snackbarProgress': {
+                  to: { width: '100%' },
+                  from: { width: '0%' },
+                },
+              }}
+            />
+            </Alert>
+        </Snackbar>
 
         {/* --- DATA GRID SECTION --- */}
         <Box sx={{ height: 550, width: '100%' }} >

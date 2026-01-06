@@ -121,8 +121,25 @@ const CustomerDrawer: React.FC<CustomerDrawerProps> = ({
       isValid = false;
     }
 
+    // Contact_number Validation
     if (!form.Contact_number?.trim()) {
       newErrors.Contact_number = "Contact Number is required";
+      isValid = false;
+    } else if (form.Contact_number.length < 10) {
+        newErrors.Contact_number = "Contact Number seems too short";
+        isValid = false;
+    }
+        // Contact_number Validation
+    if (!form.Contact_number?.trim()) {
+      newErrors.Contact_number = "Contact Number is required";
+      isValid = false;
+    } 
+    else if (!/^\d+$/.test(form.Contact_number)) {
+      newErrors.Contact_number = "Contact Number must contain only numbers";
+      isValid = false;
+    } 
+    else if (form.Contact_number.length < 10) {
+      newErrors.Contact_number = "Contact Number must be at least 10 digits";
       isValid = false;
     }
 

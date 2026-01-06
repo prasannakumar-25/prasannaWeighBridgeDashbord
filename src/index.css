@@ -12,6 +12,6 @@ html {
 
 body{
   touch-action: pan-y;
-  /* user-select: none; */
+  user-select: none;
   overflow-x: hidden;
 }

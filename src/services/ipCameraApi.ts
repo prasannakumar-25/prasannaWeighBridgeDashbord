@@ -5,7 +5,7 @@ const ipCameraApi = {
 
     addIPcameraDetails : async (payload:object) => {
         try{
-            const response = await Authaxios.post("add/ipcamera", payload)
+            const response = await Authaxios.post("/add/ipcamera", payload)
             return response.data
         }
         catch (error){
@@ -15,7 +15,7 @@ const ipCameraApi = {
     },
     getIPcameraDetails : async () => {
         try{
-            const response = await Authaxios.get("get/ipcamera")
+            const response = await Authaxios.get("/get/ipcamera")
             return response.data
         }
         catch (error){
@@ -25,7 +25,7 @@ const ipCameraApi = {
     },
     getFilterIPcameraDetails : async (Camera_Id:number, payload:object) => {
         try{
-            const response = await Authaxios.get(`get/ipcamera?Camera_Id=${Camera_Id}`, payload)
+            const response = await Authaxios.get(`/get/ipcamera?Camera_Id=${Camera_Id}`, payload)
             return response.data
         }
         catch (error){
@@ -35,7 +35,7 @@ const ipCameraApi = {
     },
     updateIPcameraDetails : async (camera_id:number, payload:object) => {
         try{
-            const response = await Authaxios.put(`update/ipcamera/${camera_id}`, payload)
+            const response = await Authaxios.put(`/update/ipcamera/${camera_id}`, payload)
             return response.data
         }
         catch (error){
@@ -45,7 +45,7 @@ const ipCameraApi = {
     },
     deleteIPcameraDetails : async (camera_id:number) => {
         try{
-            const response = await Authaxios.delete(`delete/ipcamera/${camera_id}`)
+            const response = await Authaxios.delete(`/delete/ipcamera/${camera_id}`)
             return response.data
         }
         catch (error){

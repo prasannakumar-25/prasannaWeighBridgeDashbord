@@ -16,6 +16,8 @@ import {
   Menu,
   ListItemIcon,
   ListItemText,
+  Snackbar,
+  Alert
 } from "@mui/material";
 import { 
   DataGrid, 
@@ -52,13 +54,14 @@ const CustomerMain: React.FC<CustomerMainProps> = ({
   onRefresh,
 }) => {
   const theme = useTheme();
-  const { enqueueSnackbar } = useSnackbar();
 
   // -- Local Filter State --
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>("");
   const [fromDate, setFromDate] = useState<Dayjs | null>(null);
   const [toDate, setToDate] = useState<Dayjs | null>(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   // -- DOWNLOAD MENU STATE --
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -108,7 +111,8 @@ const CustomerMain: React.FC<CustomerMainProps> = ({
   // -- PREPARE DATA FOR EXPORT --
   const getExportData = () => {
     if (filteredCustomers.length === 0) {
-      enqueueSnackbar("No data to download", { variant: "warning" });
+      setSnackbarMessage("No data to download");
+      setSnackbarOpen(true);
       return null;
     }
     return filteredCustomers.map(c => ({
@@ -138,7 +142,8 @@ const CustomerMain: React.FC<CustomerMainProps> = ({
     XLSX.writeFile(workbook, fileName);
     
     handleCloseDownloadMenu();
-    enqueueSnackbar("Exported to Excel successfully", { variant: "success" });
+    setSnackbarMessage("Exported to Excel successfully");
+    setSnackbarOpen(true);
   };
 
   // -- EXPORT TO WORD --
@@ -199,7 +204,8 @@ const CustomerMain: React.FC<CustomerMainProps> = ({
     
     document.body.removeChild(downloadLink);
     handleCloseDownloadMenu();
-    enqueueSnackbar("Exported to Word successfully", { variant: "success" });
+    setSnackbarMessage("Exported to Word successfully");
+    setSnackbarOpen(true);
   };
 
   const getStatusColor = (status: string) => {
@@ -561,8 +567,37 @@ const CustomerMain: React.FC<CustomerMainProps> = ({
           </Grid>
         </Box>
 
+        <Snackbar
+            open={snackbarOpen}
+            autoHideDuration={3000}
+            onClose={() => setSnackbarOpen(false)}
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        >
+            <Alert onClose={() => setSnackbarOpen(false)} severity="success" variant="filled">
+                {snackbarMessage}
+                 <LinearProgress
+                  variant="determinate"
+                  value={100}
+                  sx={{
+                    mt: 1,
+                    height: 4,
+                    borderRadius: 2,
+                    bgcolor: '#c8e6c9',
+                    '& .MuiLinearProgress-bar': {
+                      bgcolor: '#66bb6a',
+                      animation: 'snackbarProgress 3.5s linear forwards',
+                    },
+                    '@keyframes snackbarProgress': {
+                      to: { width: '100%' },
+                      from: { width: '0%' },
+                    },
+                  }}
+                />
+            </Alert>
+        </Snackbar>
+
         {/* --- DATA GRID --- */}
-        <Box sx={{ height: 530, width: '100%' }}>
+        <Box sx={{ height: 550, width: '100%' }}>
             <DataGrid
                 rows={filteredCustomers}
                 columns={columns}

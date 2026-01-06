@@ -13,9 +13,11 @@ import {
   Tooltip,
   useTheme,
   LinearProgress,
-  Menu,           // <--- ADDED
-  ListItemIcon,   // <--- ADDED
-  ListItemText,   // <--- ADDED
+  Menu,        
+  ListItemIcon,
+  ListItemText,
+  Snackbar,
+  Alert
 } from "@mui/material";
 import { 
   DataGrid, 
@@ -34,6 +36,7 @@ import { IPCamera, Machine } from "pages/RegisterManagement/IPCameraRegister/IPC
 import CustomPagination from "../VehicleManage/CustomPagination";
 
 import "../../RegisterManagement/MachineRegister/MachineRegister.css";
+import { setCanvasCreator } from "echarts/types/src/core/echarts.js";
 
 interface IPCameraMainProps {
   cameras: IPCamera[];
@@ -55,13 +58,14 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
   onRefresh,
 }) => {
   const theme = useTheme();
-  const { enqueueSnackbar } = useSnackbar();
 
   // -- Local Filter State --
   const [search, setSearch] = useState('');
   const [filterMachineId, setFilterMachineId] = useState<number | "">("");
   const [fromDate, setFromDate] = useState<Dayjs | null>(null);
   const [toDate, setToDate] = useState<Dayjs | null>(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   // -- DOWNLOAD MENU STATE (ADDED) --
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -109,7 +113,8 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
   // -- PREPARE DATA FOR EXPORT --
   const getExportData = () => {
     if (filteredCameras.length === 0) {
-      enqueueSnackbar("No data to download", { variant: "warning" });
+      setSnackbarMessage("No data to download");
+      setSnackbarOpen(true);
       return null;
     }
     return filteredCameras.map(c => {
@@ -144,7 +149,8 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
      XLSX.writeFile(workbook, fileName); // <--- Use variable
      
      handleCloseDownloadMenu();
-     enqueueSnackbar("Exported to Excel successfully", { variant: "success" });
+     setSnackbarMessage("Exported to Excel successfully");
+     setSnackbarOpen(true);
    };
 
   // -- EXPORT TO WORD FUNCTION --
@@ -213,7 +219,8 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
     
     document.body.removeChild(downloadLink);
     handleCloseDownloadMenu();
-    enqueueSnackbar("Exported to Word successfully", { variant: "success" });
+    setSnackbarMessage("Exported to Word successfully");
+    setSnackbarOpen(true);
   };
 
   // Status Chip Color Helper
@@ -746,6 +753,35 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
             </Grid>
           </Grid>
         </Box>
+
+        <Snackbar
+            open={snackbarOpen}
+            autoHideDuration={3000}
+            onClose={() => setSnackbarOpen(false)}
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        >
+            <Alert onClose={() => setSnackbarOpen(false)} severity="success" variant="filled">
+                {snackbarMessage}
+                 <LinearProgress
+              variant="determinate"
+              value={100}
+              sx={{
+                mt: 1,
+                height: 4,
+                borderRadius: 2,
+                bgcolor: '#c8e6c9',
+                '& .MuiLinearProgress-bar': {
+                  bgcolor: '#66bb6a',
+                  animation: 'snackbarProgress 3.5s linear forwards',
+                },
+                '@keyframes snackbarProgress': {
+                  to: { width: '100%' },
+                  from: { width: '0%' },
+                },
+              }}
+            />
+            </Alert>
+        </Snackbar>
 
         {/* --- DATA GRID SECTION --- */}
         <Box sx={{ height: 550, width: '100%' }}>

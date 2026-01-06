@@ -263,8 +263,8 @@ const WeighbridgeDrawer: React.FC<WeighbridgeDrawerProps> = ({
                         helperText={errors.Serial_no}
                         InputProps={{
                             startAdornment: (
-                                <InputAdornment position="start">
-                                    <IconifyIcon icon="mdi:barcode" color="action.active" />
+                                <InputAdornment position="end">
+                                    <IconifyIcon icon="mdi:barcode" color="primary.dark" />
                                 </InputAdornment>
                             )
                         }}

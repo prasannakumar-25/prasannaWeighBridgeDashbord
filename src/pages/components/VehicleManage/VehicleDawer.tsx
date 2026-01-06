@@ -96,6 +96,11 @@ const VehicleDrawer: React.FC<VehicleDrawerProps> = ({
     const newErrors: Partial<Record<keyof Vehicle, string>> = {};
     let isValid = true;
 
+    if (!form.Vendor_Id) {
+        newErrors.Vendor_Id = "Please select a Vendor"; // This links to vendor
+        isValid = false;
+    }
+
     if (!form.Vehicle_type?.trim()) {
       newErrors.Vehicle_type = "Vehicle Type is required";
       isValid = false;
@@ -324,19 +329,18 @@ const VehicleDrawer: React.FC<VehicleDrawerProps> = ({
                   <MenuItem
                     key={vendor.Vendor_Id}
                     value={vendor.Vendor_Id}
-                    divider={false} // Turn off default lines
+                    divider={false}
                     sx={{
                       // 2. The "Floating Pill" Shape
                       borderRadius: '10px',
-                      margin: '6px 10px', // Creates space around the item
+                      margin: '6px 10px',
                       padding: '10px 16px',
                       transition: 'all 0.2s ease-in-out',
-                      // 3. Hover Effects
                       '&:hover': {
-                        backgroundColor: 'primary.lighter', // or 'rgba(25, 118, 210, 0.08)'
-                        transform: 'translateX(5px)', // Slide right effect
+                        backgroundColor: 'primary.lighter', 
+                        transform: 'translateX(5px)', 
                         '& .vendor-avatar': {
-                          transform: 'scale(1.1) rotate(-5deg)', // Avatar animation
+                          transform: 'scale(1.1) rotate(-5deg)',
                         }
                       },
                       // 4. Selected State Styling

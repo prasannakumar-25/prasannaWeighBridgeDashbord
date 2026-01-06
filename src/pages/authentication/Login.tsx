@@ -37,9 +37,6 @@
 
 // const navigate=useNavigate()
 
-
-
-
 // const handleSubmit=async()=>{
 
 //       try{
@@ -193,12 +190,344 @@
 
 
 
+// import { ReactElement, Suspense, useState } from 'react';
+// import {
+//   Alert,
+//   Button,
+//   CircularProgress,
+//   FormControl,
+//   IconButton,
+//   InputAdornment,
+//   InputLabel,
+//   Link,
+//   Skeleton,
+//   Snackbar,
+//   Stack,
+//   TextField,
+//   Typography,
+//   LinearProgress
+// } from '@mui/material';
+// import authApi from 'services/authApi';
+// import Authlogin from 'assets/authentication-banners/login1.webp';
+// import IconifyIcon from 'components/base/IconifyIcon';
+// import Acutuz from 'assets/logo/actuz-logo.webp';
+// import Image from 'components/base/Image';
+// import '../RegisterManagement/MachineRegister/MachineRegister.css';
+// import { useAsyncError, useNavigate } from 'react-router-dom';
+
+
+// // 1. Define Types for better Type Safety
+// interface FormErrors {
+//   username?: string;
+//   password?: string;
+// }
+
+// const Login = (): ReactElement => {
+//   const navigate = useNavigate();
+//   const [snackbarOpen, setSnackbarOpen] = useState(false);
+//   const [snackbarMessage, setSnackbarMessage] = useState("");
+
+//   // State Management
+//   const [showPassword, setShowPassword] = useState(false);
+//   const [loading, setLoading] = useState(false); // 2. Add Loading State
+//   const [form, setForm] = useState({
+//     username: '',
+//     password: '',
+//   });
+  
+//   // 3. Add Error State Management
+//   const [errors, setErrors] = useState<FormErrors>({});
+//   const [apiError, setApiError] = useState<string | null>(null); // For global API errors (e.g. 401 Unauthorized)
+
+//   // 4. Validation Logic
+//   const validateForm = (): boolean => {
+//     const newErrors: FormErrors = {};
+//     let isValid = true;
+
+//     if (!form.username.trim()) {
+//       newErrors.username = 'Username is required';
+//       isValid = false;
+//     }
+
+//     if (!form.password) {
+//       newErrors.password = 'Password is required';
+//       isValid = false;
+//     } 
+//     else if (form.password.length < 6) {
+//       newErrors.password = 'Password must be at least 6 characters';
+//       isValid = false;
+//     }
+
+//     setErrors(newErrors);
+//     return isValid;
+//   };
+
+//   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const { name, value } = e.target;
+//     setForm({
+//       ...form,
+//       [name]: value,
+//     });
+    
+//     // 5. Clear specific field error when user types
+//     if (errors[name as keyof FormErrors]) {
+//       setErrors({
+//         ...errors,
+//         [name]: undefined,
+//       });
+//     }
+//   };
+
+//   const handleClickShowPassword = () => setShowPassword(!showPassword);
+  
+
+//   const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+//     event.preventDefault();
+//   };
+
+//   const handleSubmit = async () => {
+//     setApiError(null); 
+
+//     if (!validateForm()) {
+//       // setApiError("Please fill in all required fields correctly.");
+//       setSnackbarMessage("Please fill in all required fields correctly.");
+//       setSnackbarOpen(true);
+//       return;
+//     }
+//      setLoading(true);
+
+//     try {
+//       const payload = {
+//         User_name: form.username,
+//         Password: form.password,
+//       };
+
+//       const response = await authApi.addauthuser(payload);
+
+//       if (response.success) {
+//         localStorage.setItem("vendor_id",response.user.vendor_id)
+//         localStorage.setItem("Role",response.user.Role)
+//         localStorage.setItem("access_token",response.user.token)
+//         navigate('/');
+//         setSnackbarMessage("Login Successfull");
+//         setSnackbarOpen(true);
+//         console.log("Login Successfull");
+//       } else {
+//         setApiError(response.message || 'Invalid credentials provided.');
+//       }
+//     } catch (error: any) {
+//       console.error("Login failed:", error);
+
+//       let errorMessage = "";
+
+//       if (error.response?.status === 401) {
+//         errorMessage = "Invalid username or password.";
+//       } else if (error.response?.status === 403) {
+//         errorMessage = "You do not have permission to access this account.";
+//       } else if (error.response?.status >= 500) {
+//         errorMessage = "Server error. Please try again later.";
+//       } else if (error.message === "Network Error") {
+//         errorMessage = "Network error. Please check your internet connection.";
+//       } else if (error.response?.data?.message) {
+//         errorMessage = error.response.data.message;
+//       }
+
+//       setApiError(errorMessage);
+//       setSnackbarMessage(errorMessage);
+//       setSnackbarOpen(true);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+
+//   const handleCloseSnackbar = () => {
+//     setApiError(null);
+//   };
+
+//   return (
+//     <Stack
+//       direction="row"
+//       bgcolor="background.paper"
+//       boxShadow={(theme) => theme.shadows[3]}
+//       height={560}
+//       width={{ md: 960 }}
+//     >
+//       <Snackbar 
+//         open={!!apiError} 
+//         autoHideDuration={6000} 
+//         onClose={handleCloseSnackbar}
+//         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+//       >
+//         <Alert onClose={handleCloseSnackbar} severity="error" sx={{ width: '100%' }}>
+//           {apiError}
+//         </Alert>
+//       </Snackbar>
+
+//       <Stack width={{ md: 0.5 }} m={2.5} gap={10}>
+//         <Link href="/" width="fit-content">
+//           <Image src={Acutuz} width={65.8} />
+//         </Link>
+//         <Stack alignItems="center" gap={2.5} width={330} mx="auto">
+//           <Typography variant="h3">Login</Typography>
+
+//           {/* Username Field */}
+//           <FormControl variant="standard" fullWidth>
+//             <InputLabel shrink htmlFor="username" error={!!errors.username}>
+//               Username
+//             </InputLabel>
+//             <TextField
+//               variant="filled"
+//               className="input-bg-color label-black"
+//               placeholder="Enter your Username"
+//               id="username"
+//               name="username"
+//               value={form.username}
+//               onChange={handleChange}
+//               error={!!errors.username}
+//               helperText={errors.username}
+//               disabled={loading} 
+//               InputProps={{
+//                 endAdornment: (
+//                   <InputAdornment position="end">
+//                     <IconifyIcon 
+//                       icon="ic:baseline-email" 
+//                       color={errors.username ? 'error.main' : 'text.secondary'}
+//                     />
+//                   </InputAdornment>
+//                 ),
+//               }}
+//             />
+//           </FormControl>
+
+//           {/* Password Field */}
+//           <FormControl variant="standard" fullWidth>
+//             <InputLabel shrink htmlFor="password" error={!!errors.password}>
+//               Password
+//             </InputLabel>
+//             <TextField
+//               variant="filled"
+//               className="input-bg-color label-black"
+//               placeholder="********"
+//               id="password"
+//               name="password"
+//               type={showPassword ? 'text' : 'password'}
+//               value={form.password}
+//               onChange={handleChange}
+//               error={!!errors.password}
+//               helperText={errors.password}
+//               disabled={loading} 
+//               InputProps={{
+//                 endAdornment: (
+//                   <InputAdornment position="end">
+//                     <IconButton
+//                       onClick={handleClickShowPassword}
+//                       onMouseDown={handleMouseDownPassword}
+//                       edge="end"
+//                       disabled={loading}
+//                       sx={{ color: errors.password ? 'error.main' : 'text.secondary' }}
+//                     >
+//                       {showPassword ? (
+//                         <IconifyIcon icon="ic:baseline-key-off" />
+//                       ) : (
+//                         <IconifyIcon icon="ic:baseline-key" />
+//                       )}
+//                     </IconButton>
+//                   </InputAdornment>
+//                 ),
+//               }}
+//               // Allow submitting by pressing Enter
+//               onKeyDown={(e) => {
+//                 if (e.key === 'Enter') handleSubmit();
+//               }}
+//             />
+//           </FormControl>
+
+//           {/* Login Button with Loading State */}
+//           <Button 
+//             variant="contained" 
+//             fullWidth 
+//             onClick={handleSubmit}
+//             disabled={loading} // Prevent double clicks
+//             size="large"
+//           >
+//             {loading ? (
+//               <CircularProgress size={24} color="inherit" />
+//             ) : (
+//               'Log in'
+//             )}
+//           </Button>
+//         </Stack>
+//       </Stack>
+      
+//       <Suspense
+//         fallback={
+//           <Skeleton variant="rectangular" height={1} width={1} sx={{ bgcolor: 'primary.main' }} />
+//         }
+//       >
+//         <Image
+//           alt="Login banner"
+//           src={Authlogin}
+//           sx={{
+//             width: 0.5,
+//             display: { xs: 'none', md: 'block' },
+//             objectFit: 'cover'
+//           }}
+//         />
+//       </Suspense>
+//       <Snackbar
+//           open={snackbarOpen}
+//           autoHideDuration={3500}
+//           onClose={() => setSnackbarOpen(false)}
+//           anchorOrigin={{ vertical: "top", horizontal: "right" }}
+//       >
+//           <Alert onClose={() => setSnackbarOpen(false)} severity="success" variant="filled">
+//               {snackbarMessage}
+//                <LinearProgress
+//             variant="determinate"
+//             value={100}
+//             sx={{
+//               mt: 1,
+//               height: 4,
+//               borderRadius: 2,
+//               bgcolor: '#c8e6c9',
+//               '& .MuiLinearProgress-bar': {
+//                 bgcolor: '#66bb6a',
+//                 animation: 'snackbarProgress 3.5s linear forwards',
+//               },
+//               '@keyframes snackbarProgress': {
+//                 to: { width: '100%' },
+//                 from: { width: '0%' },
+//               },
+//             }}
+//           />
+//           </Alert>
+//       </Snackbar>
+//     </Stack>
+//   );
+// };
+
+// export default Login;
+
+
+
+
+
+
+
+
+
+
+
+
 import { ReactElement, Suspense, useState } from 'react';
 import {
   Alert,
   Button,
   CircularProgress,
+  Checkbox,         // Added
   FormControl,
+  FormControlLabel, // Added
   IconButton,
   InputAdornment,
   InputLabel,
@@ -208,6 +537,7 @@ import {
   Stack,
   TextField,
   Typography,
+  LinearProgress
 } from '@mui/material';
 import authApi from 'services/authApi';
 import Authlogin from 'assets/authentication-banners/login1.webp';
@@ -215,10 +545,9 @@ import IconifyIcon from 'components/base/IconifyIcon';
 import Acutuz from 'assets/logo/actuz-logo.webp';
 import Image from 'components/base/Image';
 import '../RegisterManagement/MachineRegister/MachineRegister.css';
-import { useNavigate } from 'react-router-dom';
-import { enqueueSnackbar } from 'notistack';
+import { useAsyncError, useNavigate } from 'react-router-dom';
 
-// 1. Define Types for better Type Safety
+
 interface FormErrors {
   username?: string;
   password?: string;
@@ -226,20 +555,23 @@ interface FormErrors {
 
 const Login = (): ReactElement => {
   const navigate = useNavigate();
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
-  // State Management
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false); // 2. Add Loading State
+  const [loading, setLoading] = useState(false);
+  
+  // 1. New State for Stay Logged In
+  const [rememberMe, setRememberMe] = useState(false);
+
   const [form, setForm] = useState({
     username: '',
     password: '',
   });
   
-  // 3. Add Error State Management
   const [errors, setErrors] = useState<FormErrors>({});
-  const [apiError, setApiError] = useState<string | null>(null); // For global API errors (e.g. 401 Unauthorized)
+  const [apiError, setApiError] = useState<string | null>(null);
 
-  // 4. Validation Logic
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
     let isValid = true;
@@ -269,7 +601,6 @@ const Login = (): ReactElement => {
       [name]: value,
     });
     
-    // 5. Clear specific field error when user types
     if (errors[name as keyof FormErrors]) {
       setErrors({
         ...errors,
@@ -279,7 +610,6 @@ const Login = (): ReactElement => {
   };
 
   const handleClickShowPassword = () => setShowPassword(!showPassword);
-  
 
   const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -288,12 +618,12 @@ const Login = (): ReactElement => {
   const handleSubmit = async () => {
     setApiError(null); 
 
-
     if (!validateForm()) {
+      setSnackbarMessage("Please fill in all required fields correctly.");
+      setSnackbarOpen(true);
       return;
     }
-
-    setLoading(true);
+     setLoading(true);
 
     try {
       const payload = {
@@ -304,27 +634,46 @@ const Login = (): ReactElement => {
       const response = await authApi.addauthuser(payload);
 
       if (response.success) {
-        localStorage.setItem("vendor_id",response.user.vendor_id)
-        localStorage.setItem("Role",response.user.Role)
-        localStorage.setItem("access_token",response.user.token)
+        // 2. Modified Storage Logic
+        const storage = rememberMe ? localStorage : sessionStorage;
+
+        storage.setItem("vendor_id", response.user.vendor_id);
+        storage.setItem("Role", response.user.Role);
+        storage.setItem("access_token", response.user.token);
+
         navigate('/');
-        enqueueSnackbar("Login Successfull")
-        console.log("Login Successfull")
+        setSnackbarMessage("Login Successfull");
+        setSnackbarOpen(true);
+        console.log("Login Successfull");
       } else {
         setApiError(response.message || 'Invalid credentials provided.');
       }
     } catch (error: any) {
-      console.error('Login failed:', error);
-      setApiError(error.response?.data?.message || 'Something went wrong. Please try again.');
+      console.error("Login failed:", error);
+      // ... error handling logic ...
+      let errorMessage = "";
+      if (error.response?.status === 401) {
+        errorMessage = "Invalid username or password.";
+      } else if (error.response?.status === 403) {
+        errorMessage = "You do not have permission to access this account.";
+      } else if (error.response?.status >= 500) {
+        errorMessage = "Server error. Please try again later.";
+      } else if (error.message === "Network Error") {
+        errorMessage = "Network error. Please check your internet connection.";
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
+      setApiError(errorMessage);
+      setSnackbarMessage(errorMessage);
+      setSnackbarOpen(true);
     } finally {
       setLoading(false);
     }
   };
 
-
-  const handleCloseSnackbar = () => {
-    setApiError(null);
-  };
+  // const handleCloseSnackbar = () => {
+  //   setApiError(null);
+  // };
 
   return (
     <Stack
@@ -334,7 +683,8 @@ const Login = (): ReactElement => {
       height={560}
       width={{ md: 960 }}
     >
-      <Snackbar 
+        {/* ... Snackbar and Logo code ... */}
+      {/* <Snackbar 
         open={!!apiError} 
         autoHideDuration={6000} 
         onClose={handleCloseSnackbar}
@@ -343,17 +693,17 @@ const Login = (): ReactElement => {
         <Alert onClose={handleCloseSnackbar} severity="error" sx={{ width: '100%' }}>
           {apiError}
         </Alert>
-      </Snackbar>
+      </Snackbar> */}
 
-      <Stack width={{ md: 0.5 }} m={2.5} gap={10}>
+      <Stack width={{ md: 0.5 }} m={1.1} gap={5}>
         <Link href="/" width="fit-content">
-          <Image src={Acutuz} width={65.8} />
+          <Image src={Acutuz} width={70.8} />
         </Link>
         <Stack alignItems="center" gap={2.5} width={330} mx="auto">
           <Typography variant="h3">Login</Typography>
 
-          {/* Username Field */}
           <FormControl variant="standard" fullWidth>
+             {/* ... Username Field ... */}
             <InputLabel shrink htmlFor="username" error={!!errors.username}>
               Username
             </InputLabel>
@@ -381,8 +731,8 @@ const Login = (): ReactElement => {
             />
           </FormControl>
 
-          {/* Password Field */}
           <FormControl variant="standard" fullWidth>
+            {/* ... Password Field ... */}
             <InputLabel shrink htmlFor="password" error={!!errors.password}>
               Password
             </InputLabel>
@@ -417,19 +767,32 @@ const Login = (): ReactElement => {
                   </InputAdornment>
                 ),
               }}
-              // Allow submitting by pressing Enter
               onKeyDown={(e) => {
                 if (e.key === 'Enter') handleSubmit();
               }}
             />
           </FormControl>
 
-          {/* Login Button with Loading State */}
+          {/* 3. New Checkbox UI Added Here */}
+          <Stack direction="row" alignItems="center" width="100%" sx={{ mt: -1 }}>
+            <FormControlLabel
+              control={
+                <Checkbox 
+                  checked={rememberMe} 
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  color="primary"
+                />
+              }
+              label="Stay logged in"
+              sx={{ color: 'text.secondary' }}
+            />
+          </Stack>
+
           <Button 
             variant="contained" 
             fullWidth 
             onClick={handleSubmit}
-            disabled={loading} // Prevent double clicks
+            disabled={loading} 
             size="large"
           >
             {loading ? (
@@ -456,6 +819,34 @@ const Login = (): ReactElement => {
           }}
         />
       </Suspense>
+      <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={3500}
+          onClose={() => setSnackbarOpen(false)}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+          <Alert onClose={() => setSnackbarOpen(false)} severity="success" variant="filled">
+              {snackbarMessage}
+               <LinearProgress
+            variant="determinate"
+            value={100}
+            sx={{
+              mt: 1,
+              height: 4,
+              borderRadius: 2,
+              bgcolor: '#c8e6c9',
+              '& .MuiLinearProgress-bar': {
+                bgcolor: '#66bb6a',
+                animation: 'snackbarProgress 3.5s linear forwards',
+              },
+              '@keyframes snackbarProgress': {
+                to: { width: '100%' },
+                from: { width: '0%' },
+              },
+            }}
+          />
+          </Alert>
+      </Snackbar>
     </Stack>
   );
 };

@@ -12,9 +12,11 @@ import {
   Tooltip,
   useTheme,
   LinearProgress,
-  Menu,           // <--- ADDED
-  ListItemIcon,   // <--- ADDED
-  ListItemText,   // <--- ADDED
+  Menu,
+  ListItemIcon,
+  ListItemText,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { 
   DataGrid, 
@@ -52,13 +54,15 @@ const VendorMain: React.FC<VendorMainProps> = ({
   onRefresh,
 }) => {
   const theme = useTheme();
-  const { enqueueSnackbar } = useSnackbar();
+
 
   // -- Local Filter State --
   const [search, setSearch] = useState('');
   const [filterGst, setFilterGst] = useState(''); // GST Filter
   const [fromDate, setFromDate] = useState<Dayjs | null>(null);
   const [toDate, setToDate] = useState<Dayjs | null>(null);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   // -- DOWNLOAD MENU STATE (ADDED) --
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -111,7 +115,8 @@ const VendorMain: React.FC<VendorMainProps> = ({
   // -- PREPARE DATA FOR EXPORT --
   const getExportData = () => {
     if (filteredVendors.length === 0) {
-      enqueueSnackbar("No data to download", { variant: "warning" });
+      setSnackbarMessage("No data to download");;
+      setSnackbarOpen(true);
       return null;
     }
     return filteredVendors.map(v => ({
@@ -141,7 +146,8 @@ const VendorMain: React.FC<VendorMainProps> = ({
     XLSX.writeFile(workbook, fileName); // <--- Use variable
     
     handleCloseDownloadMenu();
-    enqueueSnackbar("Exported to Excel successfully", { variant: "success" });
+    setSnackbarMessage("Exported to Excel successfully");
+    setSnackbarOpen(true);
   };
 
   // -- EXPORT TO WORD FUNCTION --
@@ -212,7 +218,8 @@ const VendorMain: React.FC<VendorMainProps> = ({
     
     document.body.removeChild(downloadLink);
     handleCloseDownloadMenu();
-    enqueueSnackbar("Exported to Word successfully", { variant: "success" });
+    setSnackbarMessage("Exported to Word successfully");
+    setSnackbarOpen(true);
   };
 
   // -- DataGrid Columns --
@@ -475,122 +482,122 @@ const VendorMain: React.FC<VendorMainProps> = ({
 
 
                <Menu
-                              anchorEl={anchorEl}
-                              open={openDownloadMenu}
-                              onClose={handleCloseDownloadMenu}
-                              // TransitionComponent={Fade} 
-                              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                              transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                              
-                              // 1. Container Styling (Glassmorphism & Shadow)
-                              PaperProps={{
-                                elevation: 0,
-                                sx: {
-                                  overflow: 'visible',
-                                  filter: 'drop-shadow(0px 4px 20px rgba(0,0,0,0.1))', // Deep, soft shadow
-                                  mt: 1.5,
-                                  minWidth: 220,
-                                  borderRadius: 3, // Modern rounded edges
-                                  border: '1px solid',
-                                  borderColor: 'divider',
-                                  
-                                  // The "Speech Bubble" Arrow
-                                  '&:before': {
-                                    content: '""',
-                                    display: 'block',
-                                    position: 'absolute',
-                                    top: 0,
-                                    right: 14,
-                                    width: 10,
-                                    height: 10,
-                                    bgcolor: 'background.paper',
-                                    transform: 'translateY(-50%) rotate(45deg)',
-                                    zIndex: 0,
-                                    borderTop: '1px solid',
-                                    borderLeft: '1px solid',
-                                    borderColor: 'divider',
-                                  },
-                                },
-                              }}
-                            >
-                              {/* Option 1: Excel */}
-                              <MenuItem 
-                                onClick={handleExportExcel}
-                                sx={{ 
-                                  py: 1.5, // Taller rows for modern feel
-                                  mx: 1,   // Spacing on sides for "floating" feel
-                                  my: 0.5,
-                                  borderRadius: 1.5,
-                                  transition: 'all 0.3s ease',
-                                  
-                                  // HOVER EFFECTS
-                                  '&:hover': {
-                                    bgcolor: 'success.lighter', // Requires theme setup, or use 'rgba(0, 200, 83, 0.08)'
-                                    transform: 'translateX(4px)', // Slight slide to the right
-                                    
-                                    // Target the Icon inside on hover
-                                    '& .MuiListItemIcon-root': {
-                                      transform: 'scale(1.2)', // Icon grows
-                                      filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.2))'
-                                    },
-                                    // Target the Text inside on hover
-                                    '& .MuiListItemText-primary': {
-                                      color: 'success.dark',
-                                      fontWeight: 'bold',
-                                    }
-                                  }
-                                }}
-                              >
-                                <ListItemIcon sx={{ transition: 'transform 0.2s ease-in-out' }}>
-                                  <IconifyIcon icon="vscode-icons:file-type-excel2" width={24} />
-                                </ListItemIcon>
-                                <ListItemText 
-                                  primary="Export to Excel" 
-                                  primaryTypographyProps={{ 
-                                    variant: 'body2', 
-                                    sx: { transition: 'color 0.2s ease' } 
-                                  }} 
-                                />
-                              </MenuItem>
-              
-                              {/* Option 2: Word */}
-                              <MenuItem 
-                                onClick={handleExportWord}
-                                sx={{ 
-                                  py: 1.5,
-                                  mx: 1,
-                                  my: 0.5,
-                                  borderRadius: 1.5,
-                                  transition: 'all 0.3s ease',
-                                  
-                                  // HOVER EFFECTS
-                                  '&:hover': {
-                                    bgcolor: 'info.lighter', // or 'rgba(24, 144, 255, 0.08)'
-                                    transform: 'translateX(4px)',
-                                    
-                                    '& .MuiListItemIcon-root': {
-                                      transform: 'scale(1.2) rotate(-5deg)', // Icon grows and tilts slightly
-                                      filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.2))'
-                                    },
-                                    '& .MuiListItemText-primary': {
-                                      color: 'info.dark',
-                                      fontWeight: 'bold',
-                                    }
-                                  }
-                                }}
-                              >
-                                <ListItemIcon sx={{ transition: 'transform 0.2s ease-in-out' }}>
-                                  <IconifyIcon icon="vscode-icons:file-type-word" width={24} />
-                                </ListItemIcon>
-                                <ListItemText 
-                                  primary="Export to Word" 
-                                  primaryTypographyProps={{ 
-                                    variant: 'body2', 
-                                    sx: { transition: 'color 0.2s ease' } 
-                                  }} 
-                                />
-                              </MenuItem>
-                            </Menu>
+                anchorEl={anchorEl}
+                open={openDownloadMenu}
+                onClose={handleCloseDownloadMenu}
+                // TransitionComponent={Fade} 
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                
+                // 1. Container Styling (Glassmorphism & Shadow)
+                PaperProps={{
+                  elevation: 0,
+                  sx: {
+                    overflow: 'visible',
+                    filter: 'drop-shadow(0px 4px 20px rgba(0,0,0,0.1))', // Deep, soft shadow
+                    mt: 1.5,
+                    minWidth: 220,
+                    borderRadius: 3, // Modern rounded edges
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    
+                    // The "Speech Bubble" Arrow
+                    '&:before': {
+                      content: '""',
+                      display: 'block',
+                      position: 'absolute',
+                      top: 0,
+                      right: 14,
+                      width: 10,
+                      height: 10,
+                      bgcolor: 'background.paper',
+                      transform: 'translateY(-50%) rotate(45deg)',
+                      zIndex: 0,
+                      borderTop: '1px solid',
+                      borderLeft: '1px solid',
+                      borderColor: 'divider',
+                    },
+                  },
+                }}
+              >
+                {/* Option 1: Excel */}
+                <MenuItem 
+                  onClick={handleExportExcel}
+                  sx={{ 
+                    py: 1.5, // Taller rows for modern feel
+                    mx: 1,   // Spacing on sides for "floating" feel
+                    my: 0.5,
+                    borderRadius: 1.5,
+                    transition: 'all 0.3s ease',
+                    
+                    // HOVER EFFECTS
+                    '&:hover': {
+                      bgcolor: 'success.lighter', // Requires theme setup, or use 'rgba(0, 200, 83, 0.08)'
+                      transform: 'translateX(4px)', // Slight slide to the right
+                      
+                      // Target the Icon inside on hover
+                      '& .MuiListItemIcon-root': {
+                        transform: 'scale(1.2)', // Icon grows
+                        filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.2))'
+                      },
+                      // Target the Text inside on hover
+                      '& .MuiListItemText-primary': {
+                        color: 'success.dark',
+                        fontWeight: 'bold',
+                      }
+                    }
+                  }}
+                >
+                  <ListItemIcon sx={{ transition: 'transform 0.2s ease-in-out' }}>
+                    <IconifyIcon icon="vscode-icons:file-type-excel2" width={24} />
+                  </ListItemIcon>
+                  <ListItemText 
+                    primary="Export to Excel" 
+                    primaryTypographyProps={{ 
+                      variant: 'body2', 
+                      sx: { transition: 'color 0.2s ease' } 
+                    }} 
+                  />
+                </MenuItem>
+
+                {/* Option 2: Word */}
+                <MenuItem 
+                  onClick={handleExportWord}
+                  sx={{ 
+                    py: 1.5,
+                    mx: 1,
+                    my: 0.5,
+                    borderRadius: 1.5,
+                    transition: 'all 0.3s ease',
+                    
+                    // HOVER EFFECTS
+                    '&:hover': {
+                      bgcolor: 'info.lighter', // or 'rgba(24, 144, 255, 0.08)'
+                      transform: 'translateX(4px)',
+                      
+                      '& .MuiListItemIcon-root': {
+                        transform: 'scale(1.2) rotate(-5deg)', // Icon grows and tilts slightly
+                        filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.2))'
+                      },
+                      '& .MuiListItemText-primary': {
+                        color: 'info.dark',
+                        fontWeight: 'bold',
+                      }
+                    }
+                  }}
+                >
+                  <ListItemIcon sx={{ transition: 'transform 0.2s ease-in-out' }}>
+                    <IconifyIcon icon="vscode-icons:file-type-word" width={24} />
+                  </ListItemIcon>
+                  <ListItemText 
+                    primary="Export to Word" 
+                    primaryTypographyProps={{ 
+                      variant: 'body2', 
+                      sx: { transition: 'color 0.2s ease' } 
+                    }} 
+                  />
+                </MenuItem>
+              </Menu>
 
               <Tooltip title="Refresh Data" arrow>
                 <IconButton
@@ -615,6 +622,34 @@ const VendorMain: React.FC<VendorMainProps> = ({
             </Grid>
           </Grid>
         </Box>
+        <Snackbar
+            open={snackbarOpen}
+            autoHideDuration={3000}
+            onClose={() => setSnackbarOpen(false)}
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        >
+            <Alert onClose={() => setSnackbarOpen(false)} severity="success" variant="filled">
+                {snackbarMessage}
+                 <LinearProgress
+              variant="determinate"
+              value={100}
+              sx={{
+                mt: 1,
+                height: 4,
+                borderRadius: 2,
+                bgcolor: '#c8e6c9',
+                '& .MuiLinearProgress-bar': {
+                  bgcolor: '#66bb6a',
+                  animation: 'snackbarProgress 3.5s linear forwards',
+                },
+                '@keyframes snackbarProgress': {
+                  to: { width: '100%' },
+                  from: { width: '0%' },
+                },
+              }}
+            />
+            </Alert>
+        </Snackbar>
 
         {/* --- DataGrid --- */}
         <Box sx={{ height: 550, width: '100%' }}>

@@ -118,6 +118,18 @@ const IPCameraDrawer: React.FC<IPCameraDrawerProps> = ({
       newErrors.IP_address = "IP Address is required";
       isValid = false;
     }
+    // ---  Professional MAC Address Validation ---
+    const mac = form.Mac_address?.trim().toUpperCase();
+    const macRegex = /^([0-9A-F]{2}[:-]){5}([0-9A-F]{2})$/;
+
+
+    if (!mac) {
+      newErrors.Mac_address = "MAC address is required.";
+      isValid = false;
+    } else if (!macRegex.test(mac)) {
+      newErrors.Mac_address = "Invalid format. Expected: XX:XX:XX:XX:XX:XX";
+      isValid = false;
+    } 
     // Optional: Validate IP format regex if needed
     
     setErrors(newErrors);
@@ -239,7 +251,7 @@ const IPCameraDrawer: React.FC<IPCameraDrawerProps> = ({
                 <Grid item xs={12}>
                     <TextField
                         label="Camera Name"
-                        className="input-bg-color  "
+                        className="input-bg-color label-black" 
                         placeholder="e.g. Main Gate Camera 01"
                         fullWidth
                         value={form.Camera_name}
@@ -354,6 +366,8 @@ const IPCameraDrawer: React.FC<IPCameraDrawerProps> = ({
                         placeholder="AA:BB:CC:DD:EE:FF"
                         fullWidth
                         value={form.Mac_address || ""}
+                        error={!!errors.Mac_address}
+                        helperText={errors.Mac_address}
                         onChange={(e) => setField("Mac_address", e.target.value)}
                         disabled={loading}
                     />
