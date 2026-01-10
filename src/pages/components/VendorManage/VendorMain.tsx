@@ -27,8 +27,7 @@ import {
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import IconifyIcon from "components/base/IconifyIcon";
-import { useSnackbar } from 'notistack';
-import * as XLSX from 'xlsx'; // <--- ADDED: Import XLSX for Excel export
+import * as XLSX from 'xlsx';
 
 // Import Types and Pagination
 import { Vendor } from "pages/RegisterManagement/VendorRegister/VendorRegister"; 

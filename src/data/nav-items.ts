@@ -7,204 +7,47 @@ export interface NavItem {
   sublist?: NavItem[];
 }
 
+// const role = localStorage.getItem('Role')
+
 const navItems: NavItem[] = [
-  // {
-  //   title: 'Authentication',
-  //   path: 'authentication',
-  //   icon: 'f7:exclamationmark-shield-fill',
-  //   active: true,
-  //   collapsible: true,
-  //   sublist: [ 
-  //     {
-  //       title: 'Sign In',
-  //       path: 'login',
-  //       active: true,
-  //       collapsible: false,
-  //     },
-  //     {
-  //       title: 'Sign Up',
-  //       path: 'sign-up',
-  //       active: true,
-  //       collapsible: false,
-  //     },
-  //     {
-  //       title: 'Forgot password',
-  //       path: 'forgot-password',
-  //       active: true,
-  //       collapsible: false,
-  //     },
-  //     {
-  //       title: 'Reset password',
-  //       path: 'reset-password',
-  //       active: true,
-  //       collapsible: false,
-  //     },
-  //   ],
-  // },
+
   {
     title: 'Dashboard',
     path: '/',
     icon: 'ion:home-sharp',
     active: true,
     collapsible: false,
-    sublist: [
-      {
-        title: 'Dashboard',
-        path: '/',
-        active: false,
-        collapsible: false,
-      },
-      {
-        title: 'Sales',
-        path: '/',
-        active: false,
-        collapsible: false,
-      },
-    ],
   },
-  // {
-  //   title: 'Resgister',
-  //   path: 'register',
-  //   icon: 'game-icons:archive-register',
-  //   active: true,
-  //   collapsible: true,
-  //   sublist: [
-  //     {
-  //       title: 'Vendor',
-  //       path: 'vendor',
-  //       active: true,
-  //       collapsible: false,
-  //       sublist: [
-  //         {
-  //           title: 'Overview',
-  //           path: '#!',
-  //           active: false,
-  //           collapsible: false,
-  //         },
-  //         {
-  //           title: 'All Projects',
-  //           path: '#!',
-  //           active: false,
-  //           collapsible: false,
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       title: 'MachineRegister',
-  //       path: '#!',
-  //       active: false,
-  //       collapsible: false,
-  //       sublist: [
-  //         {
-  //           title: 'All Users',
-  //           path: '#!',
-  //           active: false,
-  //           collapsible: false,
-  //         },
-  //         {
-  //           title: 'Add user',
-  //           path: '#!',
-  //           active: false,
-  //           collapsible: false,
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       title: 'Users',
-  //       path: '#!',
-  //       active: false,
-  //       collapsible: false,
-  //       sublist: [
-  //         {
-  //           title: 'Setting',
-  //           path: '#!',
-  //           active: false,
-  //           collapsible: false,
-  //         },
-  //         {
-  //           title: 'Billing',
-  //           path: '#!',
-  //           active: false,
-  //           collapsible: false,
-  //         },
-  //         {
-  //           title: 'Invoice',
-  //           path: '#!',
-  //           active: false,
-  //           collapsible: false,
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       title: 'Projects',
-  //       path: '#!',
-  //       active: false,
-  //       collapsible: false,
-  //       sublist: [
-  //         {
-  //           title: 'Timeline',
-  //           path: '#!',
-  //           active: false,
-  //           collapsible: false,
-  //         },
-  //       ],
-  //     },
-  //   ],
-  // },
-  //   {
-  //   title: 'Authentication',
-  //   path: 'authentication',
-  //   icon: 'f7:exclamationmark-shield-fill',
-  //   active: true,
-  //   collapsible: true,
-  //   sublist: [ 
-  //     {
-  //       title: 'Sign In',
-  //       path: 'login',
-  //       active: true,
-  //       collapsible: false,
-  //     },
-  //     {
-  //       title: 'Sign Up',
-  //       path: 'sign-up',
-  //       active: true,
-  //       collapsible: false,
-  //     },
-  //     {
-  //       title: 'Forgot password',
-  //       path: 'forgot-password',
-  //       active: true,
-  //       collapsible: false,
-  //     },
-  //     {
-  //       title: 'Reset password',
-  //       path: 'reset-password',
-  //       active: true,
-  //       collapsible: false,
-  //     },
-  //   ],
-  // },
+  {
+    title: 'UserAdmin',
+    path: '/useradminManagement',
+    icon: 'eos-icons:admin-outlined',
+    active: true,
+    collapsible: false,
+    // sublist: [
+      
+    //   {
+    //     title: 'Users',
+    //     path: '#!',
+    //     active: false,
+    //     collapsible: false,
+        
+    //   },
+    // ],
+  },
   {
     title: 'VendorRegister',
     path: '/vendorManagement',
-    icon: 'typcn:vendor-android',
+    icon: 'stash:user-shield',
     active: true,
     collapsible: false,
   },
   {
-    title: 'MachineManage',
+    title: 'MachineRegister',
     path: '/machineManagemant',
-    icon: 'streamline-cyber:virtual-machine-3',
+    icon: 'fluent-mdl2:connect-virtual-machine',
     active: true,
     collapsible: false,
-      //  sublist: [ 
-      // {
-      //   title: 'Reports',
-      //   path: '/',
-      //   active: true,
-      //   collapsible: false,
-      // },
-      //  ]
   },
   // {
   //   title: 'UserRgister',
@@ -216,7 +59,7 @@ const navItems: NavItem[] = [
   {
     title: 'CustomerRegister',
     path: '/customerRegister',
-    icon: 'raphael:customer',
+    icon: 'heroicons-outline:user-group',
     active: true,
     collapsible: false,
   },
@@ -237,12 +80,73 @@ const navItems: NavItem[] = [
   {
     title: 'Weighbridge',
     path: '/weighbridgeManage',
-    icon: 'game-icons:weight-scale',
+    icon: 'icon-park:gate-machine',
     active: true,
     collapsible: false,
   },
+];
+
+export default navItems;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   // {
+  //   title: 'Authentication',
+  //   path: 'authentication',
+  //   icon: 'f7:exclamationmark-shield-fill',
+  //   active: true,
+  //   collapsible: true,
+  //   sublist: [ 
+  //     {
+  //       title: 'Sign In',
+  //       path: 'login',
+  //       active: true,
+  //       collapsible: false,
+  //     },
+  //     {
+  //       title: 'Sign Up',
+  //       path: 'sign-up',
+  //       active: true,
+  //       collapsible: false,
+  //     },
+  //     {
+  //       title: 'Forgot password',
+  //       path: 'forgot-password',
+  //       active: true,
+  //       collapsible: false,
+  //     },
+  //     {
+  //       title: 'Reset password',
+  //       path: 'reset-password',
+  //       active: true,
+  //       collapsible: false,
+  //     },
+  //   ],
+  // },
+
+
+    // {
   //   title: 'Ecommerce',
   //   path: 'ecommerce1',
   //   icon: 'tabler:shopping-bag',
@@ -360,6 +264,3 @@ const navItems: NavItem[] = [
   //   active: true,
   //   collapsible: false,
   // },
-];
-
-export default navItems;

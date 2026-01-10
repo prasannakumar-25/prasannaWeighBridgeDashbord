@@ -7,11 +7,12 @@ import PageLoader from '../components/loading/PageLoader';
 import Splash from 'components/loading/Splash';
 import VendorRegister from 'pages/RegisterManagement/VendorRegister/VendorRegister';
 import MachineRegister from 'pages/RegisterManagement/MachineRegister/MachineRegister';
-import UserRegister from 'pages/RegisterManagement/UserRegistration/UserRegister';
+// import UserRegister from 'pages/RegisterManagement/UserRegistration/UserRegister';
 import VehicleRegister from 'pages/RegisterManagement/VehicleRegister/VehicleRegister';
 import IPCameraRegister from 'pages/RegisterManagement/IPCameraRegister/IPCameraRegister';
 import WeighbridgeRegister from 'pages/RegisterManagement/WeighbridgeRegister/WeighbridgeRegister';
 import CustomerRegister from 'pages/RegisterManagement/CustomerRegister/CustomerRegister';
+import UserAdminRegister from 'pages/RegisterManagement/UserAdminRegister/UserAdmin';
 
 
 
@@ -107,6 +108,28 @@ const routes: RouteObject[] = [
         ],
       },
       {
+        path: rootPaths.userAdminRoot,
+        element: (
+          // <AuthLayout>
+            <Suspense fallback={<PageLoader />}>
+              <Outlet />
+            </Suspense>
+          // </AuthLayout>
+        ),
+        children: [
+          {
+            path: paths.userAdmin,
+            element: 
+            <MainLayout>
+              <Suspense fallback={<PageLoader />}>
+                <UserAdminRegister />
+              </Suspense>
+            </MainLayout>,
+          },
+          
+        ],
+      },
+      {
         path: rootPaths.vendorRoot,
         element: (
           // <AuthLayout>
@@ -150,28 +173,28 @@ const routes: RouteObject[] = [
           
         ],
       },
-      {
-        path: rootPaths.userRoot,
-        element: (
-          // <AuthLayout>
-            <Suspense fallback={<PageLoader />}>
-              <Outlet />
-            </Suspense>
-          // </AuthLayout>
-        ),
-        children: [
-          {
-            path: paths.user,
-            element: 
-            <MainLayout>
-              <Suspense fallback={<PageLoader />}>
-                <UserRegister />
-              </Suspense>
-            </MainLayout>,
-          },
+      // {
+      //   path: rootPaths.userRoot,
+      //   element: (
+      //     // <AuthLayout>
+      //       <Suspense fallback={<PageLoader />}>
+      //         <Outlet />
+      //       </Suspense>
+      //     // </AuthLayout>
+      //   ),
+      //   children: [
+      //     {
+      //       path: paths.user,
+      //       element: 
+      //       <MainLayout>
+      //         <Suspense fallback={<PageLoader />}>
+      //           <UserRegister />
+      //         </Suspense>
+      //       </MainLayout>,
+      //     },
           
-        ],
-      },
+      //   ],
+      // },
       {
         path: rootPaths.customerRoot,
         element: (
@@ -260,42 +283,6 @@ const routes: RouteObject[] = [
           
         ],
       },
-      // {
-      //   path: rootPaths.authRoot,
-      //   element: (
-      //     <AuthLayout>
-      //       <Suspense fallback={<PageLoader />}>
-      //         <Outlet />
-      //       </Suspense>
-      //     </AuthLayout>
-      //   ),
-      //   children: [
-      //     {
-      //       path: paths.login,
-      //       // element: <Login />,
-      //       element: (
-      //         // <MainLayout>
-      //           <Suspense fallback={<PageLoader />}>
-      //             <Login />
-      //           </Suspense>
-      //         // </MainLayout>
-      //       ),
-      //     },
-      //     {
-      //       path: paths.signup,
-      //       element: <SignUp />,
-      //     },
-      //     {
-      //       path: paths.resetPassword,
-      //       element: <ResetPassword />,
-      //     },
-      //     {
-      //       path: paths.forgotPassword,
-      //       element: <ForgotPassword />,
-      //     },
-          
-      //   ],
-      // },
       {
         path: '*',
         element: <Error404 />,
