@@ -494,7 +494,7 @@ const Topbar = ({ handleDrawerToggle }: TopbarProps): ReactElement => {
                 {formattedTime}
               </Typography>
             </Stack>
-          </Stack>
+          </Stack> 
           
           <AccountDropdown />
         </Stack>
