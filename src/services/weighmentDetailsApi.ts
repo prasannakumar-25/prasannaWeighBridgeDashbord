@@ -43,7 +43,7 @@ const weighmentDetailsApi = {
     },
     deleteWeighmentDetails : async (weighment_id:number) => {
         try{
-            const response = await Authaxios.delete(`/delete/weightDetails${weighment_id}`)
+            const response = await Authaxios.delete(`/delete/weightDetails/${weighment_id}`)
             return response.data
         }
         catch (error){

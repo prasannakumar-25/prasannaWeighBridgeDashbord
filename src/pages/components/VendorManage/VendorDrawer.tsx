@@ -39,7 +39,7 @@ const VendorDrawer: React.FC<VendorDrawerProps> = ({
 }) => {
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
-  const drawerWidth = isMdUp ? 650 : "100%";
+  const drawerWidth = isMdUp ? 800 : "100%";
 
   // State
   const [form, setForm] = useState<Vendor>({
@@ -70,7 +70,7 @@ const VendorDrawer: React.FC<VendorDrawerProps> = ({
           Contact_number: "",
           Email: "",
           Gst_number: "",
-         Address: "",
+          Address: "",
           Website: "",
         });
       }
@@ -105,7 +105,7 @@ const VendorDrawer: React.FC<VendorDrawerProps> = ({
       isValid = false;
     }
 
-    // Contact_number Validation (Indian format example based on your previous code)
+    
     // Contact_number Validation
     if (!form.Contact_number?.trim()) {
       newErrors.Contact_number = "Contact_number Number is required";
@@ -266,7 +266,7 @@ const VendorDrawer: React.FC<VendorDrawerProps> = ({
 
               <Grid item xs={12} sm={6}>
                 <TextField
-                  label="Contact_number Number"
+                  label="Contact Number "
                   className="input-bg-color label-black"
                   placeholder="+91 9876543210"
                   fullWidth

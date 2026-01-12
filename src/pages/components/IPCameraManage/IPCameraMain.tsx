@@ -13,9 +13,11 @@ import {
   Tooltip,
   useTheme,
   LinearProgress,
-  Menu,           // <--- ADDED
-  ListItemIcon,   // <--- ADDED
-  ListItemText,   // <--- ADDED
+  Menu,        
+  ListItemIcon,
+  ListItemText,
+  Snackbar,
+  Alert
 } from "@mui/material";
 import { 
   DataGrid, 
@@ -34,10 +36,11 @@ import { IPCamera, Machine } from "pages/RegisterManagement/IPCameraRegister/IPC
 import CustomPagination from "../VehicleManage/CustomPagination";
 
 import "../../RegisterManagement/MachineRegister/MachineRegister.css";
+import { setCanvasCreator } from "echarts/types/src/core/echarts.js";
 
 interface IPCameraMainProps {
   cameras: IPCamera[];
-  machines: Machine[];
+  machineList: Machine[];
   onAdd: () => void;
   onEdit: (cam: IPCamera) => void;
   onDelete: (Camera_Id: number) => void;
@@ -47,7 +50,7 @@ interface IPCameraMainProps {
 
 const IPCameraMain: React.FC<IPCameraMainProps> = ({
   cameras,
-  machines,
+  machineList,
   onAdd,
   onEdit,
   onDelete,
@@ -55,13 +58,14 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
   onRefresh,
 }) => {
   const theme = useTheme();
-  const { enqueueSnackbar } = useSnackbar();
 
   // -- Local Filter State --
   const [search, setSearch] = useState('');
   const [filterMachineId, setFilterMachineId] = useState<number | "">("");
   const [fromDate, setFromDate] = useState<Dayjs | null>(null);
   const [toDate, setToDate] = useState<Dayjs | null>(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   // -- DOWNLOAD MENU STATE (ADDED) --
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -98,7 +102,7 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
       const matchesMachine = filterMachineId === "" || c.Machine_Id === filterMachineId;
 
       // 3. Date Filter (Installed Date)
-      const itemDate = dayjs(c.InStalled_date);
+      const itemDate = dayjs(c.Installed_date);
       const matchesFromDate = fromDate ? itemDate.isValid() && (itemDate.isAfter(fromDate, 'day') || itemDate.isSame(fromDate, 'day')) : true;
       const matchesToDate = toDate ? itemDate.isValid() && (itemDate.isBefore(toDate, 'day') || itemDate.isSame(toDate, 'day')) : true;
 
@@ -109,40 +113,45 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
   // -- PREPARE DATA FOR EXPORT --
   const getExportData = () => {
     if (filteredCameras.length === 0) {
-      enqueueSnackbar("No data to download", { variant: "warning" });
+      setSnackbarMessage("No data to download");
+      setSnackbarOpen(true);
       return null;
     }
     return filteredCameras.map(c => {
-      const machineName = machines.find(m => m.id === c.Machine_Id)?.machineName || "Unknown";
+      // const machineName = machines.find(m => m.id === c.Machine_Id)?.machineName || "Unknown";
       return {
         "ID": c.Camera_Id,
         "Camera Name": c.Camera_name,
-        "Machine": machineName,
+        "Machine": c.Machine_name || c.Machine_Id,
         "IP Address": c.IP_address,
         "MAC Address": c.Mac_address || "",
         "RTSP URL": c.RTSP_URL || "",
         "Location": c.Location || "",
         "Status": c.Status,
-        "Installed Date": c.InStalled_date ? dayjs(c.InStalled_date).format('YYYY-MM-DD') : ""
+        "Installed Date": c.Installed_date ? dayjs(c.Installed_date).format('YYYY-MM-DD') : ""
       };
     });
   };
 
   // -- EXPORT TO EXCEL FUNCTION --
-  const handleExportExcel = () => {
-    const data = getExportData();
-    if (!data) return;
-
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "IPCameras");
-    
-    // Generate buffer and trigger download
-    XLSX.writeFile(workbook, "IP_Camera_Register.xlsx");
-    
-    handleCloseDownloadMenu();
-    enqueueSnackbar("Exported to Excel successfully", { variant: "success" });
-  };
+   const handleExportExcel = () => {
+     const data = getExportData();
+     if (!data) return;
+ 
+     const worksheet = XLSX.utils.json_to_sheet(data);
+     const workbook = XLSX.utils.book_new();
+     XLSX.utils.book_append_sheet(workbook, worksheet, "IPcamera");
+     
+     // <--- CHANGED HERE: Create professional filename with timestamp
+     const fileName = `IPCamera_Register_${dayjs().format('YYYY-MM-DD_HH-mm')}.xlsx`;
+ 
+     // Generate buffer and trigger download
+     XLSX.writeFile(workbook, fileName); // <--- Use variable
+     
+     handleCloseDownloadMenu();
+     setSnackbarMessage("Exported to Excel successfully");
+     setSnackbarOpen(true);
+   };
 
   // -- EXPORT TO WORD FUNCTION --
   const handleExportWord = () => {
@@ -193,23 +202,25 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
     });
     
     const url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(html);
-    
+    const fileName = `IPCamera_Register_${dayjs().format('YYYY-MM-DD_HH-mm')}.doc`;
+
     // Create download link
     const downloadLink = document.createElement("a");
     document.body.appendChild(downloadLink);
     
     if (navigator.userAgent.indexOf("MSIE") !== -1 || navigator.appVersion.indexOf("Trident/") > 0) {
         // IE Support
-        (window.navigator as any).msSaveOrOpenBlob(blob, "IP_Camera_Register.doc");
+        (window.navigator as any).msSaveOrOpenBlob(blob, fileName);
     } else {
         downloadLink.href = url;
-        downloadLink.download = "IP_Camera_Register.doc";
+        downloadLink.download = fileName;
         downloadLink.click();
     }
     
     document.body.removeChild(downloadLink);
     handleCloseDownloadMenu();
-    enqueueSnackbar("Exported to Word successfully", { variant: "success" });
+    setSnackbarMessage("Exported to Word successfully");
+    setSnackbarOpen(true);
   };
 
   // Status Chip Color Helper
@@ -236,14 +247,19 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
         )
     },
     {
-        field: 'Machine_Id',
+        field: 'Machine_name',
         headerName: 'Machine',
         flex: 1,
         minWidth: 150,
-        renderCell: (params: any) => {
-            const row = params.row || params;
-            return machines.find(m => m.id === row.Machine_Id)?.machineName || "—";
-        }
+        renderCell: (params: GridRenderCellParams) => (
+            <Typography variant="body2" color="text.primary">
+                {params.row.Machine_name || params.row.Machine_Id}
+            </Typography>
+        )
+        // renderCell: (params: any) => {
+        //     const row = params.row || params;
+        //     return machines.find(m => m.id === row.Machine_Id)?.machineName || "—";
+        // }
     },
     {
         field: 'IP_address',
@@ -258,7 +274,7 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
         minWidth: 140,
     },
     {
-        field: 'InStalled_date',
+        field: 'Installed_date',
         headerName: 'Installed Date',
         width: 140,
         renderCell: (params: any) => {
@@ -350,7 +366,7 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
             </Stack>
         )
     }
-  ], [machines, onEdit, onDelete]);
+  ], [machineList, onEdit, onDelete]);
 
   return (
     <Stack
@@ -406,7 +422,7 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
 
             {/* From Date */}
             <Grid item xs={6} sm={3} md={2}>
-              <Typography variant="caption" fontWeight={300} fontSize={14} color="text.secondary" display="block" mb={0.5}>
+              <Typography variant="caption" fontWeight={300} fontSize={14} color="text.secondary" display="block" mb={0.8}>
                   From Date
               </Typography>
               <DatePicker
@@ -442,7 +458,7 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
 
             {/* Machine Filter Dropdown */}
             <Grid item xs={12} sm={6} md={2}>
-              <TextField
+              {/* <TextField
                 select
                 label="Filter Machine"
                 placeholder="Filter Machine"
@@ -453,10 +469,91 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
                 onChange={(e) => setFilterMachineId(e.target.value === "" ? "" : Number(e.target.value))}
               >
                 <MenuItem value=""><em>All Machines</em></MenuItem>
-                {machines.map((m) => (
-                  <MenuItem key={m.id} value={m.id}>{m.machineName}</MenuItem>
+                {machineList.map((m) => (
+                  <MenuItem key={m.Machine_Id} value={m.Machine_Id}>{m.Machine_name}</MenuItem>
+                ))}
+              </TextField> */}
+
+              <TextField
+                select
+                label="Filter Machine"
+                placeholder="Filter Machine"
+                variant="outlined"
+                size="small"
+                fullWidth
+                value={filterMachineId}
+                onChange={(e) => setFilterMachineId(e.target.value === "" ? "" : Number(e.target.value))}
+                
+                // 1. Style the Dropdown Container (Matches Vendor Filter)
+                SelectProps={{
+                  MenuProps: {
+                    PaperProps: {
+                      sx: {
+                        mt: 1, // Add space between input and menu
+                        borderRadius: 2,
+                        boxShadow: '0px 4px 20px rgba(0,0,0,0.1)', // Soft modern shadow
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        maxHeight: 300,
+                      },
+                    },
+                    MenuListProps: { sx: { py: 1 } }, // Remove default padding for cleaner margins
+                  },
+                }}
+              >
+                {/* 2. Style "All Machines" Option */}
+                <MenuItem 
+                  value="" 
+                  sx={{
+                    borderRadius: 1.5,
+                    mx: 1, // Horizontal margin
+                    my: 0.5, // Vertical spacing
+                    py: 1,
+                    transition: 'all 0.2s ease-in-out',
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      transform: 'translateX(5px)', // Slide effect
+                    },
+                  }}
+                >
+                  <em style={{ fontWeight: 500, color: 'text.secondary' }}>All Machines</em>
+                </MenuItem>
+
+                {/* 3. Style Dynamic Options */}
+                {machineList.map((m) => (
+                  <MenuItem 
+                    key={m.Machine_Id} 
+                    value={m.Machine_Id}
+                    sx={{
+                      borderRadius: 1.5,
+                      mx: 1,
+                      my: 0.5,
+                      py: 1,
+                      transition: 'all 0.2s ease-in-out',
+                      
+                      // Hover State
+                      '&:hover': {
+                        bgcolor: 'primary.lighter', // Or use 'rgba(25, 118, 210, 0.08)'
+                        transform: 'translateX(5px)',
+                        fontWeight: 600,
+                      },
+
+                      // Selected State
+                      '&.Mui-selected': {
+                        bgcolor: 'primary.main',
+                        color: 'common.white',
+                        fontWeight: 600,
+                        '&:hover': {
+                          bgcolor: 'primary.dark',
+                        },
+                      }
+                    }}
+                  >
+                    {m.Machine_name}
+                  </MenuItem>
                 ))}
               </TextField>
+
             </Grid>
 
             {/* Actions */}
@@ -493,7 +590,7 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
                 </IconButton>
               </Tooltip>
 
-              <Menu
+              {/* <Menu
                 anchorEl={anchorEl}
                 open={openDownloadMenu}
                 onClose={handleCloseDownloadMenu}
@@ -513,9 +610,127 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
                   </ListItemIcon>
                   <ListItemText>Export to Word</ListItemText>
                 </MenuItem>
+              </Menu> */}
+
+              <Menu
+                anchorEl={anchorEl}
+                open={openDownloadMenu}
+                onClose={handleCloseDownloadMenu}
+                // TransitionComponent={Fade} 
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                
+                // 1. Container Styling (Glassmorphism & Shadow)
+                PaperProps={{
+                  elevation: 0,
+                  sx: {
+                    overflow: 'visible',
+                    filter: 'drop-shadow(0px 4px 20px rgba(0,0,0,0.1))', // Deep, soft shadow
+                    mt: 1.5,
+                    minWidth: 220,
+                    borderRadius: 3, // Modern rounded edges
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    
+                    // The "Speech Bubble" Arrow
+                    '&:before': {
+                      content: '""',
+                      display: 'block',
+                      position: 'absolute',
+                      top: 0,
+                      right: 14,
+                      width: 10,
+                      height: 10,
+                      bgcolor: 'background.paper',
+                      transform: 'translateY(-50%) rotate(45deg)',
+                      zIndex: 0,
+                      borderTop: '1px solid',
+                      borderLeft: '1px solid',
+                      borderColor: 'divider',
+                    },
+                  },
+                }}
+              >
+                {/* Option 1: Excel */}
+                <MenuItem 
+                  onClick={handleExportExcel}
+                  sx={{ 
+                    py: 1.5, // Taller rows for modern feel
+                    mx: 1,   // Spacing on sides for "floating" feel
+                    my: 0.5,
+                    borderRadius: 1.5,
+                    transition: 'all 0.3s ease',
+                    
+                    // HOVER EFFECTS
+                    '&:hover': {
+                      bgcolor: 'success.lighter', // Requires theme setup, or use 'rgba(0, 200, 83, 0.08)'
+                      transform: 'translateX(4px)', // Slight slide to the right
+                      
+                      // Target the Icon inside on hover
+                      '& .MuiListItemIcon-root': {
+                        transform: 'scale(1.2)', // Icon grows
+                        filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.2))'
+                      },
+                      // Target the Text inside on hover
+                      '& .MuiListItemText-primary': {
+                        color: 'success.dark',
+                        fontWeight: 'bold',
+                      }
+                    }
+                  }}
+                >
+                  <ListItemIcon sx={{ transition: 'transform 0.2s ease-in-out' }}>
+                    <IconifyIcon icon="vscode-icons:file-type-excel2" width={24} />
+                  </ListItemIcon>
+                  <ListItemText 
+                    primary="Export to Excel" 
+                    primaryTypographyProps={{ 
+                      variant: 'body2', 
+                      sx: { transition: 'color 0.2s ease' } 
+                    }} 
+                  />
+                </MenuItem>
+
+                {/* Option 2: Word */}
+                <MenuItem 
+                  onClick={handleExportWord}
+                  sx={{ 
+                    py: 1.5,
+                    mx: 1,
+                    my: 0.5,
+                    borderRadius: 1.5,
+                    transition: 'all 0.3s ease',
+                    
+                    // HOVER EFFECTS
+                    '&:hover': {
+                      bgcolor: 'info.lighter', // or 'rgba(24, 144, 255, 0.08)'
+                      transform: 'translateX(4px)',
+                      
+                      '& .MuiListItemIcon-root': {
+                        transform: 'scale(1.2) rotate(-5deg)', // Icon grows and tilts slightly
+                        filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.2))'
+                      },
+                      '& .MuiListItemText-primary': {
+                        color: 'info.dark',
+                        fontWeight: 'bold',
+                      }
+                    }
+                  }}
+                >
+                  <ListItemIcon sx={{ transition: 'transform 0.2s ease-in-out' }}>
+                    <IconifyIcon icon="vscode-icons:file-type-word" width={24} />
+                  </ListItemIcon>
+                  <ListItemText 
+                    primary="Export to Word" 
+                    primaryTypographyProps={{ 
+                      variant: 'body2', 
+                      sx: { transition: 'color 0.2s ease' } 
+                    }} 
+                  />
+                </MenuItem>
               </Menu>
 
-              <Tooltip title="Refresh" arrow>
+              <Tooltip title="Refresh Data" arrow>
                 <IconButton
                   onClick={onRefresh}
                   disabled={loading}
@@ -539,6 +754,35 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
           </Grid>
         </Box>
 
+        <Snackbar
+            open={snackbarOpen}
+            autoHideDuration={3000}
+            onClose={() => setSnackbarOpen(false)}
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        >
+            <Alert onClose={() => setSnackbarOpen(false)} severity="success" variant="filled">
+                {snackbarMessage}
+                 <LinearProgress
+              variant="determinate"
+              value={100}
+              sx={{
+                mt: 1,
+                height: 4,
+                borderRadius: 2,
+                bgcolor: '#c8e6c9',
+                '& .MuiLinearProgress-bar': {
+                  bgcolor: '#66bb6a',
+                  animation: 'snackbarProgress 3.5s linear forwards',
+                },
+                '@keyframes snackbarProgress': {
+                  to: { width: '100%' },
+                  from: { width: '0%' },
+                },
+              }}
+            />
+            </Alert>
+        </Snackbar>
+
         {/* --- DATA GRID SECTION --- */}
         <Box sx={{ height: 550, width: '100%' }}>
             <DataGrid
@@ -556,8 +800,9 @@ const IPCameraMain: React.FC<IPCameraMainProps> = ({
                     loadingOverlay: LinearProgress as GridSlots['loadingOverlay'],
                     pagination: CustomPagination,
                     noRowsOverlay: () => (
-                        <Stack height="100%" alignItems="center" justifyContent="center">
-                            No IP Cameras found
+                        <Stack height="100%" alignItems="center" justifyContent="center" color="text.secondary">
+                             <IconifyIcon icon="fluent:box-search-24-regular" width={40} height={40} sx={{mb:1, opacity:0.5}}/>
+                             <Typography variant="body2">No IP Cameras found</Typography>
                         </Stack>
                     ),
                 }}

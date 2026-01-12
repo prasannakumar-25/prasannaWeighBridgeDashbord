@@ -26,12 +26,11 @@ import MachineDrawer from "pages/components/MachineManage/MachineDrawer";
 
 // Custom CSS
 import "../../RegisterManagement/MachineRegister/MachineRegister.css";
-import { number } from "echarts";
-
+import vendorApi from "services/vendorApi";
 // --- Global Types ---
 export type Vendor = {
   Vendor_Id: number;
-  vendorName: string;
+  Vendor_name?: string;
   category?: string;
   phone?: string;
   email?: string;
@@ -46,6 +45,7 @@ export type Vendor = {
 export type Machine = {
   Machine_Id: number;
   Vendor_Id: number;
+  Vendor_name?: string;
   Machine_name: string;
   password: string;
   Machine_mac?: string;
@@ -86,7 +86,13 @@ const MachineRegister: React.FC<{ onLogout?: () => void }> = () => {
         setMachines(response.data); 
       } else {
         setSnackbarMessage(response.message || "Failed to register machine");
+        setSnackbarOpen(true);
       }
+      //  2. Fetch Vendors (For the dropdown in Drawer)
+      const vendorRes = await vendorApi.getVendordetails();
+      if (vendorRes.success) {
+        setVendors(vendorRes.data);
+      } 
     } catch (error: any) {
       const errorMessage = error.response?.data.message || "Something error occured please try again later";
       setSnackbarMessage(errorMessage);
@@ -119,23 +125,7 @@ const MachineRegister: React.FC<{ onLogout?: () => void }> = () => {
     setEditingMachine(null);
   };
 
-  // const handleSave = (form: Machine) => {
-  //   setLoading(true);
-  //   // Simulate API call'
-  //   setTimeout(() => {
-  //       if (editingMachine) {
-  //         setMachines((prev) => prev.map((p) => (p.Machine_Id === editingMachine.Machine_Id ? { ...form, Machine_Id: editingMachine.Machine_Id } : p)));
-  //         setSnackbarMessage("Machine updated successfully",);
-  //       } else {
-  //         const newMachine: Machine = { ...form, Machine_Id: Date.now() };
-  //         setMachines((prev) => [newMachine, ...prev]);
-  //         setSnackbarMessage("Machine added successfully");
-  //       }
-  //       setSnackbarOpen(true);
-  //       handleCloseDrawer();
-  //   }, 400);  
-  //   setLoading(false);
-  // };
+
   const handleSave = async () => {
     setLoading(true);
      await fetchMachine();          // 🔹 refresh list from API
@@ -145,14 +135,44 @@ const MachineRegister: React.FC<{ onLogout?: () => void }> = () => {
          : "Machine added successfully"
      );
      setSnackbarOpen(true);
-     handleCloseDrawer();           // 🔹 close drawer
+     handleCloseDrawer();          // 🔹 close drawer
+     setLoading(false);
     
   }
+
+  // const handleSave = async (formData: Machine) => {
+  //   setLoading(true);
+  //   setTimeout(() => {
+  //     if (editingMachine) {
+  //       setMachines((prev) => 
+  //       prev.map((m) => (m.Machine_Id === editingMachine.Machine_Id ? {...formData, Machine_Id: editingMachine.Machine_Id} : m))
+  //     );
+  //     setSnackbarMessage("Customr updated Successfully");
+  //     setSnackbarOpen(true);
+  //     } else {
+  //       const selectedVendor = vendors.find(v => v.Vendor_Id === formData.Vendor_Id);
+  //       const newCustomer: Machine = { 
+  //           ...formData, 
+  //           Machine_Id: Date.now(),
+  //           Vendor_name: selectedVendor?.Vendor_name 
+  //       };
+  //       setMachines((prev) => [newCustomer, ...prev]);
+  //       setSnackbarMessage("Customer added successfully");
+  //       setSnackbarOpen(true);
+  //     }
+  //     handleCloseDrawer();
+  //     setLoading(false)
+  //   }, 400);
+  // }
+
+
+
 
   // --- Delete Logic ---
   const initiateDelete = (Machine_Id: number) => {
     setMachineToDelete(Machine_Id);
     setDeleteDialogOpen(true);
+    setLoading(false);
   };
 
   const confirmDelete = async () => {
@@ -195,11 +215,11 @@ const MachineRegister: React.FC<{ onLogout?: () => void }> = () => {
         {/* 1. Main View */}
         <MachineMain
           machines={machines}
-          vendors={vendors}
           onAdd={handleOpenAdd}
           onEdit={handleOpenEdit}
           onDelete={initiateDelete}
           onRefresh={fetchMachine}
+          vendorList={vendors}
           loading={loading}
         />
 
@@ -209,7 +229,7 @@ const MachineRegister: React.FC<{ onLogout?: () => void }> = () => {
           onClose={handleCloseDrawer}
           onSave={handleSave}
           initialData={editingMachine}
-          vendors={vendors}
+          vendorList={vendors} // <--- Passing Vendors here
           loading={loading}
         />
 
@@ -246,7 +266,7 @@ const MachineRegister: React.FC<{ onLogout?: () => void }> = () => {
             open={snackbarOpen}
             autoHideDuration={3000}
             onClose={() => setSnackbarOpen(false)}
-            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
         >
             <Alert onClose={() => setSnackbarOpen(false)} severity="success" variant="filled">
                 {snackbarMessage}

@@ -14,7 +14,6 @@ import {
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import IconifyIcon from "components/base/IconifyIcon";
-import { useSnackbar } from 'notistack';
 import vendorApi from "services/vendorApi";
 
 // Sub Components
@@ -24,9 +23,16 @@ import VendorDrawer from "pages/components/VendorManage/VendorDrawer";
 // Custom CSS
 import "../MachineRegister/MachineRegister.css"; 
 
+export type SuperAdmin = {
+  Super_ID: number;
+  User_name: string;
+}
+
 // --- Global Types ---
 export type Vendor = {
   Vendor_Id: number;
+  Super_ID: number;
+  User_name?: string;
   Vendor_name: string;
   Contact_number?: string;
   Email?: string;
@@ -36,17 +42,8 @@ export type Vendor = {
   Created_at?: string; // Added for Date Filtering
 };
 
-// Interface for API Raw Response
-// interface ApiVendor {
-//   id: number;
-//   Vendor_name: string;
-//   Contact_number?: string;
-//   Email?: string;
-//   Website?: string;
-//   Gst_number?: string;
-//   Address: string;
-//   Created_at?: string; // Assuming API returns this
-// }
+
+
 
 const VendorRegister: React.FC<{ onLogout?: () => void }> = () => {
   // --- State ---
@@ -63,35 +60,8 @@ const VendorRegister: React.FC<{ onLogout?: () => void }> = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
-  const { enqueueSnackbar } = useSnackbar();
 
-  // --- API / Effect ---
-  // const fetchVendor = async () => {
-  //   setLoading(true);
-  //   try {
-  //     const response = await vendorApi.getVendordetails();
-  //     if (response.success) {
-  //       const mappedData: Vendor[] = response.data.map((v: ApiVendor) => ({
-  //         id: v.id,
-  //         Vendor_name: v.Vendor_name,
-  //         Contact_number: v.Contact_number,
-  //         Email: v.Email,
-  //         Website: v.Website,
-  //         Gst_number: v.Gst_number,
-  //         Address: v.Address,
-  //         Created_at: v.Created_at || new Date().toISOString(),
-  //       }));
-  //       setVendors(mappedData);
-  //     } else {
-  //       enqueueSnackbar(response.message || "Failed to fetch vendors", { variant: "error" });
-  //     }
-  //   } catch (error: any) {
-  //     const errorMessage = error.response?.data.message || "Error fetching vendors";
-  //     enqueueSnackbar(errorMessage, { variant: "error" });
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+
 
     // --- API / Effect ---
     const fetchVendor = async () => {
@@ -118,41 +88,7 @@ const VendorRegister: React.FC<{ onLogout?: () => void }> = () => {
     // For Mock display purposes:
     setLoading(true);
     fetchVendor();
-    // setTimeout(() => {
-    //     setVendors([
-    //         {
-    //             id: 1,
-    //             Vendor_name: "TechCorp Solutions",
-    //             Contact_number: "9876543210",
-    //             Email: "contact@techcorp.com",
-    //             Website: "www.techcorp.com",
-    //             Gst_number: "29ABCDE1234F1Z5",
-    //             Address: "Bangalore, Karnataka",
-    //             Created_at: "2023-11-01"
-    //         },
-    //         {
-    //             id: 2,
-    //             Vendor_name: "Global Logistics Ltd",
-    //             Contact_number: "8765432109",
-    //             Email: "info@globallogistics.in",
-    //             Website: "www.globallogistics.in",
-    //             Gst_number: "27AABBCC1234F1Z5",
-    //             Address: "Mumbai, Maharashtra",
-    //             Created_at: "2023-12-15"
-    //         },
-    //         {
-    //             id: 3,
-    //             Vendor_name: "Sunrise Traders",
-    //             Contact_number: "7654321098",
-    //             Email: "sales@sunrisetraders.com",
-    //             Website: "",
-    //             Gst_number: "33AABBCC1234F1Z5",
-    //             Address: "Chennai, Tamil Nadu",
-    //             Created_at: "2024-01-10"
-    //         }
-    //     ]);
-    //     setLoading(false);
-    // }, 500);
+    setLoading(false);
   }, []);
 
   // --- Handlers ---
@@ -171,43 +107,56 @@ const VendorRegister: React.FC<{ onLogout?: () => void }> = () => {
     setEditingVendor(null);
   };
 
+
   const handleSave = async (form: Vendor) => {
     setLoading(true);
     try {
+      // 1. Prepare the payload
       const payload = {
+        Super_Id: 0,
         Vendor_name: form.Vendor_name.trim(),
         Contact_number: form.Contact_number?.trim(),
         Email: form.Email?.trim().toLowerCase(),
         Address: form.Address?.trim(),
-
         Gst_number: form.Gst_number?.trim(),
         Website: form.Website?.trim()
       };
-      // const response = await vendorApi.addVendor(payload);
-      
 
       if (editingVendor) {
-        
-        setVendors((prev) => prev.map((v) => (v.Vendor_Id === editingVendor.Vendor_Id ? { ...form, Vendor_Id: editingVendor.Vendor_Id, Created_at: v.Created_at } : v)));
-        setSnackbarMessage("Vendor updated successfully");
-        setLoading(false);
-      } else {
-        const response = await vendorApi.addVendor(payload);
-        if (response.success) {
-          setVendors(response.data)
+        // ===== UPDATE LOGIC
+        const response = await vendorApi.updateVendordetails(editingVendor.Vendor_Id, payload);
+
+        if (response.success || response.status === 200) { 
+          setVendors((prev) => 
+            prev.map((v) => 
+              v.Vendor_Id === editingVendor.Vendor_Id 
+                ? { ...v, ...payload }
+                : v
+            )
+          );
+          setSnackbarMessage("Vendor updated successfully");
         } else {
-          setSnackbarMessage(response.message || "failed to Added the Vendor")
+          throw new Error(response.message || "Failed to update vendor");
         }
+
+      } else {
+        // ==== ADD LOGIC 
+        const response = await vendorApi.addVendor(payload);
         
-        // Mock Add
-        const newVendor = { ...form, Vendor_Id: Date.now(), Created_at: new Date().toISOString() };
-        setVendors(prev => [newVendor, ...prev]);
-        setSnackbarMessage("Vendor registered successfully!");
+        if (response.success || response.status === 200) {
+          setVendors(prev => [response.data, ...prev]);
+          setSnackbarMessage("Vendor registered successfully!");
+        } else {
+          throw new Error(response.message || "Failed to add vendor");
+        }
       }
+
       setSnackbarOpen(true);
       handleCloseDrawer();
     } catch (error: any) {
-      setSnackbarMessage(error.response?.data.message || "Error saving vendor");
+      console.error("Handle Save Error:", error);
+      setSnackbarMessage(error.response?.data?.message || error.message || "Error saving vendor");
+      setSnackbarOpen(true);
     } finally {
       setLoading(false);
     }
@@ -286,7 +235,7 @@ const VendorRegister: React.FC<{ onLogout?: () => void }> = () => {
             open={snackbarOpen}
             autoHideDuration={3000}
             onClose={() => setSnackbarOpen(false)}
-            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
         >
             <Alert onClose={() => setSnackbarOpen(false)} severity="success" variant="filled">
                 {snackbarMessage}

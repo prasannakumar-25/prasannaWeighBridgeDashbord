@@ -32,7 +32,7 @@ interface WeighbridgeDrawerProps {
   onClose: () => void;
   onSave: (data: Weighbridge) => void;
   initialData: Weighbridge | null;
-  machines: Machine[];
+  machineList: Machine[];
   loading?: boolean;
 }
 
@@ -41,17 +41,17 @@ const WeighbridgeDrawer: React.FC<WeighbridgeDrawerProps> = ({
   onClose,
   onSave,
   initialData,
-  machines,
+  machineList,
   loading = false,
 }) => {
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
-  const drawerWidth = isMdUp ? 650 : "100%";
+  const drawerWidth = isMdUp ? 800 : "100%";
 
   // State for form data and specific field errors
   const [form, setForm] = useState<Weighbridge>({
     Weighbridge_Id: 0,
-    Machine_Id: undefined,
+    Machine_Id: 0,
     Serial_no: "",
     Port: "COM4",
     Baud_rate: "19200",
@@ -74,7 +74,7 @@ const WeighbridgeDrawer: React.FC<WeighbridgeDrawerProps> = ({
       } else {
         setForm({
           Weighbridge_Id: 0,
-          Machine_Id: undefined,
+          Machine_Id: 0,
           Serial_no: "",
           Port: "COM4",
           Baud_rate: "19200",
@@ -128,7 +128,7 @@ const WeighbridgeDrawer: React.FC<WeighbridgeDrawerProps> = ({
   const handleSubmit = async () => {
     if (!validate()) return;
     const payload = {
-      Machine_Id: 1,
+      Machine_Id: form.Machine_Id,
       Serial_no: form.Serial_no,
       Port: form.Port,
       Baud_rate: form.Baud_rate,
@@ -146,7 +146,7 @@ const WeighbridgeDrawer: React.FC<WeighbridgeDrawerProps> = ({
       } else {
         response = await weighBridgeApi.addWeighbridgeDetails(payload);
       }
-      if (response?.sussess) {
+      if (response?.success) {
          console.log("Success", response);
          onSave(response.data)
          onClose();
@@ -242,9 +242,9 @@ const WeighbridgeDrawer: React.FC<WeighbridgeDrawerProps> = ({
                         <MenuItem value={0} disabled sx={{ color: 'text.secondary', fontStyle: 'italic' }}>
                             Select a Machine
                         </MenuItem>
-                        {machines.map((m) => (
-                            <MenuItem key={m.id} value={m.id}>
-                            {m.machineName}
+                        {machineList.map((m) => (
+                            <MenuItem key={m.Machine_Id} value={m.Machine_Id}>
+                            {m.Machine_name}
                             </MenuItem>
                         ))}
                         </TextField>
@@ -263,8 +263,8 @@ const WeighbridgeDrawer: React.FC<WeighbridgeDrawerProps> = ({
                         helperText={errors.Serial_no}
                         InputProps={{
                             startAdornment: (
-                                <InputAdornment position="start">
-                                    <IconifyIcon icon="mdi:barcode" color="action.active" />
+                                <InputAdornment position="end">
+                                    <IconifyIcon icon="mdi:barcode" color="primary.dark" />
                                 </InputAdornment>
                             )
                         }}
@@ -395,6 +395,3 @@ const WeighbridgeDrawer: React.FC<WeighbridgeDrawerProps> = ({
 };
 
 export default WeighbridgeDrawer;
-
-
-

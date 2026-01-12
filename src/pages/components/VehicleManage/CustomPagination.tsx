@@ -94,130 +94,173 @@ import React from 'react';
 import {
   Box,
   Typography,
+  Pagination,
   PaginationItem,
-  Pagination as MuiPagination,
   Select,
   MenuItem,
   Stack,
   FormControl,
-  SelectChangeEvent
+  InputLabel,
+  useTheme,
+  useMediaQuery,
+  SelectChangeEvent,
 } from '@mui/material';
 import {
-  GridPagination,
   useGridApiContext,
   useGridSelector,
   gridPageCountSelector,
+  gridExpandedRowCountSelector,
   gridPaginationModelSelector,
-  gridFilteredTopLevelRowCountSelector,
 } from '@mui/x-data-grid';
 
-function Pagination({ className }: { className?: string }) {
+function CustomPaginationToolbar() {
   const apiRef = useGridApiContext();
-  
-  // Selectors
-  const pageCount = useGridSelector(apiRef, gridPageCountSelector);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  // Get Grid State
   const paginationModel = useGridSelector(apiRef, gridPaginationModelSelector);
-  // use gridFilteredTopLevelRowCountSelector to get the count AFTER filters are applied
-  const visibleRows = useGridSelector(apiRef, gridFilteredTopLevelRowCountSelector);
+  const pageCount = useGridSelector(apiRef, gridPageCountSelector);
+  const rowCount = useGridSelector(apiRef, gridExpandedRowCountSelector);
 
-  // Helper to handle "All" records logic
-  const isAllRows = paginationModel.pageSize === -1 || paginationModel.pageSize >= visibleRows;
+  // Calculate Ranges
+  const { page, pageSize } = paginationModel;
+  const startRecord = rowCount > 0 ? page * pageSize + 1 : 0;
+  const endRecord = rowCount > 0 ? Math.min((page + 1) * pageSize, rowCount) : 0;
 
-  // Calculate Range: "Showing 1 - 5 of 20"
-  const startRecord = visibleRows === 0 ? 0 : paginationModel.page * paginationModel.pageSize + 1;
-  const endRecord = isAllRows 
-    ? visibleRows 
-    : Math.min((paginationModel.page + 1) * paginationModel.pageSize, visibleRows);
-
-  // Handle Page Change
-  const handlePageChange = (_event: React.ChangeEvent<unknown>, newPage: number) => {
-    apiRef.current.setPage(newPage - 1);
+  // Handlers
+  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    apiRef.current.setPage(value - 1);
   };
 
-  // Handle Page Size Change (The "Picker")
   const handlePageSizeChange = (event: SelectChangeEvent<number>) => {
-    const newSize = Number(event.target.value);
-    apiRef.current.setPageSize(newSize);
-    apiRef.current.setPage(0); // Reset to first page on size change
+    apiRef.current.setPageSize(Number(event.target.value));
   };
 
   return (
     <Box
-      className={className}
       sx={{
         display: 'flex',
-        justifyContent: 'space-between',
+        flexDirection: { xs: 'column', md: 'row' },
         alignItems: 'center',
-        width: '100%',
+        justifyContent: 'space-between',
         p: 2,
-        flexWrap: 'wrap',
-        gap: 2
+        width: '100%',
+        borderTop: `1px solid ${theme.palette.divider}`,
+        backgroundColor: theme.palette.background.paper,
+        gap: 2,
       }}
     >
-      {/* LEFT: Record Counter */}
+      {/* LEFT SIDE: Record Status */}
       <Typography variant="body2" color="text.secondary" fontWeight={500}>
-        Showing {startRecord} - {endRecord} of {visibleRows} Records
+        Showing <Box component="span" >{startRecord}</Box> 
+        {' - '} 
+        <Box component="span">{endRecord}</Box> 
+        {' of '} 
+        <Box component="span">{rowCount}</Box> 
+        {' records'}
       </Typography>
 
-      {/* CENTER: Navigation Numbers */}
-      <MuiPagination
-        color="primary"
-        count={pageCount}
-        page={paginationModel.page + 1}
-        onChange={handlePageChange}
-        showFirstButton
-        showLastButton
-        renderItem={(item) => (
-          <PaginationItem
-            {...item}
+      {/* RIGHT SIDE: Controls */}
+      <Stack direction={{ xs: 'column', sm: 'row' }} alignItems="center" spacing={2}>
+        
+        {/* Feature 1: Page Size Selector */}
+        {/* <Stack direction="row" alignItems="center" spacing={1}>
+          <Typography variant="body2" color="text.secondary">
+            Rows per page:
+          </Typography>
+          <FormControl variant="standard" size="small">
+            <Select
+              value={pageSize}
+              variant='outlined'
+              onChange={handlePageSizeChange}
+              disableUnderline
+              sx={{
+                fontWeight: 600,
+                // color: theme.palette.primary.main,
+                '& .MuiSelect-select': { py: 0.5, pr: 3,}, 
+              }}
+            >
+              {[3,5, 10, 25, 50, 100].map((size) => (
+                <MenuItem key={size} value={size}>
+                  {size}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Stack> */}
+        <Stack direction="row" alignItems="center" spacing={1.5}>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ whiteSpace: "nowrap" }}
+        >
+          Rows per page:
+        </Typography>
+
+        <FormControl size="small" variant="outlined">
+          <Select
+            value={pageSize}
+            onChange={handlePageSizeChange}
             sx={{
-              '&.Mui-selected': {
-                color: '#fff',
-                fontWeight: 'bold',
-                '&:hover': {
-                    backgroundColor: 'primary.dark',
-                }
+              height: 36,
+              minWidth: 72,
+              fontSize: 14,
+              fontWeight: 500,
+              '& .MuiSelect-select': {
+                display: 'flex',
+                alignItems: 'center',
+                padding: '6px 32px 6px 12px',
               },
             }}
-          />
-        )}
-      />
-
-      {/* RIGHT: Rows Per Page Picker */}
-      <Stack direction="row" alignItems="center" spacing={1}>
-        <Typography variant="body2" color="text.secondary">
-          Rows:
-        </Typography>
-        <FormControl variant="standard" sx={{ minWidth: 60 }}>
-            <Select
-                disableUnderline
-                value={paginationModel.pageSize}
-                onChange={handlePageSizeChange}
-                size="small"
-                sx={{
-                    fontSize: '0.875rem',
-                    fontWeight: 600,
-                    color: 'primary.main',
-                    '& .MuiSelect-select': {
-                        paddingBottom: 0.5,
-                        paddingTop: 0.5,
-                        paddingLeft: 1
-                    }
-                }}
-            >
-                <MenuItem value={5}>5</MenuItem>
-                <MenuItem value={10}>10</MenuItem>
-                <MenuItem value={20}>20</MenuItem>
-                <MenuItem value={50}>50</MenuItem>
-                {/* Value -1 or a very large number represents "All" */}
-                <MenuItem value={visibleRows > 0 ? visibleRows : 10000}>All</MenuItem>
-            </Select>
+          >
+            {[1, 2, 3, 5, 10, 25, 50, 100].map((size) => (
+              <MenuItem key={size} value={size}>
+                {size}
+              </MenuItem>
+            ))}
+          </Select>
         </FormControl>
+      </Stack>
+
+
+        {/* Feature 2: Navigation Buttons */}
+        <Pagination
+          count={pageCount}
+          page={page + 1}
+          onChange={handlePageChange}
+          color="primary"
+          shape="rounded"
+          siblingCount={isMobile ? 0 : 1}
+          boundaryCount={1}
+          renderItem={(item) => (
+            <PaginationItem
+              {...item}
+              components={{
+                previous: () => <Typography variant="body2" fontWeight="bold">Prev</Typography>,
+                next: () => <Typography variant="body2" fontWeight="bold">Next</Typography>,
+              }}
+              sx={{
+                '&.Mui-selected': {
+                  color: '#fff',
+                  boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)', // Subtle professional shadow
+                },
+                '&.MuiPaginationItem-previousNext': {
+                    px: 2, // Give the text buttons breathing room
+                    borderRadius: 4, 
+                }
+              }}
+            />
+          )}
+        />
       </Stack>
     </Box>
   );
 }
 
+// Wrapper for the DataGrid
 export default function CustomPagination(props: any) {
-  return <GridPagination ActionsComponent={Pagination} {...props} />;
+    // Note: We use slots={{ footer: ... }} in the DataGrid, not just ActionsComponent
+    // This allows us to take over the ENTIRE bottom bar area for maximum control.
+    return <CustomPaginationToolbar />;
 }

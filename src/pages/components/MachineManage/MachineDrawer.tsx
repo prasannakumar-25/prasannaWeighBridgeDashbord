@@ -25,19 +25,14 @@ import { Machine, Vendor } from "pages/RegisterManagement/MachineRegister/Machin
 import "../../RegisterManagement/MachineRegister/MachineRegister.css";
 import machineApi from "services/machineApi";
 
-// ----------------------------------------------------------------------
-// NOTE: Please ensure your 'Machine' interface in your types file 
-// includes these two new optional fields to avoid TypeScript errors:
-// estateVehicleType?: string;
-// estateMaterialType?: string;
-// ----------------------------------------------------------------------
+
 
 interface MachineDrawerProps {
   open: boolean;
   onClose: () => void;
   onSave: (data: Machine) => void;
   initialData: Machine | null;
-  vendors: Vendor[];
+  vendorList: Vendor[]; // Received from parent
   loading: boolean;
 }
 
@@ -46,12 +41,12 @@ const MachineDrawer: React.FC<MachineDrawerProps> = ({
   onClose,
   onSave,
   initialData,
-  vendors,
+  vendorList,
   loading,
 }) => {
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
-  const drawerWidth = isMdUp ? 650 : "100%";
+  const drawerWidth = isMdUp ? 800 : "100%";
 
   // State
   const [showPassword, setShowPassword] = useState(false);
@@ -115,122 +110,118 @@ const MachineDrawer: React.FC<MachineDrawerProps> = ({
     }
   };
 
+  // const validate = (): boolean => {
+  //   const newErrors: any = {};
+  //   let isValid = true;
+
+  //   const macRegex =
+  //   /^([0-9A-F]{2}[:-]){5}([0-9A-F]{2})$|^([0-9A-F]{4}\.){2}([0-9A-F]{4})$/;
+
+  //   const mac = form.Machine_mac?.trim().toUpperCase();
+
+  //   if (!form.Machine_name?.trim()) { 
+  //     newErrors.Machine_name = "Machine name is required";
+  //     isValid = false;
+  //   }
+  //   if (!form.password?.trim()) {
+  //     newErrors.password = "Password is required";
+  //     isValid = false;
+  //   }
+  //   if (!form.Vendor_Id || form.Vendor_Id <= 0) {
+  //     newErrors.Vendor_Id = "Vendor selection is required";
+  //     isValid = false;
+  //   }
+  //   if (form.Capacity_ton !== undefined && form.Capacity_ton < 0) {
+  //     newErrors.Capacity_ton = "Capacity cannot be negative";
+  //     isValid = false;
+  //   }
+  //   if (!mac) {
+  //     newErrors.Machine_mac = "MAC address is required";
+  //     isValid = false;
+  //   } else if (!macRegex.test(mac)) {
+  //     newErrors.Machine_mac =
+  //       "Invalid MAC address (Format: AA:BB:CC:DD:EE:FF)";
+  //     isValid = false;
+  //   }
+
+  //   setErrors(newErrors);
+
+  //   if (!isValid) {
+  //     setGlobalError("Please correct the highlighted errors below.")
+  //   } else {
+  //     setGlobalError(null);
+  //   }
+  //   return isValid;
+  // };
+
+
+
   const validate = (): boolean => {
-    const newErrors: any = {};
+    const newErrors: Record<string, string> = {};
     let isValid = true;
 
-    if (!form.Machine_name?.trim()) {
-      newErrors.Machine_name = "Machine name is required";
+    // --- 1. Machine Name Validation ---
+    const name = form.Machine_name?.trim();
+    if (!name) {
+      newErrors.Machine_name = "Machine name is required.";
       isValid = false;
-    }
-    if (!form.password?.trim()) {
-      newErrors.password = "Password is required";
+    } else if (name.length < 3) {
+      newErrors.Machine_name = "Machine name must be at least 3 characters.";
       isValid = false;
-    }
-    // if (!form.Vendor_Id || form.Vendor_Id <= 0) {
-    //   newErrors.Vendor_Id = "Vendor selection is required";
-    //   isValid = false;
-    // }
-    if (form.Capacity_ton !== undefined && form.Capacity_ton < 0) {
-      newErrors.Capacity_ton = "Capacity cannot be negative";
-      isValid = false;
-    }
-    if (!form.Machine_mac?.trim()) {
-      newErrors.Machine_mac = "Mac address is required";
+    } else if (name.length > 50) {
+      newErrors.Machine_name = "Machine name cannot exceed 50 characters.";
       isValid = false;
     }
 
-    // Estate Specific Validation
-    // if (form.Machine_type === "Estate") {
-    //   if (!form.estateVehicleType) {
-    //     newErrors.estateVehicleType = "Vehicle type is required for Estate";
-    //     isValid = false;
-    //   }
-    //   if (!form.estateMaterialType) {
-    //     newErrors.estateMaterialType = "Material type is required for Estate";
-    //     isValid = false;
-    //   }
-    // }
+    // --- 2. Password Validation ---
+    // Enforcing a minimum length prevents weak setup keys
+    const pwd = form.password?.trim();
+    if (!pwd) {
+      newErrors.password = "Access password is required.";
+      isValid = false;
+    } else if (pwd.length < 6) {
+      newErrors.password = "Password must be at least 6 characters.";
+      isValid = false;
+    }
+
+    // --- 3. Vendor Validation ---
+    if (!form.Vendor_Id || form.Vendor_Id === 0) {
+      newErrors.Vendor_Id = "Please select a valid vendor associated with this machine.";
+      isValid = false;
+    }
+
+    // --- 4. Professional MAC Address Validation ---
+    const mac = form.Machine_mac?.trim().toUpperCase();
+    const macRegex = /^([0-9A-F]{2}[:-]){5}([0-9A-F]{2})$/;
+
+
+    if (!mac) {
+      newErrors.Machine_mac = "MAC address is required.";
+      isValid = false;
+    } else if (!macRegex.test(mac)) {
+      newErrors.Machine_mac = "Invalid format. Expected: XX:XX:XX:XX:XX:XX";
+      isValid = false;
+    } 
+
+    // --- Capacity Validation (Keep existing logic) ---
+    if (form.Capacity_ton !== undefined && form.Capacity_ton < 0) {
+      newErrors.Capacity_ton = "Capacity cannot be negative.";
+      isValid = false;
+    }
 
     setErrors(newErrors);
 
     if (!isValid) {
-      setGlobalError("Please correct the highlighted errors below.")
+      setGlobalError("Form contains errors. Please check the fields highlighted below.");
     } else {
       setGlobalError(null);
     }
+
     return isValid;
   };
-
-  // const handleSubmit = async () => {
-  //   if(!validate()) return;
-
-  //   const payload ={
-  //      Vendor_Id: 1,
-  //      Machine_name: form.Machine_name,
-  //      Password: form.password,
-  //      Machine_mac: form.Machine_mac,
-  //      Machine_model: form.Machine_model,
-  //      Capacity_ton: form.Capacity_ton,
-  //      Last_service_date: form.Last_service_date,
-  //      Status: form.Status,
-  //      Machine_type: form.Machine_type,
-  //      Machine_location: form.Machine_location
-  //   }
-
-  //   try{
-  //     const response = await machineApi.addMachinDetails(payload)
-  //     console.log("response :", response)
-  //     if (response?.success) {
-  //       onSave(response.data);
-  //       onClose();
-  //     }
-  //   }
-  //   catch(error){
-  //     console.log("error :", error)
-  //   }
-
-  //   // console.log("---------------called-------------------")
-  //   try{
-        
-
-
-  //       const updateresponse = await machineApi.updataMachineDetailes(payload)
-  //       if(updateresponse.success)
-  //       {
-  //         console.log("successfully updated")
-  //       }
-  //       else 
-  //       {
-  //         console.log("Failed")
-  //       }
-  //     }
-  //   catch(error)
-  //   {
-  //     console.error(error)
-  //     throw error
-  //   }
-  // }
   
 
-  // Helper for the "OK" button inside Estate card
-  // const handleEstateConfirm = () => {
-  //   // Just a visual confirmation or partial validation
-  //   if (!form.estateVehicleType || !form.estateMaterialType) {
-  //      setErrors(prev => ({
-  //        ...prev,
-  //        estateVehicleType: !form.estateVehicleType ? "Required" : undefined,
-  //        estateMaterialType: !form.estateMaterialType ? "Required" : undefined
-  //      }));
-  //   } else {
-  //      // Clear estate errors if filled
-  //      setErrors(prev => ({
-  //        ...prev,
-  //        estateVehicleType: undefined,
-  //        estateMaterialType: undefined
-  //      }));
-  //   }
-  // };
+
   const handleSubmit = async () => {
     // 1. Run Validation
     if(!validate()) return;
@@ -396,23 +387,119 @@ const MachineDrawer: React.FC<MachineDrawerProps> = ({
               </Grid>
 
               <Grid item xs={12} sm={6}>
+                {/* <TextField
+                    label="Select Vendor"
+                    select
+                    fullWidth
+                    value={form.Vendor_Id === 0 ? "" : form.Vendor_Id} // Handle 0 as empty
+                    onChange={(e) => setField("Vendor_Id", Number(e.target.value))}
+                    disabled={loading}
+                    error={!!errors.Vendor_Id} // Show error if not selected
+                    helperText={errors.Vendor_Id}
+                    className="input-bg-color label-black"
+                >
+                    {vendorList.map((vendor) => (
+                        <MenuItem key={vendor.Vendor_Id} value={vendor.Vendor_Id}>
+                            {vendor.Vendor_name}
+                        </MenuItem>
+                    ))}
+                </TextField> */}
+
+
                 <TextField
-                  label="Associated Vendor"
-                  className="input-bg-color label-black"
+                  label="Select Vendor"
                   select
                   fullWidth
-                  value={form.Vendor_Id || 0}
+                  value={form.Vendor_Id === 0 ? "" : form.Vendor_Id}
                   onChange={(e) => setField("Vendor_Id", Number(e.target.value))}
                   disabled={loading}
                   error={!!errors.Vendor_Id}
                   helperText={errors.Vendor_Id}
+                  className="input-bg-color label-black"
+                  
+                  // 1. Customize the Dropdown Container (The "Paper")
+                  SelectProps={{
+                    MenuProps: {
+                      PaperProps: {
+                        sx: {
+                          borderRadius: 2,
+                          marginTop: 1,
+                          boxShadow: '0px 4px 20px rgba(0,0,0,0.1)', // Soft modern shadow
+                          border: '1px solid',
+                          borderColor: 'divider',
+                          maxHeight: 300, // Good for long lists
+                        },
+                      },
+                      // Remove default padding to handle our own margins
+                      MenuListProps: { sx: { py: 1 } } 
+                    },
+                  }}
                 >
-                  <MenuItem value={0} disabled sx={{ color: "text.secondary", fontStyle: "italic" }}>
-                    Select Vendor
+                  {/* Placeholder option (Optional, if you want a clear option) */}
+                  <MenuItem value="" disabled sx={{ fontSize: '0.85rem', color: 'text.secondary' }}>
+                    <em>Choose a vendor...</em>
                   </MenuItem>
-                  {vendors.map((v) => (
-                    <MenuItem key={v.Vendor_Id} value={v.Vendor_Id}>
-                      {v.vendorName}
+
+                  {vendorList.map((vendor) => (
+                    <MenuItem
+                      key={vendor.Vendor_Id}
+                      value={vendor.Vendor_Id}
+                      divider={false} // Turn off default lines
+                      sx={{
+                        // 2. The "Floating Pill" Shape
+                        borderRadius: '10px',
+                        margin: '6px 10px', // Creates space around the item
+                        padding: '10px 16px',
+                        transition: 'all 0.2s ease-in-out',
+
+                        // 3. Hover Effects
+                        '&:hover': {
+                          backgroundColor: 'primary.lighter', // or 'rgba(25, 118, 210, 0.08)'
+                          transform: 'translateX(5px)', // Slide right effect
+                          '& .vendor-avatar': {
+                            transform: 'scale(1.1) rotate(-5deg)', // Avatar animation
+                          }
+                        },
+
+                        // 4. Selected State Styling
+                        '&.Mui-selected': {
+                          backgroundColor: 'primary.main',
+                          color: 'common.white',
+                          '&:hover': {
+                            backgroundColor: 'primary.dark',
+                          },
+                          // Change sub-text color when selected
+                          '& .vendor-id-text': {
+                            color: 'rgba(255,255,255,0.7)', 
+                          }
+                        }
+                      }}
+                    >
+                      {/* Layout for Avatar + Text */}
+                      <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                        
+                        {/* Generated Avatar based on Name */}
+                        <Avatar 
+                          className="vendor-avatar"
+                          sx={{ 
+                            width: 28, 
+                            height: 28, 
+                            mr: 2, 
+                            fontSize: '0.75rem',
+                            bgcolor: 'primary.main', // or dynamic colors
+                            transition: 'transform 0.2s'
+                          }}
+                        >
+                          {vendor.Vendor_name ? vendor.Vendor_name.charAt(0).toUpperCase() : 'V'}
+                        </Avatar>
+
+                        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                          <Typography variant="body2" fontWeight={600}>
+                            {vendor.Vendor_name}
+                          </Typography>
+                          
+                        </Box>
+                      </Box>
                     </MenuItem>
                   ))}
                 </TextField>
@@ -425,6 +512,8 @@ const MachineDrawer: React.FC<MachineDrawerProps> = ({
                   placeholder="e.g. AA:BB:CC:DD:EE:FF"
                   fullWidth
                   value={form.Machine_mac || ""}
+                  error={!!errors.Machine_mac}
+                  helperText={errors.Machine_mac}
                   onChange={(e) => setField("Machine_mac", e.target.value)}
                   disabled={loading}
                   InputProps={{
@@ -527,79 +616,7 @@ const MachineDrawer: React.FC<MachineDrawerProps> = ({
                 />
               </Grid>
 
-              {/* ----- ESTATE CONFIGURATION CARD (Conditional) ----- */}
-              {/* <Grid item xs={12}>
-                <Collapse in={form.Machine_type === "Estate"} timeout="auto" unmountOnExit>
-                  <Paper
-                    elevation={0}
-                    sx={{
-                      p: 2,
-                      mt: 1,
-                      border: `1px dashed ${theme.palette.primary.main}`,
-                      bgcolor: alpha(theme.palette.primary.main, 0.04),
-                      borderRadius: 2,
-                    }}
-                  >
-                    <Stack direction="row" alignItems="center" spacing={1} mb={2}>
-                        <IconifyIcon icon="mdi:nature-people" color={theme.palette.primary.main} />
-                        <Typography variant="subtitle2" color="primary.main" fontWeight={700}>
-                            Estate Details
-                        </Typography>
-                    </Stack>
-
-                    <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                select
-                                label="Vehicle Option"
-                                fullWidth
-                                size="small"
-                                value={form.estateVehicleType || ""}
-                                onChange={(e) => setField("estateVehicleType", e.target.value)}
-                                error={!!errors.estateVehicleType}
-                                helperText={errors.estateVehicleType}
-                                sx={{ bgcolor: 'background.paper' }}
-                            >
-                                <MenuItem value="Own Vehicle">Own Vehicle</MenuItem>
-                                <MenuItem value="Other Vehicle">Other Vehicle</MenuItem>
-                            </TextField>
-                        </Grid>
-
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                select
-                                label="Material Type"
-                                fullWidth
-                                size="small"
-                                value={form.estateMaterialType || ""}
-                                onChange={(e) => setField("estateMaterialType", e.target.value)}
-                                error={!!errors.estateMaterialType}
-                                helperText={errors.estateMaterialType}
-                                sx={{ bgcolor: 'background.paper' }}
-                            >
-                                <MenuItem value="Own Leaf">Own Leaf</MenuItem>
-                                <MenuItem value="Baught Leaf">Baught Leaf</MenuItem>
-                                <MenuItem value="Dispatch Material">Dispatch Material</MenuItem>
-                                <MenuItem value="Other Material">Other Material</MenuItem>
-                            </TextField>
-                        </Grid>
-                        
-                        <Grid item xs={12} display="flex" justifyContent="flex-end">
-                             <Button 
-                                variant="contained" 
-                                size="small"
-                                color="primary" 
-                                onClick={handleEstateConfirm}
-                                startIcon={<IconifyIcon icon="mdi:check-circle-outline" />}
-                                sx={{ borderRadius: 20, px: 3, textTransform: 'none' }}
-                             >
-                                OK
-                             </Button>
-                        </Grid>
-                    </Grid>
-                  </Paper>
-                </Collapse>
-              </Grid> */}
+              
               {/* ------------------------------------------------ */}
 
               <Grid item xs={12}>

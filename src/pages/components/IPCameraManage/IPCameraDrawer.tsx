@@ -31,7 +31,7 @@ interface IPCameraDrawerProps {
   onClose: () => void;
   onSave: (data: IPCamera) => void;
   initialData: IPCamera | null;
-  machines: Machine[];
+  machineList: Machine[];
   loading: boolean;
 }
 
@@ -40,12 +40,12 @@ const IPCameraDrawer: React.FC<IPCameraDrawerProps> = ({
   onClose,
   onSave,
   initialData,
-  machines,
+  machineList,
   loading,
 }) => {
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
-  const drawerWidth = isMdUp ? 650 : "100%";
+  const drawerWidth = isMdUp ? 800 : "100%";
 
   // State
   const [showPassword, setShowPassword] = useState(false);
@@ -61,7 +61,7 @@ const IPCameraDrawer: React.FC<IPCameraDrawerProps> = ({
     Mac_address: "",
     Status: "Offline",
     Location: "",
-    InStalled_date: new Date().toISOString().split('T')[0],
+    Installed_date: new Date().toISOString().split('T')[0],
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof IPCamera, string>>>({});
@@ -88,7 +88,7 @@ const IPCameraDrawer: React.FC<IPCameraDrawerProps> = ({
             Mac_address: "",
             Status: "Offline",
             Location: "",
-            InStalled_date: new Date().toISOString().split('T')[0],
+            Installed_date: new Date().toISOString().split('T')[0],
         });
       }
     }
@@ -118,6 +118,18 @@ const IPCameraDrawer: React.FC<IPCameraDrawerProps> = ({
       newErrors.IP_address = "IP Address is required";
       isValid = false;
     }
+    // ---  Professional MAC Address Validation ---
+    const mac = form.Mac_address?.trim().toUpperCase();
+    const macRegex = /^([0-9A-F]{2}[:-]){5}([0-9A-F]{2})$/;
+
+
+    if (!mac) {
+      newErrors.Mac_address = "MAC address is required.";
+      isValid = false;
+    } else if (!macRegex.test(mac)) {
+      newErrors.Mac_address = "Invalid format. Expected: XX:XX:XX:XX:XX:XX";
+      isValid = false;
+    } 
     // Optional: Validate IP format regex if needed
     
     setErrors(newErrors);
@@ -130,40 +142,11 @@ const IPCameraDrawer: React.FC<IPCameraDrawerProps> = ({
     return isValid;
   };
 
-  // const handleSubmit = async () => {
-  //   if (!validate()) return;
-
-  //   const payload =  {
-  //     Machine_Id: 1,
-  //     Camera_name: form.Camera_name,
-  //     IP_address: form.IP_address,
-  //     RTSP_URL: form.RTSP_URL,
-  //     HTTP_URL: form.HTTP_URL,
-  //     Username: form.Username,
-  //     Password: form.Password,
-  //     Mac_address: form.Mac_address,
-  //     Status: form.Status,
-  //     Location: form.Location,
-  //     InStalled_date: form.InStalled_date,
-  //   }
-  //   console.log("-----response form -----", form)
-
-  //   try {
-  //     const response = await ipCameraApi.addIPcameraDetails(payload);
-  //     if (response?.success) {
-  //       onSave(response.data);
-  //       onClose();
-  //     }
-  //   } catch (error) {
-  //     console.log("response: ", error)
-  //   }
-  //   console.log("-----------called------------")
-  // };
   const handleSubmit = async () => {
     if (!validate()) return;
 
     const payload =  {
-      Machine_Id: 5,
+      Machine_Id: form.Machine_Id,
       Camera_name: form.Camera_name,
       IP_address: form.IP_address,
       RTSP_URL: form.RTSP_URL,
@@ -173,7 +156,7 @@ const IPCameraDrawer: React.FC<IPCameraDrawerProps> = ({
       Mac_address: form.Mac_address,
       Status: form.Status,
       Location: form.Location,
-      InStalled_date: form.InStalled_date,
+      Installed_date: form.Installed_date,
     }
     try {
       let response 
@@ -268,7 +251,7 @@ const IPCameraDrawer: React.FC<IPCameraDrawerProps> = ({
                 <Grid item xs={12}>
                     <TextField
                         label="Camera Name"
-                        className="input-bg-color  "
+                        className="input-bg-color label-black" 
                         placeholder="e.g. Main Gate Camera 01"
                         fullWidth
                         value={form.Camera_name}
@@ -297,9 +280,9 @@ const IPCameraDrawer: React.FC<IPCameraDrawerProps> = ({
                         <MenuItem value={0} disabled sx={{ color: 'text.secondary', fontStyle: 'italic' }}>
                             Select Machine
                         </MenuItem>
-                        {machines.map((m) => (
-                        <MenuItem key={m.id} value={m.id}>
-                            {m.machineName}
+                        {machineList.map((m) => (
+                        <MenuItem key={m.Machine_Id} value={m.Machine_Id}>
+                            {m.Machine_name}
                         </MenuItem>
                         ))}
                     </TextField>
@@ -317,7 +300,6 @@ const IPCameraDrawer: React.FC<IPCameraDrawerProps> = ({
                     >
                         <MenuItem value="Online">Online</MenuItem>
                         <MenuItem value="Offline">Offline</MenuItem>
-                        <MenuItem value="Error">Error</MenuItem>
                     </TextField>
                 </Grid>
 
@@ -346,8 +328,8 @@ const IPCameraDrawer: React.FC<IPCameraDrawerProps> = ({
                         className="input-bg-color label-black"
                         type="date"
                         fullWidth
-                        value={form.InStalled_date || ""}
-                        onChange={(e) => setField("InStalled_date", e.target.value)}
+                        value={form.Installed_date || ""}
+                        onChange={(e) => setField("Installed_date", e.target.value)}
                         disabled={loading}
                         InputLabelProps={{ shrink: true }}
                     />
@@ -384,6 +366,8 @@ const IPCameraDrawer: React.FC<IPCameraDrawerProps> = ({
                         placeholder="AA:BB:CC:DD:EE:FF"
                         fullWidth
                         value={form.Mac_address || ""}
+                        error={!!errors.Mac_address}
+                        helperText={errors.Mac_address}
                         onChange={(e) => setField("Mac_address", e.target.value)}
                         disabled={loading}
                     />

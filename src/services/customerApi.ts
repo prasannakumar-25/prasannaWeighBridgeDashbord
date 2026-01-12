@@ -43,7 +43,7 @@ const customerApi = {
     },
     deleteCustomerDetails : async (customer_id:number) => {
         try{
-            const response = await Authaxios.delete(`/delete/customer${customer_id}`)
+            const response = await Authaxios.delete(`/delete/customer/${customer_id}`)
             return response.data
         }
         catch (error){

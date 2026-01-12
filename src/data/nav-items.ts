@@ -7,151 +7,111 @@ export interface NavItem {
   sublist?: NavItem[];
 }
 
+// const role = localStorage.getItem('Role')
+
 const navItems: NavItem[] = [
+
   {
-    title: 'Authentication',
-    path: 'authentication',
-    icon: 'f7:exclamationmark-shield-fill',
-    active: true,
-    collapsible: true,
-    sublist: [ 
-      {
-        title: 'Sign In',
-        path: 'login',
-        active: true,
-        collapsible: false,
-      },
-      {
-        title: 'Sign Up',
-        path: 'sign-up',
-        active: true,
-        collapsible: false,
-      },
-      {
-        title: 'Forgot password',
-        path: 'forgot-password',
-        active: true,
-        collapsible: false,
-      },
-      {
-        title: 'Reset password',
-        path: 'reset-password',
-        active: true,
-        collapsible: false,
-      },
-    ],
-  },
-  {
-    title: 'Home',
+    title: 'Dashboard',
     path: '/',
     icon: 'ion:home-sharp',
     active: true,
     collapsible: false,
-    sublist: [
-      {
-        title: 'Dashboard',
-        path: '/',
-        active: false,
-        collapsible: false,
-      },
-      {
-        title: 'Sales',
-        path: '/',
-        active: false,
-        collapsible: false,
-      },
-    ],
   },
   {
-    title: 'Resgister',
-    path: 'register',
-    icon: 'game-icons:archive-register',
+    title: 'UserAdmin',
+    path: '/useradminManagement',
+    icon: 'eos-icons:admin-outlined',
     active: true,
-    collapsible: true,
-    sublist: [
-      {
-        title: 'Vendor',
-        path: 'vendor',
-        active: true,
-        collapsible: false,
-        sublist: [
-          {
-            title: 'Overview',
-            path: '#!',
-            active: false,
-            collapsible: false,
-          },
-          {
-            title: 'All Projects',
-            path: '#!',
-            active: false,
-            collapsible: false,
-          },
-        ],
-      },
-      {
-        title: 'MachineRegister',
-        path: '#!',
-        active: false,
-        collapsible: false,
-        sublist: [
-          {
-            title: 'All Users',
-            path: '#!',
-            active: false,
-            collapsible: false,
-          },
-          {
-            title: 'Add user',
-            path: '#!',
-            active: false,
-            collapsible: false,
-          },
-        ],
-      },
-      {
-        title: 'Users',
-        path: '#!',
-        active: false,
-        collapsible: false,
-        sublist: [
-          {
-            title: 'Setting',
-            path: '#!',
-            active: false,
-            collapsible: false,
-          },
-          {
-            title: 'Billing',
-            path: '#!',
-            active: false,
-            collapsible: false,
-          },
-          {
-            title: 'Invoice',
-            path: '#!',
-            active: false,
-            collapsible: false,
-          },
-        ],
-      },
-      {
-        title: 'Projects',
-        path: '#!',
-        active: false,
-        collapsible: false,
-        sublist: [
-          {
-            title: 'Timeline',
-            path: '#!',
-            active: false,
-            collapsible: false,
-          },
-        ],
-      },
-    ],
+    collapsible: false,
+    // sublist: [
+      
+    //   {
+    //     title: 'Users',
+    //     path: '#!',
+    //     active: false,
+    //     collapsible: false,
+        
+    //   },
+    // ],
   },
-  //   {
+  {
+    title: 'VendorRegister',
+    path: '/vendorManagement',
+    icon: 'stash:user-shield',
+    active: true,
+    collapsible: false,
+  },
+  {
+    title: 'MachineRegister',
+    path: '/machineManagemant',
+    icon: 'fluent-mdl2:connect-virtual-machine',
+    active: true,
+    collapsible: false,
+  },
+  // {
+  //   title: 'UserRgister',
+  //   path: '/userManagement',
+  //   icon: 'mdi:user-group-outline',
+  //   active: true,
+  //   collapsible: false,
+  // },
+  {
+    title: 'CustomerRegister',
+    path: '/customerRegister',
+    icon: 'heroicons-outline:user-group',
+    active: true,
+    collapsible: false,
+  },
+  {
+    title: 'VehicleRegister',
+    path: '/vehicleManagement',
+    icon: 'icon-park-solid:engineering-vehicle',
+    active: true,
+    collapsible: false,
+  },
+  {
+    title: 'IPCamera',
+    path: '/ipcameraManage',
+    icon: 'cbi:aqara-camera-g5',
+    active: true,
+    collapsible: false,
+  },
+  {
+    title: 'Weighbridge',
+    path: '/weighbridgeManage',
+    icon: 'icon-park:gate-machine',
+    active: true,
+    collapsible: false,
+  },
+];
+
+export default navItems;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // {
   //   title: 'Authentication',
   //   path: 'authentication',
   //   icon: 'f7:exclamationmark-shield-fill',
@@ -184,58 +144,9 @@ const navItems: NavItem[] = [
   //     },
   //   ],
   // },
-  {
-    title: 'VendorRegister',
-    path: '/vendorManagement',
-    icon: 'typcn:vendor-android',
-    active: true,
-    collapsible: false,
-  },
-  {
-    title: 'MachineManage',
-    path: '/machineManagemant',
-    icon: 'streamline-cyber:virtual-machine-3',
-    active: true,
-    collapsible: false,
-      //  sublist: [ 
-      // {
-      //   title: 'Reports',
-      //   path: '/',
-      //   active: true,
-      //   collapsible: false,
-      // },
-      //  ]
-  },
-  {
-    title: 'UserRgister',
-    path: '/userManagement',
-    icon: 'mdi:user-group-outline',
-    active: true,
-    collapsible: false,
-  },
-  {
-    title: 'VehicleRegister',
-    path: '/vehicleManagement',
-    icon: 'icon-park-solid:engineering-vehicle',
-    active: true,
-    collapsible: false,
-  },
-  {
-    title: 'IPCamera',
-    path: '/ipcameraManage',
-    icon: 'cbi:aqara-camera-g5',
-    active: true,
-    collapsible: false,
-  },
-  {
-    title: 'Weighbridge',
-    path: '/weighbridgeManage',
-    icon: 'game-icons:weight-scale',
-    active: true,
-    collapsible: false,
-  },
 
-  // {
+
+    // {
   //   title: 'Ecommerce',
   //   path: 'ecommerce1',
   //   icon: 'tabler:shopping-bag',
@@ -291,68 +202,65 @@ const navItems: NavItem[] = [
   //   ],
   // },
 
-  {
-    title: 'Notification',
-    path: '#!',
-    icon: 'zondicons:notifications',
-    active: true,
-    collapsible: true,
-    sublist: [
-      {
-        title: 'VnedorNf',
-        path: '/',
-        active: true,
-        collapsible: false,
-      },
-      {
-        title: 'MachineNf',
-        path: '/',
-        active: true,
-        collapsible: false,
-      },
-      {
-        title: 'CustomerNf',
-        path: '/',
-        active: true,
-        collapsible: false,
-      },
-    ]
-  },
+  // {
+  //   title: 'Notification',
+  //   path: '#!',
+  //   icon: 'zondicons:notifications',
+  //   active: true,
+  //   collapsible: true,
+  //   sublist: [
+  //     {
+  //       title: 'VnedorNf',
+  //       path: '/',
+  //       active: true,
+  //       collapsible: false,
+  //     },
+  //     {
+  //       title: 'MachineNf',
+  //       path: '/',
+  //       active: true,
+  //       collapsible: false,
+  //     },
+  //     {
+  //       title: 'CustomerNf',
+  //       path: '/',
+  //       active: true,
+  //       collapsible: false,
+  //     },
+  //   ]
+  // },
   
-  {
-    title: 'Calendar',
-    path: '#!',
-    icon: 'ph:calendar',
-    active: true,
-    collapsible: true,
-    sublist: [
-      {
-        title: 'Sign In',
-        path: '/login',
-        active: true,
-        collapsible: false,
-      },
-      {
-        title: 'Sign Up',
-        path: 'sign-up',
-        active: true,
-        collapsible: false,
-      },
-      {
-        title: 'Forgot password',
-        path: 'forgot-password',
-        active: true,
-        collapsible: false,
-      },
-    ]
-  },
-  {
-    title: 'Message',
-    path: '#!',
-    icon: 'ph:chat-circle-dots-fill',
-    active: true,
-    collapsible: false,
-  },
-];
-
-export default navItems;
+  // {
+  //   title: 'Calendar',
+  //   path: '#!',
+  //   icon: 'ph:calendar',
+  //   active: true,
+  //   collapsible: true,
+  //   sublist: [
+  //     {
+  //       title: 'Sign In',
+  //       path: '/login',
+  //       active: true,
+  //       collapsible: false,
+  //     },
+  //     {
+  //       title: 'Sign Up',
+  //       path: 'sign-up',
+  //       active: true,
+  //       collapsible: false,
+  //     },
+  //     {
+  //       title: 'Forgot password',
+  //       path: 'forgot-password',
+  //       active: true,
+  //       collapsible: false,
+  //     },
+  //   ]
+  // },
+  // {
+  //   title: 'Message',
+  //   path: '#!',
+  //   icon: 'ph:chat-circle-dots-fill',
+  //   active: true,
+  //   collapsible: false,
+  // },

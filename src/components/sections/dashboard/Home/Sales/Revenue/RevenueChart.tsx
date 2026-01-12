@@ -21,14 +21,14 @@ const RevenueChart = ({ chartRef, seriesData, legendData, colors, ...rest }: Rev
     () => ({
       xAxis: {
         type: 'category',
-        data: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August'],
+        data: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'Decomber'],
         boundaryGap: false,
         axisLine: {
           show: true,
           lineStyle: {
             color: theme.palette.divider,
             width: 1,
-            type: 'dashed',
+            type: 'dashed', 
           },
         },
         axisLabel: {

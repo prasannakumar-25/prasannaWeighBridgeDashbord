@@ -43,7 +43,7 @@ const partialDetailsApi = {
     },
     deletePartialDetails : async (partial_id:number) => {
         try{
-            const response = await Authaxios.delete(`/delete/partialDetails${partial_id}`)
+            const response = await Authaxios.delete(`/delete/partialDetails/${partial_id}`)
             return response.data
         }
         catch (error){

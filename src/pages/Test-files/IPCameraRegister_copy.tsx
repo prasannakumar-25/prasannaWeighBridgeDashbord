@@ -1614,3 +1614,93 @@
 // };
 
 // export default IPCameraRegister;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // const handleSave = async (form: Vendor) => {
+  //   setLoading(true);
+  //   try {
+  //     const payload = {
+  //       Super_Id: 0,
+  //       Vendor_name: form.Vendor_name.trim(),
+  //       Contact_number: form.Contact_number?.trim(),
+  //       Email: form.Email?.trim().toLowerCase(),
+  //       Address: form.Address?.trim(),
+
+  //       Gst_number: form.Gst_number?.trim(),
+  //       Website: form.Website?.trim()
+  //     };
+  //     // const response = await vendorApi.addVendor(payload);
+      
+
+  //     if (editingVendor) {
+        
+  //       setVendors((prev) => prev.map((v) => (v.Vendor_Id === editingVendor.Vendor_Id ? { ...form, Vendor_Id: editingVendor.Vendor_Id, Created_at: v.Created_at } : v)));
+  //       setSnackbarMessage("Vendor updated successfully");
+  //       setLoading(false);
+  //     } else {
+  //       const response = await vendorApi.addVendor(payload);
+  //       if (response.success) {
+  //         setVendors(response.data)
+  //       } else {
+  //         setSnackbarMessage(response.message || "failed to Added the Vendor")
+  //       }
+        
+  //       // Mock Add
+  //       const newVendor = { ...form, Vendor_Id: Date.now(), Created_at: new Date().toISOString() };
+  //       setVendors(prev => [newVendor, ...prev]);
+  //       setSnackbarMessage("Vendor registered successfully!");
+  //     }
+  //     setSnackbarOpen(true);
+  //     handleCloseDrawer();
+  //   } catch (error: any) {
+  //     setSnackbarMessage(error.response?.data.message || "Error saving vendor");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+
+    // --- API / Effect ---
+  // const fetchVendor = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const response = await vendorApi.getVendordetails();
+  //     if (response.success) {
+  //       const mappedData: Vendor[] = response.data.map((v: ApiVendor) => ({
+  //         id: v.id,
+  //         Vendor_name: v.Vendor_name,
+  //         Contact_number: v.Contact_number,
+  //         Email: v.Email,
+  //         Website: v.Website,
+  //         Gst_number: v.Gst_number,
+  //         Address: v.Address,
+  //         Created_at: v.Created_at || new Date().toISOString(),
+  //       }));
+  //       setVendors(mappedData);
+  //     } else {
+  //       enqueueSnackbar(response.message || "Failed to fetch vendors", { variant: "error" });
+  //     }
+  //   } catch (error: any) {
+  //     const errorMessage = error.response?.data.message || "Error fetching vendors";
+  //     enqueueSnackbar(errorMessage, { variant: "error" });
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };

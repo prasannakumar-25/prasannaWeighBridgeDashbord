@@ -1,5 +1,4 @@
 
-
 import React, { useEffect, useState } from "react";
 import {
   Dialog,
@@ -11,6 +10,7 @@ import {
   Snackbar,
   Alert,
   LinearProgress,
+  Box
 } from "@mui/material";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -24,11 +24,12 @@ import VehicleDrawer from "pages/components/VehicleManage/VehicleDawer";
 
 import IconifyIcon from "components/base/IconifyIcon";
 import vehicletypeApi from "services/vehicletypeApi";
+import vendorApi from "services/vendorApi";
 
 // --- Types ---
 export type Vendor = {
   Vendor_Id: number;
-  vendorName: string;
+  Vendor_name: string;
 };
 
 export type Machine = {
@@ -42,6 +43,7 @@ export type Vehicle = {
   Vehicle_Id: number;
   Vehicle_type: string;
   Vendor_Id?: number;
+  Vendor_name?: string;
   customerId?: number;
   Tare_weight?: number;
   status: "Active" | "Inactive";
@@ -78,7 +80,15 @@ const VehicleRegister: React.FC = () => {
         setVehicles(response.data);
       } else {
         setSnackbarMessage(response.message || "Failed to fetch vehicle data");
+        setSnackbarOpen(true);
       }
+
+        // 2. Fetch Vendors (For the dropdown in Drawer)
+      const vendorRes = await vendorApi.getVendordetails();
+      if (vendorRes.success) {
+        setVendors(vendorRes.data);
+      } 
+
     } catch (error: any) {
       const errorMessage = error.response?.data.message || "Something error occurred please try again later";
       setSnackbarMessage(errorMessage);
@@ -89,21 +99,11 @@ const VehicleRegister: React.FC = () => {
   };
 
 
-  // function SlideRightToLeft(props: SlideProps) {
-  //   return <Slide {...props} direction="left" />;
-  // }
 
   // Load Data Mock
   useEffect(() => {
     setLoading(true);
     fetchVehicle();
-    // setVendors([
-    //     { id: 1, vendorName: "TechCorp Industries" },
-    //     { id: 2, vendorName: "Global Logistics" }
-    // ]);
-    // setMachines([
-    //     { id: 101, vendorId: 1, machineName: "Machine A", machineType: "Company" }
-    // ]);
     setLoading(false);
   }, []);
 
@@ -123,39 +123,18 @@ const VehicleRegister: React.FC = () => {
     setEditingVehicle(null);
   };
 
-  // const handleSaveVehicle = async (formData: Vehicle) => {
-  //   setLoading(true);
-  //   // Mimic API Call
-  //   try {
-  //     setTimeout(() => {
-  //       if (editingVehicle) {
-  //            setVehicles(prev => prev.map(v => v.Vehicle_Id === formData.Vehicle_Id ? formData : v));
-  //            setSnackbarMessage("Vehicle updated successfully!");
-  //       } else {
-  //            const newVehicle = { ...formData, Vehicle_Id: Date.now() };
-  //            setVehicles(prev => [newVehicle, ...prev]);
-  //            setSnackbarMessage("Vehicle added successfully!");
-  //       }
-  //       setLoading(false);
-  //       setSnackbarOpen(true)
-  //       handleCloseDrawer();
-  //     }, 500); 
-  //   } catch (error) {
-  //      setSnackbarMessage("Error saving data");
-  //      setLoading(false);
-  //   }
-  // };
-    const handleSaveVehicle = async () => {
-    setLoading(true);
-     await fetchVehicle();          // 🔹 refresh list from API
-     setSnackbarMessage(
-       editingVehicle
-         ? "Vehicle updated successfully"
-         : "Vehicle added successfully"
-     );
-     setSnackbarOpen(true);
-     handleCloseDrawer();           // 🔹 close drawer
-    
+
+  const handleSaveVehicle = async () => {
+  setLoading(true);
+   await fetchVehicle();          // 🔹 refresh list from API
+   setSnackbarMessage(
+     editingVehicle
+       ? "Vehicle updated successfully"
+       : "Vehicle added successfully"
+   );
+   setSnackbarOpen(true);
+   handleCloseDrawer();           // 🔹 close drawer
+   setLoading(false);
   }
 
   // --- Delete Logic ---
@@ -200,10 +179,10 @@ const VehicleRegister: React.FC = () => {
         {/* 1. Main Table View */}
         <VehicleMain 
             vehicles={vehicles}
-            vendors={vendors}
             onAdd={handleOpenAdd}
             onEdit={handleOpenEdit}
             onDelete={initiateDelete}
+            vendorList={vendors} // <--- Passing Vendors here
             onRefresh={fetchVehicle}
             loading={loading}
         />
@@ -215,13 +194,13 @@ const VehicleRegister: React.FC = () => {
             onClose={handleCloseDrawer}
             onSave={handleSaveVehicle}
             initialData={editingVehicle}
-            vendors={vendors}
+            vendorList={vendors} // <--- Passing Vendors here
             machines={machines}
             loading={loading}
         />
 
         {/* 3. Global Dialogs */}
-        <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)} maxWidth="xs" fullWidth>
+        {/* <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)} maxWidth="xs" fullWidth>
             <DialogTitle>Confirm Delete</DialogTitle>
             <DialogContent>
                 <Typography>Are you sure you want to delete this Vehicle?</Typography>
@@ -232,14 +211,107 @@ const VehicleRegister: React.FC = () => {
                 startIcon={<IconifyIcon icon = "wpf:delete"/>}
                 >Delete</Button>
             </DialogActions> 
-        </Dialog>
+        </Dialog> */}
+
+         
+        <Dialog
+  open={deleteDialogOpen}
+  onClose={() => setDeleteDialogOpen(false)}
+  maxWidth="xs"
+  fullWidth
+  PaperProps={{
+    sx: {
+      borderRadius: 2.5,
+      overflow: "hidden",
+    },
+  }}
+>
+  {/* Header */}
+  <Box
+    sx={{
+      px: 3,
+      py: 2,
+      bgcolor: "grey.100",
+      borderBottom: "1px solid",
+      borderColor: "divider",
+      display: "flex",
+      alignItems: "center",
+      gap: 1.5,
+    }}
+  >
+    <IconifyIcon
+      icon="mdi:alert-circle-outline"
+      style={{ fontSize: 24, color: "#d32f2f" }}
+    />
+    <Typography variant="h6" fontWeight={600}>
+      Confirm Delete
+    </Typography>
+  </Box>
+
+  {/* Content */}
+  <DialogContent sx={{ px: 3, py: 2.5 }}>
+    <Typography variant="body1">
+      Are you sure you want to delete this vehicle?
+    </Typography>
+
+    <Typography
+      variant="body2"
+      color="text.secondary"
+      sx={{ mt: 1 }}
+    >
+      This action cannot be undone and will permanently remove the record.
+    </Typography>
+  </DialogContent>
+
+  {/* Actions */}
+  <DialogActions
+    sx={{
+      px: 3,
+      py: 2,
+      borderTop: "1px solid",
+      borderColor: "divider",
+      justifyContent: "flex-end",
+      gap: 1,
+    }}
+  >
+    <Button
+      onClick={() => setDeleteDialogOpen(false)}
+      variant="outlined"
+      color="inherit"
+      sx={{
+        textTransform: "none",
+        borderRadius: 2,
+      }}
+    >
+      Cancel
+    </Button>
+
+    <Button
+      onClick={confirmDelete}
+      variant="contained"
+      color="error"
+      startIcon={<IconifyIcon icon="mdi:delete-outline" />}
+      sx={{
+        textTransform: "none",
+        borderRadius: 2,
+        boxShadow: "0 6px 14px rgba(211,47,47,0.35)",
+      }}
+    >
+      Delete
+    </Button>
+  </DialogActions>
+</Dialog>
+
+
+
+
 
         {/* 4. Global Snackbar */}
-        {/* <Snackbar
+        <Snackbar
             open={snackbarOpen}
             autoHideDuration={3000}
             onClose={() => setSnackbarOpen(false)}
-            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
         >
             <Alert onClose={() => setSnackbarOpen(false)} severity="success" variant="filled">
                 {snackbarMessage}
@@ -262,54 +334,7 @@ const VehicleRegister: React.FC = () => {
               }}
             />
             </Alert>
-        </Snackbar> */}
-        <Snackbar
-          open={snackbarOpen}
-          autoHideDuration={3500}
-          onClose={() => setSnackbarOpen(false)}
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-          // TransitionComponent={SlideRightToLeft}
-          TransitionProps={{ timeout: 550 }}
-        >
-          <Alert
-            severity="success"
-            onClose={() => setSnackbarOpen(false)}
-            icon={false}
-            sx={{
-              minWidth: 340,
-              borderRadius: 2,
-              bgcolor: '#83cc89ff',
-              color: '#000000ff',
-              border: '1px solid #c8e6c9',
-              boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
-              fontWeight: 500,
-              p: 1.5,
-              pb: 0.5,
-            }}
-          >
-            {snackbarMessage}
-
-            <LinearProgress
-              variant="determinate"
-              value={100}
-              sx={{
-                mt: 1,
-                height: 4,
-                borderRadius: 2,
-                bgcolor: '#c8e6c9',
-                '& .MuiLinearProgress-bar': {
-                  bgcolor: '#66bb6a',
-                  animation: 'snackbarProgress 3.5s linear forwards',
-                },
-                '@keyframes snackbarProgress': {
-                  to: { width: '100%' },
-                  from: { width: '0%' },
-                },
-              }}
-            />
-          </Alert>
         </Snackbar>
-
       </div>
     </LocalizationProvider>
   );

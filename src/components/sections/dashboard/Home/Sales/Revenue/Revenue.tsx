@@ -18,7 +18,7 @@ const Revenue = (): ReactElement => {
   const seriesData: LineSeriesOption[] = [
     {
       id: 1,
-      data: [65, 210, 175, 140, 105, 20, 120, 20],
+      data: [65, 210, 175, 140, 105, 20, 120, 20, 100, 300, 250, 400],
       type: 'line',
       smooth: true,
       color: lineChartColors[0],
@@ -32,7 +32,7 @@ const Revenue = (): ReactElement => {
     },
     {
       id: 2,
-      data: [20, 125, 100, 30, 150, 300, 90, 180],
+      data: [20, 125, 100, 30, 150, 300, 90, 180, 210, 250, 200, 350],
       type: 'line',
       smooth: true,
       color: lineChartColors[1],
